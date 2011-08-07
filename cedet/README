@@ -4,3 +4,9 @@
 -'semantic-idle-completion-list-default', report errors as messages if
 'semantic-idle-scheduler-verbose-flag' is non-nil
 
+# search.for.additional.matches.diff [bzr r8077 | committed]
+
+-'semantic-collector-abstract'|'semantic-collector-calculate-completions',
+search for additional matches if new prefix is a substring of the old
+prefix
+
