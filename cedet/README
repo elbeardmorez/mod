@@ -1,0 +1,6 @@
+
+# report.errors.as.messages.in.verbose.mode.diff [bzr r8076 | committed]
+
+-'semantic-idle-completion-list-default', report errors as messages if
+'semantic-idle-scheduler-verbose-flag' is non-nil
+

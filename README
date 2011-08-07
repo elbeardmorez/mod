@@ -4,6 +4,9 @@ a dumping ground for patches which modify or add functionality
 
 ## projects
 
+### cedet
+-report.errors.as.messages.in.verbose.mode.diff [bzr r8076 | committed]
+
 ### qmc2
 -darkone-arcade-theme [svn r4926 | committed]
 
