@@ -10,3 +10,21 @@
 search for additional matches if new prefix is a substring of the old
 prefix
 
+# new.behavior.and.options.for.semantic-displayor-tooltip.class.diff [bzr r8089 | committed]
+
+-new defcustoms to fine-tune behavior of displayor-tooltip class:
+(semantic-displayor-tooltip-mode)
+(semantic-displayor-tooltip-initial-max-tags)
+(semantic-displayor-tooltip-max-tags)
+
+-'semantic-displayor-tooltip', use new variables as initforms. use
+new slot 'mode' instead of 'force-show', rename 'max-tags' to
+'max-tags-initial'.
+
+-'semantic-displayor-tooltip'|'semantic-displayor-show-request',
+display completions according to new modes, replacing the old
+'force-show' behavior. also, make variable names clearer
+
+-'semantic-displayor-tooltip'|'semantic-displayor-scroll-request',
+use new max-tags-initial slot
+

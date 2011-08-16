@@ -7,6 +7,7 @@ a dumping ground for patches which modify or add functionality
 ### cedet
 -report.errors.as.messages.in.verbose.mode.diff [bzr r8076 | committed]
 -search.for.additional.matches.diff [bzr r8077 | committed]
+-new.behavior.and.options.for.semantic-displayor-tooltip.class.v2.diff [bzr r8089 | committed]
 
 ### qmc2
 -darkone-arcade-theme [svn r4926 | committed]
