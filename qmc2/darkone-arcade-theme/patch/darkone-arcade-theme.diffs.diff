@@ -1,0 +1,920 @@
+Index: arcade/arcadesettings.cpp
+===================================================================
+--- arcade/arcadesettings.cpp	(revision 4925)
++++ arcade/arcadesettings.cpp	(working copy)
+@@ -217,6 +217,114 @@
+     return value(QString("Arcade/%1/showShaderEffect").arg(arcadeTheme), false).toBool();
+ }
+ 
++void ArcadeSettings::setToolbarHidden(bool hidden)
++{
++    setValue(QString("Arcade/%1/toolbarHidden").arg(arcadeTheme), hidden);
++}
++bool ArcadeSettings::toolbarHidden()
++{
++    return value(QString("Arcade/%1/toolbarHidden").arg(arcadeTheme), false).toBool();
++}
++
++void ArcadeSettings::setListHidden(bool hidden)
++{
++    setValue(QString("Arcade/%1/listHidden").arg(arcadeTheme), hidden);
++}
++bool ArcadeSettings::listHidden()
++{
++    return value(QString("Arcade/%1/listHidden").arg(arcadeTheme), false).toBool();
++}
++
++void ArcadeSettings::setSortByName(bool sortByName)
++{
++    setValue(QString("Arcade/%1/sortByName").arg(arcadeTheme), sortByName);
++}
++bool ArcadeSettings::sortByName()
++{
++    return value(QString("Arcade/%1/sortByName").arg(arcadeTheme), true).toBool();
++}
++
++void ArcadeSettings::setToolbarAutoHide(bool toolbarAutoHide)
++{
++    setValue(QString("Arcade/%1/toolbarAutoHide").arg(arcadeTheme), toolbarAutoHide);
++}
++bool ArcadeSettings::toolbarAutoHide()
++{
++    return value(QString("Arcade/%1/toolbarAutoHide").arg(arcadeTheme), true).toBool();
++}
++
++void ArcadeSettings::setBackLight(bool backLight)
++{
++    setValue(QString("Arcade/%1/backLight").arg(arcadeTheme), backLight);
++}
++bool ArcadeSettings::backLight()
++{
++    return value(QString("Arcade/%1/backLight").arg(arcadeTheme), false).toBool();
++}
++
++void ArcadeSettings::setDisableLaunchFlash(bool disableLaunchFlash)
++{
++    setValue(QString("Arcade/%1/disableLaunchFlash").arg(arcadeTheme), disableLaunchFlash);
++}
++bool ArcadeSettings::disableLaunchFlash()
++{
++    return value(QString("Arcade/%1/disableLaunchFlash").arg(arcadeTheme), false).toBool();
++}
++
++void ArcadeSettings::setDisableZoom(bool disableZoom)
++{
++    setValue(QString("Arcade/%1/disableZoom").arg(arcadeTheme), disableZoom);
++}
++bool ArcadeSettings::disableZoom()
++{
++    return value(QString("Arcade/%1/disableZoom").arg(arcadeTheme), false).toBool();
++}
++
++void ArcadeSettings::setOverlayScale(double overlayScale)
++{
++    setValue(QString("Arcade/%1/overlayScale").arg(arcadeTheme), overlayScale);
++}
++double ArcadeSettings::overlayScale()
++{
++    return value(QString("Arcade/%1/overlayScale").arg(arcadeTheme), 1.0).toDouble();
++}
++
++void ArcadeSettings::setLightTimeout(double lightTimeout)
++{
++    setValue(QString("Arcade/%1/lightTimeout").arg(arcadeTheme), lightTimeout);
++}
++double ArcadeSettings::lightTimeout()
++{
++    return value(QString("Arcade/%1/lightTimeout").arg(arcadeTheme), 60).toDouble();
++}
++
++void ArcadeSettings::setDataTypePrimary(QString dataTypePrimary)
++{
++    setValue(QString("Arcade/%1/dataTypePrimary").arg(arcadeTheme), dataTypePrimary);
++}
++QString ArcadeSettings::dataTypePrimary()
++{
++    return value(QString("Arcade/%1/dataTypePrimary").arg(arcadeTheme), "title").toString();
++}
++
++void ArcadeSettings::setDataTypeSecondary(QString dataTypeSecondary)
++{
++    setValue(QString("Arcade/%1/dataTypeSecondary").arg(arcadeTheme), dataTypeSecondary);
++}
++QString ArcadeSettings::dataTypeSecondary()
++{
++    return value(QString("Arcade/%1/dataTypeSecondary").arg(arcadeTheme), "preview").toString();
++}
++
++void ArcadeSettings::setColourScheme(QString colourScheme)
++{
++    setValue(QString("Arcade/%1/colourScheme").arg(arcadeTheme), colourScheme);
++}
++QString ArcadeSettings::colourScheme()
++{
++    return value(QString("Arcade/%1/colourScheme").arg(arcadeTheme), "metal").toString();
++}
++
+ QString ArcadeSettings::gameListCacheFile()
+ {
+     return value(QString("%1/FilesAndDirectories/GamelistCacheFile").arg(emulatorPrefix)).toString();
+@@ -351,3 +459,24 @@
+ {
+     return value(QString("%1/GUI/Language").arg(frontEndPrefix)).toString();
+ }
++
++QString ArcadeSettings::gameInfoDB()
++{
++    return value(QString("%1/FilesAndDirectories/GameInfoDB").arg(emulatorPrefix)).toString();
++}
++
++bool ArcadeSettings::compressGameInfoDB()
++{
++    return value(QString("%1/GUI/CompressGameInfoDB").arg(frontEndPrefix)).toBool();
++}
++
++QString ArcadeSettings::emuInfoDB()
++{
++    return value(QString("%1/FilesAndDirectories/EmuInfoDB").arg(emulatorPrefix)).toString();
++}
++
++bool ArcadeSettings::compressEmuInfoDB()
++{
++    return value(QString("%1/GUI/CompressEmuInfoDB").arg(frontEndPrefix)).toBool();
++}
++
+Index: arcade/arcadesettings.h
+===================================================================
+--- arcade/arcadesettings.h	(revision 4925)
++++ arcade/arcadesettings.h	(working copy)
+@@ -41,22 +41,48 @@
+     // theme-specific settings
+     void setFpsVisible(bool);
+     bool fpsVisible();
++    void setFullScreen(bool);
++    bool fullScreen();
++    void setLastIndex(int);
++    int lastIndex();
++    // ToxicWaste
+     void setShowBackgroundAnimation(bool);
+     bool showBackgroundAnimation();
+     void setAnimateInForeground(bool);
+     bool animateInForeground();
+-    void setFullScreen(bool);
+-    bool fullScreen();
+     void setSecondaryImageType(QString);
+     QString secondaryImageType();
+     void setCabinetFlipped(bool);
+     bool cabinetFlipped();
+-    void setLastIndex(int);
+-    int lastIndex();
+     void setMenuHidden(bool);
+     bool menuHidden();
+     void setShowShaderEffect(bool);
+     bool showShaderEffect();
++    // darkone
++    void setToolbarHidden(bool);
++    bool toolbarHidden();
++    void setListHidden(bool);
++    bool listHidden();
++    void setSortByName(bool);
++    bool sortByName();
++    void setBackLight(bool);
++    bool backLight();
++    void setToolbarAutoHide(bool);
++    bool toolbarAutoHide();
++    void setDisableLaunchFlash(bool);
++    bool disableLaunchFlash();
++    void setDisableZoom(bool);
++    bool disableZoom();
++    void setDataTypePrimary(QString);
++    QString dataTypePrimary();
++    void setDataTypeSecondary(QString);
++    QString dataTypeSecondary();
++    void setLightTimeout(double);
++    double lightTimeout();
++    void setOverlayScale(double);
++    double overlayScale();
++    void setColourScheme(QString);
++    QString colourScheme();
+ 
+     // main frontend / emulator settings (from QMC2, read-only)
+     QString gameListCacheFile();
+@@ -86,6 +112,10 @@
+     QString emulatorExecutablePath();
+     QString emulatorWorkingDirectory();
+     QString language();
++    QString gameInfoDB();
++    bool compressGameInfoDB();
++    QString emuInfoDB();
++    bool compressEmuInfoDB();
+ };
+ 
+ #endif
+Index: arcade/imageprovider.cpp
+===================================================================
+--- arcade/imageprovider.cpp	(revision 4925)
++++ arcade/imageprovider.cpp	(working copy)
+@@ -34,35 +34,13 @@
+ QImage ImageProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
+ {
+     QImage image, result;
+-    QStringList idWords = id.split("/", QString::SkipEmptyParts);
+-    if ( idWords.count() > 1 ) {
+-        QString imageType = idWords[0];
+-        QString gameId = idWords[1];
+-        QString cacheKey = imageType + "-" + gameId;
+-        if ( mImageCache.contains(cacheKey) )
+-            image = *mImageCache.object(cacheKey);
+-        else if ( isZippedImageType(imageType) )
+-            image = loadZippedImage(imageType, gameId);
+-        else {
+-            QStringList imageFolders = imageFolder(imageType).split(";", QString::SkipEmptyParts);
+-            if ( !imageFolders.isEmpty() ) {
+-                foreach (QString folder, imageFolders) {
+-                    QString fileName = QFileInfo(folder + "/" + gameId + ".png").absoluteFilePath();
+-                    if ( !image.load(fileName) )
+-                        image.load(QLatin1String(":/images/ghost.png"));
+-                    else
+-                        break;
+-                }
+-                mImageCache.insert(cacheKey, new QImage(image));
+-            } else {
+-                QMC2_ARCADE_LOG_STR(QObject::tr("WARNING: ImageProvider::requestImage(): invalid image type '%1' requested").arg(imageType));
+-                image.load(QLatin1String(":/images/ghost.png"));
+-            }
+-        }
+-    } else {
+-        QMC2_ARCADE_LOG_STR(QObject::tr("WARNING: ImageProvider::requestImage(): invalid image ID '%1' requested").arg(id));
+-        image.load(QLatin1String(":/images/ghost.png"));
+-    }
++    QString cacheKey = "";
++    if (id != "")
++       cacheKey = loadImage(id, CacheClassImage);
++    if (cacheKey != "")
++       image = *mImageCache.object(cacheKey);
++    else
++       image.load(QLatin1String(":/images/ghost.png"));
+     if ( requestedSize.isValid() )
+         result = image.scaled(requestedSize, Qt::KeepAspectRatio);
+     else
+@@ -75,35 +53,13 @@
+ QPixmap ImageProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize)
+ {
+     QPixmap image, result;
+-    QStringList idWords = id.split("/", QString::SkipEmptyParts);
+-    if ( idWords.count() > 1 ) {
+-        QString imageType = idWords[0];
+-        QString gameId = idWords[1];
+-        QString cacheKey = imageType + "-" + gameId;
+-        if ( mPixmapCache.contains(cacheKey) )
+-            image = *mPixmapCache.object(cacheKey);
+-        else if ( isZippedImageType(imageType) )
+-            image = loadZippedPixmap(imageType, gameId);
+-        else {
+-            QStringList imageFolders = imageFolder(imageType).split(";", QString::SkipEmptyParts);
+-            if ( !imageFolders.isEmpty() ) {
+-                foreach (QString folder, imageFolders) {
+-                    QString fileName = QFileInfo(folder + "/" + gameId + ".png").absoluteFilePath();
+-                    if ( !image.load(fileName) )
+-                        image.load(QLatin1String(":/images/ghost.png"));
+-                    else
+-                        break;
+-                }
+-                mPixmapCache.insert(cacheKey, new QPixmap(image));
+-            } else {
+-                QMC2_ARCADE_LOG_STR(QObject::tr("WARNING: ImageProvider::requestImage(): invalid image type '%1' requested").arg(imageType));
+-                image.load(QLatin1String(":/images/ghost.png"));
+-            }
+-        }
+-    } else {
+-        QMC2_ARCADE_LOG_STR(QObject::tr("WARNING: ImageProvider::requestImage(): invalid image ID '%1' requested").arg(id));
+-        image.load(QLatin1String(":/images/ghost.png"));
+-    }
++    QString cacheKey = "";
++    if (id != "")
++       cacheKey = loadImage(id, CacheClassPixmap);
++    if (cacheKey != "")
++       image = *mPixmapCache.object(cacheKey);
++    else
++       image.load(QLatin1String(":/images/ghost.png"));
+     if ( requestedSize.isValid() )
+         result = image.scaled(requestedSize, Qt::KeepAspectRatio);
+     else
+@@ -113,58 +69,128 @@
+     return result;
+ }
+ 
+-QImage ImageProvider::loadZippedImage(QString imageType, QString id)
++QString ImageProvider::loadImage(const QString &id)
+ {
+-    QString cacheKey = imageType + "-" + id;
+-    if ( mImageCache.contains(cacheKey) )
+-        return *mImageCache.object(cacheKey);
+-    QImage zippedImage;
+-    QString imageFileName = id + ".png";
+-    unzFile imageFile = mZipFileMap[imageType];
+-    if ( imageFile && unzLocateFile(imageFile, (const char *)imageFileName.toLocal8Bit(), 0) == UNZ_OK ) {
+-        QByteArray imageData;
+-        char imageBuffer[QMC2_ARCADE_ZIP_BUFSIZE];
+-        if ( unzOpenCurrentFile(imageFile) == UNZ_OK ) {
+-            int len = 0;
+-            while ( (len = unzReadCurrentFile(imageFile, &imageBuffer, QMC2_ARCADE_ZIP_BUFSIZE)) > 0 ) {
+-                for (int i = 0; i < len; i++)
+-                    imageData += imageBuffer[i];
+-            }
+-            unzCloseCurrentFile(imageFile);
+-            zippedImage.loadFromData(imageData, "PNG");
+-        } else
+-            zippedImage.load(QLatin1String(":/images/ghost.png"));
+-        mImageCache.insert(cacheKey, new QImage(zippedImage));
+-    } else
+-        zippedImage.load(QLatin1String(":/images/ghost.png"));
+-    return zippedImage;
++    if (id == "")
++        return "";
++
++    QString cacheKey;
++    cacheKey = loadImage(id, CacheClassImage);
++    if (cacheKey != "") return cacheKey;
++    cacheKey = loadImage(id, CacheClassPixmap);
++    if (cacheKey != "") return cacheKey;
++
++    return "";
+ }
+ 
+-QPixmap ImageProvider::loadZippedPixmap(QString imageType, QString id)
++//don't cache missing
++QString ImageProvider::loadImage(const QString &id, const enum CacheClass cacheClass)
+ {
+-    QString cacheKey = imageType + "-" + id;
+-    if ( mPixmapCache.contains(cacheKey) )
+-        return *mPixmapCache.object(cacheKey);
+-    QPixmap zippedImage;
+-    QString imageFileName = id + ".png";
+-    unzFile imageFile = mZipFileMap[imageType];
+-    if ( imageFile && unzLocateFile(imageFile, (const char *)imageFileName.toLocal8Bit(), 0) == UNZ_OK ) {
+-        QByteArray imageData;
+-        char imageBuffer[QMC2_ARCADE_ZIP_BUFSIZE];
+-        if ( unzOpenCurrentFile(imageFile) == UNZ_OK ) {
+-            int len = 0;
+-            while ( (len = unzReadCurrentFile(imageFile, &imageBuffer, QMC2_ARCADE_ZIP_BUFSIZE)) > 0 ) {
+-                for (int i = 0; i < len; i++)
+-                    imageData += imageBuffer[i];
+-            }
+-            unzCloseCurrentFile(imageFile);
+-            zippedImage.loadFromData(imageData, "PNG");
+-        } else
+-            zippedImage.load(QLatin1String(":/images/ghost.png"));
+-        mPixmapCache.insert(cacheKey, new QPixmap(zippedImage));
+-    } else
+-        zippedImage.load(QLatin1String(":/images/ghost.png"));
+-    return zippedImage;
++    if (id == "")
++        return "";
++
++    QString validCacheKey = "";
++    QStringList idWords = id.split("/", QString::SkipEmptyParts);
++    if ( idWords.count() == 0 ) {
++        QMC2_ARCADE_LOG_STR(QObject::tr("WARNING: ImageProvider::loadImage(): invalid image ID '%1' requested").arg(id));
++    } else {
++        QString imageType = idWords[0];
++        QString gameId = idWords[1];
++        QString cacheKey = imageType + "-" + gameId;
++        switch (cacheClass) {
++            case CacheClassImage :
++                if ( mImageCache.contains(cacheKey) )
++                    validCacheKey = cacheKey;
++                else {
++                    QImage image;
++                    if ( isZippedImageType(imageType) ) {
++                        QString imageFileName = id + ".png";
++                        unzFile imageFile = mZipFileMap[imageType];
++                        if ( imageFile && unzLocateFile(imageFile, (const char *)imageFileName.toLocal8Bit(), 0) != UNZ_OK ) {
++                            QMC2_ARCADE_LOG_STR(QObject::tr("WARNING: ImageProvider::validateImage(): unable to load zipimage type '%1' requested").arg(imageFileName));
++                        } else {
++                            QByteArray imageData;
++                            char imageBuffer[QMC2_ARCADE_ZIP_BUFSIZE];
++                            if ( unzOpenCurrentFile(imageFile) != UNZ_OK ) {
++                                QMC2_ARCADE_LOG_STR(QObject::tr("WARNING: ImageProvider::validateImage(): unable to load zipimage type '%1' requested").arg(imageFileName));
++                            } else {
++                                int len = 0;
++                                while ( (len = unzReadCurrentFile(imageFile, &imageBuffer, QMC2_ARCADE_ZIP_BUFSIZE)) > 0 ) {
++                                    for (int i = 0; i < len; i++)
++                                        imageData += imageBuffer[i];
++                                }
++                                unzCloseCurrentFile(imageFile);
++                                if ( image.loadFromData(imageData, "PNG") )  {
++                                    mImageCache.insert(cacheKey, new QImage(image));
++                                    validCacheKey = cacheKey;
++                                }
++                            }
++                        }
++                    } else {
++                        QStringList imageFolders = imageFolder(imageType).split(";", QString::SkipEmptyParts);
++                        if ( imageFolders.isEmpty() ) {
++                            QMC2_ARCADE_LOG_STR(QObject::tr("WARNING: ImageProvider::loadImage(): invalid image type '%1' requested").arg(imageType));
++                        } else {
++                            foreach (QString folder, imageFolders) {
++                                QString fileName = QFileInfo(folder + "/" + gameId + ".png").absoluteFilePath();
++                                QImage image;
++                                if ( image.load(fileName) ) {
++                                     mImageCache.insert(cacheKey, new QImage(image));
++                                     validCacheKey = cacheKey;
++                                }
++                            }
++                        }
++                    }
++                }
++                break;
++            case CacheClassPixmap :
++                if ( mPixmapCache.contains(cacheKey) )
++                    validCacheKey = cacheKey;
++                else {
++                    QPixmap image;
++                    if ( isZippedImageType(imageType) ) {
++                        QString imageFileName = id + ".png";
++                        unzFile imageFile = mZipFileMap[imageType];
++                        if ( imageFile && unzLocateFile(imageFile, (const char *)imageFileName.toLocal8Bit(), 0) != UNZ_OK ) {
++                            QMC2_ARCADE_LOG_STR(QObject::tr("WARNING: ImageProvider::validateImage(): unable to load zipimage type '%1' requested").arg(imageFileName));
++                        } else {
++                            QByteArray imageData;
++                            char imageBuffer[QMC2_ARCADE_ZIP_BUFSIZE];
++                            if ( unzOpenCurrentFile(imageFile) != UNZ_OK ) {
++                                QMC2_ARCADE_LOG_STR(QObject::tr("WARNING: ImageProvider::validateImage(): unable to load zipimage type '%1' requested").arg(imageFileName));
++                            } else {
++                                int len = 0;
++                                while ( (len = unzReadCurrentFile(imageFile, &imageBuffer, QMC2_ARCADE_ZIP_BUFSIZE)) > 0 ) {
++                                    for (int i = 0; i < len; i++)
++                                        imageData += imageBuffer[i];
++                                }
++                                unzCloseCurrentFile(imageFile);
++                                if ( image.loadFromData(imageData, "PNG") )  {
++                                    mPixmapCache.insert(cacheKey, new QPixmap(image));
++                                    validCacheKey = cacheKey;
++                                }
++                            }
++                        }
++                    } else {
++                        QStringList imageFolders = imageFolder(imageType).split(";", QString::SkipEmptyParts);
++                        if ( imageFolders.isEmpty() ) {
++                            QMC2_ARCADE_LOG_STR(QObject::tr("WARNING: ImageProvider::loadImage(): invalid image type '%1' requested").arg(imageType));
++                        } else {
++                            foreach (QString folder, imageFolders) {
++                                QString fileName = QFileInfo(folder + "/" + gameId + ".png").absoluteFilePath();
++                                QPixmap image;
++                                if ( image.load(fileName) ) {
++                                     mPixmapCache.insert(cacheKey, new QPixmap(image));
++                                     validCacheKey = cacheKey;
++                                }
++                            }
++                        }
++                    }
++                }
++                break;
++        }
++    }
++    return validCacheKey;
+ }
+ 
+ QString ImageProvider::imageTypeToZipFile(QString type)
+Index: arcade/imageprovider.h
+===================================================================
+--- arcade/imageprovider.h	(revision 4925)
++++ arcade/imageprovider.h	(working copy)
+@@ -16,10 +16,12 @@
+ 
+     QImage requestImage(const QString &, QSize *, const QSize &);
+     QPixmap requestPixmap(const QString &, QSize *, const QSize &);
++    QString loadImage(const QString &);
+ 
++    enum CacheClass { CacheClassImage, CacheClassPixmap };
++
+ private:
+-    QImage loadZippedImage(QString, QString);
+-    QPixmap loadZippedPixmap(QString, QString);
++    QString loadImage(const QString &id, const enum CacheClass cacheClass);
+     QString imageTypeToZipFile(QString);
+     QString imageTypeToLongName(QString);
+     bool isZippedImageType(QString);
+Index: arcade/macros.h
+===================================================================
+--- arcade/macros.h	(revision 4925)
++++ arcade/macros.h	(working copy)
+@@ -117,4 +117,8 @@
+ #define QMC2_ARCADE_LOG_CSTR(s)     if ( !consoleWindow ) { printf("%s: %s\n", (const char *)QTime::currentTime().toString("hh:mm:ss.zzz").toLocal8Bit(), (const char *)s); fflush(stdout); } else { consoleWindow->appendPlainText(QTime::currentTime().toString("hh:mm:ss.zzz") + ": " + QString(s)); }
+ #define QMC2_ARCADE_LOG_CSTR_NT(s)  if ( !consoleWindow ) { printf("%s\n", (const char *)s); fflush(stdout); } else { consoleWindow->appendPlainText(QString(s)); }
+ 
++// exchangable (de)compression routines
++#define QMC2_ARCADE_COMPRESS(data)			qCompress((data))
++#define QMC2_ARCADE_UNCOMPRESS(data)			(data).isEmpty() ? QByteArray() : qUncompress(data)
++
+ #endif
+Index: arcade/main.cpp
+===================================================================
+--- arcade/main.cpp	(revision 4925)
++++ arcade/main.cpp	(working copy)
+@@ -63,7 +63,7 @@
+                                   "Option           Meaning             Possible values ([..] = default)\n"
+                                   "---------------  ------------------  ------------------------------------\n"
+                                   "-emu             Emulator mode       [mame], mess, ume\n"
+-                                  "-theme           Theme selection     [ToxicWaste]\n"
++                                  "-theme           Theme selection     ToxicWaste, darkone [ToxicWaste]\n"
+                                   "-console         Console type        [terminal], window, window-minimized\n"
+                                   "-graphicssystem  Graphics engine     [raster], native, opengl\n"
+                                   "-config_path     Configuration path  [%1], ...\n").arg(QMC2_ARCADE_DOT_PATH);
+@@ -94,10 +94,10 @@
+ 
+     // avalibale emulator modes & themes
+     emulatorModeNames << QObject::tr("MAME") << QObject::tr("MESS") << QObject::tr("UME");
+-    arcadeThemes << "ToxicWaste";
+-    mameThemes << "ToxicWaste";
++    arcadeThemes << "ToxicWaste" << "darkone";
++    mameThemes << "ToxicWaste" << "darkone";
+     // messThemes << "..."
+-    umeThemes << "ToxicWaste";
++    umeThemes << "ToxicWaste" << "darkone";
+ 
+     QString console = QMC2_ARCADE_CLI_CONS;
+ 
+Index: arcade/qmc2-arcade.pro
+===================================================================
+--- arcade/qmc2-arcade.pro	(revision 4925)
++++ arcade/qmc2-arcade.pro	(working copy)
+@@ -3,7 +3,9 @@
+ # Add more folders to ship with the application, here
+ folder_01.source = qml/ToxicWaste
+ folder_01.target = qml
+-DEPLOYMENTFOLDERS = folder_01
++folder_02.source = qml/darkone
++folder_02.target = qml
++DEPLOYMENTFOLDERS = folder_01 folder_02
+ 
+ # Additional import path used to resolve QML modules in Creator's code model
+ QML_IMPORT_PATH =
+@@ -20,11 +22,13 @@
+ SOURCES += main.cpp \
+     tweakedqmlappviewer.cpp \
+     imageprovider.cpp \
++    infoprovider.cpp \
+     arcadesettings.cpp \
+     gameobject.cpp \
+     consolewindow.cpp \
+     processmanager.cpp \
+     joystick.cpp \
++    pointer.cpp \
+     ../zlib/zutil.c \
+     ../zlib/uncompr.c \
+     ../zlib/trees.c \
+@@ -52,11 +56,14 @@
+     qml/ToxicWaste/ToxicWaste.qml \
+     qml/ToxicWaste/ToxicWaste.js \
+     qml/ToxicWaste/BackgroundAnimation.qml \
++    qml/darkone/darkone.qml \
++    qml/darkone/darkone.js \
+     ../zlib/README.zlib
+ 
+ HEADERS += \
+     tweakedqmlappviewer.h \
+     imageprovider.h \
++    infoprovider.h \
+     arcadesettings.h \
+     macros.h \
+     gameobject.h \
+@@ -64,6 +71,8 @@
+     processmanager.h \
+     emulatoroption.h \
+     joystick.h \
++    wheel.h \
++    pointer.h \
+     ../zlib/zutil.h \
+     ../zlib/zlib.h \
+     ../zlib/zconf.h \
+@@ -87,8 +96,10 @@
+ 
+ evil_hack_to_fool_lupdate {
+     SOURCES += qml/ToxicWaste/ToxicWaste.qml \
++               qml/ToxicWaste/ToxicWaste.js \
+                qml/ToxicWaste/BackgroundAnimation.qml \
+-               qml/ToxicWaste/ToxicWaste.js \
++               qml/darkone/darkone.qml \
++               qml/darkone/darkone.js
+ }
+ 
+ TRANSLATIONS += translations/qmc2-arcade_de.ts \
+Index: arcade/qmc2-arcade.qrc
+===================================================================
+--- arcade/qmc2-arcade.qrc	(revision 4925)
++++ arcade/qmc2-arcade.qrc	(working copy)
+@@ -25,6 +25,29 @@
+         <file>qml/ToxicWaste/images/shadereffectsource.png</file>
+         <file>qml/ToxicWaste/images/toxic.png</file>
+         <file>qml/ToxicWaste/images/windowed.png</file>
++        <file>qml/ToxicWaste/images/green_bubble.png</file>
++        <file>qml/ToxicWaste/images/blue_bubble.png</file>
++        <file>qml/ToxicWaste/images/purple_bubble.png</file>
++        <file>qml/darkone/components/Button.qml</file>
++        <file>qml/darkone/components/CheckBox.qml</file>
++        <file>qml/darkone/components/CheckableGroup.qml</file>
++        <file>qml/darkone/components/CheckableGroup.js</file>
++        <file>qml/darkone/components/Checkable.qml</file>
++        <file>qml/darkone/darkone.js</file>
++        <file>qml/darkone/darkone.qml</file>
++        <file>qml/darkone/images/arrow.png</file>
++        <file>qml/darkone/images/checkmark.png</file>
++        <file>qml/darkone/images/clear.png</file>
++        <file>qml/darkone/images/exit.png</file>
++        <file>qml/darkone/images/find.png</file>
++        <file>qml/darkone/images/fullscreen.png</file>
++        <file>qml/darkone/images/toolbar_toggle.png</file>
++        <file>qml/darkone/images/list_toggle.png</file>
++        <file>qml/darkone/images/launch.png</file>
++        <file>qml/darkone/images/cabinet.png</file>
++        <file>qml/darkone/images/preferences.png</file>
++        <file>qml/darkone/images/backlight.png</file>
++        <file>qml/darkone/images/windowed.png</file>
+         <file>translations/qmc2-arcade_de.qm</file>
+         <file>translations/qmc2-arcade_el.qm</file>
+         <file>translations/qmc2-arcade_es.qm</file>
+@@ -35,8 +58,5 @@
+         <file>translations/qmc2-arcade_ro.qm</file>
+         <file>translations/qmc2-arcade_sv.qm</file>
+         <file>translations/qmc2-arcade_us.qm</file>
+-        <file>qml/ToxicWaste/images/green_bubble.png</file>
+-        <file>qml/ToxicWaste/images/blue_bubble.png</file>
+-        <file>qml/ToxicWaste/images/purple_bubble.png</file>
+     </qresource>
+ </RCC>
+Index: arcade/tweakedqmlappviewer.cpp
+===================================================================
+--- arcade/tweakedqmlappviewer.cpp	(revision 4925)
++++ arcade/tweakedqmlappviewer.cpp	(working copy)
+@@ -8,11 +8,14 @@
+ #include <QPaintEngine>
+ 
+ #include "tweakedqmlappviewer.h"
+-#include "imageprovider.h"
+ #include "arcadesettings.h"
+ #include "gameobject.h"
+ #include "consolewindow.h"
+ #include "macros.h"
++//#if QT_VERSION < 0x050000
++#include "wheel.h"
++#include "pointer.h"
++//#endif
+ 
+ extern ArcadeSettings *globalConfig;
+ extern ConsoleWindow *consoleWindow;
+@@ -23,18 +26,38 @@
+ TweakedQmlApplicationViewer::TweakedQmlApplicationViewer(QWidget *parent)
+ 	: QmlApplicationViewer(parent)
+ {
++    initialised = false;
+     numFrames = 0;
+     windowModeSwitching = false;
+ 
++//#if QT_VERSION < 0x050000
++    qmlRegisterType<WheelArea>("Wheel", 1, 0, "WheelArea");
++    qmlRegisterType<CursorShapeArea>("Pointer", 1, 0, "CursorShapeArea");
++//#endif
++
+     processManager = new ProcessManager(this);
+     processManager->createTemplateList();
++    connect(processManager, SIGNAL(emulatorStarted(int)), this, SIGNAL(emulatorStarted(int)));
++    connect(processManager, SIGNAL(emulatorFinished(int)), this, SIGNAL(emulatorFinished(int)));
+ 
+     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+-    engine()->addImageProvider(QLatin1String("qmc2"), new ImageProvider(QDeclarativeImageProvider::Image));
++
++    imageProvider = new ImageProvider(QDeclarativeImageProvider::Image);
++    engine()->addImageProvider(QLatin1String("qmc2"), imageProvider);
++
++    infoProvider = new InfoProvider();
++
+     engine()->addImportPath(QDir::fromNativeSeparators(XSTR(QMC2_ARCADE_QML_IMPORT_PATH)));
+     rootContext()->setContextProperty("viewer", this);
+ 
+-    loadGamelist();
++    // theme-specific initialisation
++    if ( globalConfig->arcadeTheme == "ToxicWaste" ) {
++        loadGamelist();
++    } else if ( globalConfig->arcadeTheme == "darkone" ) {
++        // propagate empty gameList to QML
++        rootContext()->setContextProperty("gameListModel", QVariant::fromValue(gameList));
++        rootContext()->setContextProperty("gameListModelCount", gameList.count());
++    }
+ 
+     connect(&frameCheckTimer, SIGNAL(timeout()), this, SLOT(fpsReady()));
+     frameCheckTimer.start(1000);
+@@ -42,7 +65,12 @@
+ 
+ TweakedQmlApplicationViewer::~TweakedQmlApplicationViewer()
+ {
+-    saveSettings();
++#ifdef QMC2_DEBUG
++    QMC2_ARCADE_LOG_STR(tr("DEBUG: TweakedQmlApplicationViewer::~TweakedQmlApplicationViewer()
++                            viewer.initialised: ''%1'").arg(rootContext()->contextProperty("initialised").toString()));
++#endif
++    if (initialised)
++        saveSettings();
+ }
+ 
+ void TweakedQmlApplicationViewer::fpsReady()
+@@ -70,7 +98,24 @@
+         rootObject()->setProperty("cabinetFlipped", globalConfig->cabinetFlipped());
+         rootObject()->setProperty("lastIndex", globalConfig->lastIndex() < gameList.count() ? globalConfig->lastIndex() : 0);
+         rootObject()->setProperty("menuHidden", globalConfig->menuHidden());
++    } else if ( globalConfig->arcadeTheme == "darkone" ) {
++        rootObject()->setProperty("lastIndex", globalConfig->lastIndex());
++        rootObject()->setProperty("dataTypePrimary", globalConfig->dataTypePrimary());
++        rootObject()->setProperty("dataTypeSecondary", globalConfig->dataTypeSecondary());
++        rootObject()->setProperty("fullScreen", globalConfig->fullScreen());
++        rootObject()->setProperty("listHidden", globalConfig->listHidden());
++        rootObject()->setProperty("toolbarHidden", globalConfig->toolbarHidden());
++        rootObject()->setProperty("fpsVisible", globalConfig->fpsVisible());
++        rootObject()->setProperty("sortByName", globalConfig->sortByName());
++        rootObject()->setProperty("backLight", globalConfig->backLight());
++        rootObject()->setProperty("toolbarAutoHide", globalConfig->toolbarAutoHide());
++        rootObject()->setProperty("disableLaunchFlash", globalConfig->disableLaunchFlash());
++        rootObject()->setProperty("disableZoom", globalConfig->disableZoom());
++        rootObject()->setProperty("overlayScale", std::max(0.33, globalConfig->overlayScale()));
++        rootObject()->setProperty("lightTimeout", std::max(5.0, globalConfig->lightTimeout()));
++        rootObject()->setProperty("colourScheme", globalConfig->colourScheme());
+     }
++    initialised = true;
+ 
+     QMC2_ARCADE_LOG_STR(tr("Ready to launch %1").arg(emulatorMode != QMC2_ARCADE_EMUMODE_MESS ? tr("games") : tr("machines")));
+ }
+@@ -99,6 +144,22 @@
+         globalConfig->setCabinetFlipped(rootObject()->property("cabinetFlipped").toBool());
+         globalConfig->setLastIndex(rootObject()->property("lastIndex").toInt());
+         globalConfig->setMenuHidden(rootObject()->property("menuHidden").toBool());
++    } else if ( globalConfig->arcadeTheme == "darkone" ) {
++        globalConfig->setLastIndex(rootObject()->property("lastIndex").toInt());
++        globalConfig->setDataTypePrimary(rootObject()->property("dataTypePrimary").toString());
++        globalConfig->setDataTypeSecondary(rootObject()->property("dataTypeSecondary").toString());
++        globalConfig->setToolbarHidden(rootObject()->property("toolbarHidden").toBool());
++        globalConfig->setListHidden(rootObject()->property("listHidden").toBool());
++        globalConfig->setFullScreen(rootObject()->property("fullScreen").toBool());
++        globalConfig->setFpsVisible(rootObject()->property("fpsVisible").toBool());
++        globalConfig->setSortByName(rootObject()->property("sortByName").toBool());
++        globalConfig->setBackLight(rootObject()->property("backLight").toBool());
++        globalConfig->setToolbarAutoHide(rootObject()->property("toolbarAutoHide").toBool());
++        globalConfig->setDisableLaunchFlash(rootObject()->property("disableLaunchFlash").toBool());
++        globalConfig->setDisableZoom(rootObject()->property("disableZoom").toBool());
++        globalConfig->setOverlayScale(rootObject()->property("overlayScale").toDouble());
++        globalConfig->setLightTimeout(rootObject()->property("lightTimeout").toDouble());
++        globalConfig->setColourScheme(rootObject()->property("colourScheme").toString());
+     }
+ }
+ 
+@@ -192,7 +253,7 @@
+ void TweakedQmlApplicationViewer::loadGamelist()
+ {
+     QString gameListCachePath;
+-    bool listAlreadySorted = false;
++    gameList.clear();
+ 
+     if ( globalConfig->useFilteredList() ) {
+         gameListCachePath = QFileInfo(globalConfig->filteredListFile()).absoluteFilePath();
+@@ -201,8 +262,7 @@
+                                 arg(gameListCachePath).
+                                 arg(emulatorMode != QMC2_ARCADE_EMUMODE_MESS ? tr("game list") : tr("machine list")));
+             gameListCachePath = QFileInfo(globalConfig->gameListCacheFile()).absoluteFilePath();
+-        } else
+-            listAlreadySorted = true;
++        }
+     } else
+         gameListCachePath = QFileInfo(globalConfig->gameListCacheFile()).absoluteFilePath();
+ 
+@@ -253,7 +313,7 @@
+                      arg(emulatorMode != QMC2_ARCADE_EMUMODE_MESS ? tr("game list") : tr("machine list")).
+                      arg(QDir::toNativeSeparators(gameListCachePath)));
+ 
+-    if ( !listAlreadySorted )
++    if ( globalConfig->sortByName() )
+         qSort(gameList.begin(), gameList.end(), GameObject::lessThan);
+ 
+     // propagate gameList to QML
+@@ -271,6 +331,26 @@
+     processManager->startEmulator(id);
+ }
+ 
++QString TweakedQmlApplicationViewer::loadImage(const QString &id)
++{
++    return imageProvider->loadImage(id);
++}
++
++QString TweakedQmlApplicationViewer::requestInfo(const QString &id, const QString &infoClass)
++{
++    QString info("");
++    if (infoClass == "gameinfo")
++        info = infoProvider->requestInfo(id, InfoProvider::InfoClassGame);
++    else if (infoClass == "emuinfo")
++        info = infoProvider->requestInfo(id, InfoProvider::InfoClassEmu);
++#ifdef QMC2_DEBUG
++    else
++        info = QString("DEBUG: TweakedQmlApplicationViewer::requestInfo() unsupported info class '%1'").arg(infoClass);
++#endif
++
++    return info;
++}
++
+ int TweakedQmlApplicationViewer::findIndex(QString pattern, int startIndex)
+ {
+     if ( pattern.isEmpty() )
+@@ -279,23 +359,30 @@
+     int foundIndex = startIndex;
+     bool indexFound = false;
+ 
+-    QRegExp patternRegExp(pattern, Qt::CaseInsensitive, QRegExp::Wildcard);
++    QRegExp wildcard(pattern, Qt::CaseInsensitive, QRegExp::Wildcard);
++    QRegExp regexp(pattern, Qt::CaseInsensitive, QRegExp::RegExp);
+ 
+     for (int i = startIndex + 1; i < gameList.count() && !indexFound; i++) {
+         QString description = ((GameObject *)gameList[i])->description();
+         QString id = ((GameObject *)gameList[i])->id();
+-        if ( description.indexOf(patternRegExp, 0) >= 0 || id.indexOf(patternRegExp, 0) >= 0 ) {
++        if ( description.indexOf(wildcard, 0) >= 0 || id.indexOf(wildcard, 0) >= 0 ) {
+             foundIndex = i;
+             indexFound = true;
++        } else if ( regexp.indexIn(description, 0) >= 0 || regexp.indexIn(id, 0) >= 0 ) {
++            foundIndex = i;
++            indexFound = true;
+         }
+     }
+ 
+     for (int i = 0; i < startIndex && !indexFound; i++) {
+         QString description = ((GameObject *)gameList[i])->description();
+         QString id = ((GameObject *)gameList[i])->id();
+-        if ( description.indexOf(patternRegExp, 0) >= 0 || id.indexOf(patternRegExp, 0) >= 0 ) {
++        if ( description.indexOf(wildcard, 0) >= 0 || id.indexOf(wildcard, 0) >= 0 ) {
+             foundIndex = i;
+             indexFound = true;
++        } else if ( regexp.indexIn(description, 0) >= 0 || regexp.indexIn(id, 0) >= 0 ) {
++            foundIndex = i;
++            indexFound = true;
+         }
+     }
+ 
+Index: arcade/tweakedqmlappviewer.h
+===================================================================
+--- arcade/tweakedqmlappviewer.h	(revision 4925)
++++ arcade/tweakedqmlappviewer.h	(working copy)
+@@ -6,6 +6,8 @@
+ 
+ #include "qmlapplicationviewer.h"
+ #include "processmanager.h"
++#include "imageprovider.h"
++#include "infoprovider.h"
+ 
+ class TweakedQmlApplicationViewer : public QmlApplicationViewer
+ {
+@@ -18,11 +20,17 @@
+     bool savedMaximized;
+     QList<QObject *> gameList;
+     ProcessManager *processManager;
++    ImageProvider *imageProvider;
++    InfoProvider *infoProvider;
+     bool windowModeSwitching;
+ 
+     explicit TweakedQmlApplicationViewer(QWidget *parent = 0);
+     virtual ~TweakedQmlApplicationViewer();
+ 
++signals:
++    void emulatorStarted(int);
++    void emulatorFinished(int);
++
+ public slots:
+     void fpsReady();
+     void loadSettings();
+@@ -34,9 +42,14 @@
+     int romStateCharToInt(char);
+     void loadGamelist();
+     void launchEmulator(QString);
++    QString loadImage(const QString &);
++    QString requestInfo(const QString&, const QString&);
+     int findIndex(QString, int startIndex = 0);
+     void log(QString);
+ 
++private:
++    bool initialised;
++
+ protected:
+     void paintEvent(QPaintEvent *);
+     void closeEvent(QCloseEvent *);
+Index: arcademodesetup.ui
+===================================================================
+--- arcademodesetup.ui	(revision 4925)
++++ arcademodesetup.ui	(working copy)
+@@ -34,6 +34,11 @@
+            <string notr="true">ToxicWaste</string>
+           </property>
+          </item>
++         <item>
++          <property name="text">
++           <string notr="true">darkone</string>
++          </property>
++         </item>
+         </widget>
+        </item>
+        <item row="3" column="0">

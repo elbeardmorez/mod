@@ -1,0 +1,72 @@
+
+# qmc2 'darkone' arcade theme
+
+## installation
+-pull qmc2 rev 4925
+-apply patches from the 'patch' dir
+-copy 'images' folder from under this repo's 'binary' dir to 'QMC-SRC/arcade/qml/darkone/'
+-build (make arcade)
+-run (qmc2-arcade -theme darkone)
+
+## changes (from ToxicWaste)
+### aesthetics
+-colours
+-lighting effect
+-perspectives
+-enlarged screen area
+-reduced coin slot area
+-fixed, smaller text sizes
+-center list on play
+-clean up selection highlighting
+-don't scroll inappropriately (and painfully to the eye)
+-no text overlap on search filter border
+-never obscure the toolbar
+-transition animations (eye candy)
+### functionality
+-screen as primary viewport for scaling
+-overlay zoom
+-lock scaling / zooming to sensible values
+-hide/show list
+-minimum list width
+-autohide toolbar
+-sort list by name (or not)
+-arcade areas clickable (play buttons)
+-screen interaction
+--cycle images and text
+--preference display mechanism for data (images/info)
+-display secondary data type (image/info) if primary is missing
+-display mixed image/info content
+-auto lights out
+-full regex support in search
+-mouse wheel scaling
+-multiple cursor shapes
+-page up/down scroll fix
+-more keyboard shortcuts
+
+## misc
+-restructured files
+-added a few graphics
+-debug property enables logging / visual templates
+
+-removed exit confirmation menu
+-removed preference menu buttons
+-removed listview highlighter
+-removed bubbles / shader effects
+-removed logo / background
+-removed flipable
+
+## todo
+-play in window [pipe dream! ..or libmame and a lot of effort]
+
+## devs
+-tested solely with gnu/linux qt 4.8.4 / qtquick 1.1
+-patch 'diff-r4925.diff' targets modified (existing) files
+-patch 'add-r4925.diff' targets additional files
+-infoprovider.cpp is a created pretty much entirely from qmc2-main.cpp chunks (ruthlessly stripped). i dislike the code duplication too, sorry
+-imageprovider.cpp was modified out of necessity to test for success in retrieving a cached file. i tried to reduce the (existing) code duplication too
+-the game list is loaded slightly later in this theme to ensure no reload is required should sort-by-name be set
+-tweakedapplicationviewer's addition 'initialised' var was required to stop a full set of null settings being saved when the viewer failed to load. doubt any user would ever hit this
+-the additional components were sourced from qt-components (licence intact) / qt-forums (generic samples)
+-wheel.h/pointer.h are deprecated as of qt5. i looked at ways to implement both, but options are limited. push .qml through a pp or use multiple files
+-there's an excessive amount of comments. i like comments
+-thanks to the original author for doing the hard work

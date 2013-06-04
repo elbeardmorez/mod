@@ -1,0 +1,3114 @@
+Index: arcade/infoprovider.cpp
+===================================================================
+--- arcade/infoprovider.cpp	(revision 0)
++++ arcade/infoprovider.cpp	(working copy)
+@@ -0,0 +1,306 @@
++
++#include <QTextStream>
++#include <QTextCodec>
++
++#include "infoprovider.h"
++#include "arcadesettings.h"
++#include "consolewindow.h"
++#include "macros.h"
++
++extern ArcadeSettings *globalConfig;
++extern ConsoleWindow *consoleWindow;
++
++InfoProvider::InfoProvider()
++{
++  QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
++  QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
++  loadGameInfoDB();
++  loadEmuInfoDB();
++}
++
++InfoProvider::~InfoProvider()
++{
++   clearGameInfoDB();
++   clearEmuInfoDB();
++}
++
++void InfoProvider::clearGameInfoDB() {
++  if ( !qmc2GameInfoDB.isEmpty() ) {
++    QMapIterator<QString, QByteArray *> it(qmc2GameInfoDB);
++    QList<QByteArray *> deletedRecords;
++    while ( it.hasNext() ) {
++      it.next();
++      if ( !deletedRecords.contains(it.value()) ) {
++        if ( it.value() )
++          delete it.value();
++        deletedRecords.append(it.value());
++      }
++    }
++    deletedRecords.clear();
++    qmc2GameInfoDB.clear();
++  }
++}
++
++void InfoProvider::clearEmuInfoDB() {
++  if ( !qmc2EmuInfoDB.isEmpty() ) {
++    QMapIterator<QString, QByteArray *> it(qmc2EmuInfoDB);
++    QList<QByteArray *> deletedRecords;
++    while ( it.hasNext() ) {
++      it.next();
++      if ( !deletedRecords.contains(it.value()) ) {
++        if ( it.value() )
++          delete it.value();
++        deletedRecords.append(it.value());
++      }
++    }
++    deletedRecords.clear();
++    qmc2EmuInfoDB.clear();
++  }
++}
++
++void InfoProvider::loadGameInfoDB()
++{
++#ifdef QMC2_DEBUG
++  QMC2_ARCADE_LOG_STR(QString("DEBUG: InfoProvider::loadGameInfoDB()"));
++#endif
++  qmc2InfoStopParser = false;
++#if defined(QMC2_EMUTYPE_MAME) || defined(QMC2_EMUTYPE_UME)
++  QMC2_ARCADE_LOG_STR(QObject::tr("loading game info DB"));
++#elif defined(QMC2_EMUTYPE_MESS)
++  QMC2_ARCADE_LOG_STR(QObject::tr("loading machine info DB"));
++#endif
++
++  // clear game/machine info DB
++  clearGameInfoDB();
++
++  bool compressData = globalConfig->compressGameInfoDB();
++  QString pathToGameInfoDB = globalConfig->gameInfoDB();
++
++  QFile gameInfoDB(pathToGameInfoDB);
++  gameInfoDB.open(QIODevice::ReadOnly | QIODevice::Text);
++
++  if ( gameInfoDB.isOpen() ) {
++    QTextStream ts(&gameInfoDB);
++    ts.setCodec(QTextCodec::codecForName("UTF-8"));
++    while ( !ts.atEnd() && !qmc2InfoStopParser ) {
++      QString singleLine = ts.readLine();
++      while ( !singleLine.simplified().startsWith("$info=") && !ts.atEnd() ) {
++        singleLine = ts.readLine();
++      }
++      if ( singleLine.simplified().startsWith("$info=") ) {
++        QStringList gameWords = singleLine.simplified().mid(6).split(",");
++        while ( !singleLine.simplified().startsWith("$bio") && !ts.atEnd() ) {
++          singleLine = ts.readLine();
++        }
++        if ( singleLine.simplified().startsWith("$bio") ) {
++          QString gameInfoString;
++          bool firstLine = true;
++          while ( !singleLine.simplified().startsWith("$end") && !ts.atEnd() ) {
++            singleLine = ts.readLine();
++            if ( !singleLine.simplified().startsWith("$end") ) {
++              if ( !firstLine ) {
++                  gameInfoString.append(singleLine.trimmed() + "<br>");
++              } else if ( !singleLine.isEmpty() ) {
++                gameInfoString.append("<b>" + singleLine.trimmed() + "</b><br>");
++                firstLine = false;
++              }
++            }
++          }
++          if ( singleLine.simplified().startsWith("$end") ) {
++            // reduce the number of line breaks
++            gameInfoString.replace("<br><br><br><br>", "<p>");
++            gameInfoString.replace("<br><br><br>", "<p>");
++            gameInfoString.replace("<br><br>", "<p>");
++            if ( gameInfoString.endsWith("<p>") )
++              gameInfoString.remove(gameInfoString.length() - 3, gameInfoString.length() - 1);
++            QByteArray *gameInfo;
++#if QT_VERSION >= 0x050000
++            if ( compressData )
++              gameInfo = new QByteArray(QMC2_ARCADE_COMPRESS(QTextCodec::codecForLocale()->fromUnicode(gameInfoString)));
++            else
++              gameInfo = new QByteArray(QTextCodec::codecForLocale()->fromUnicode(gameInfoString));
++#else
++            if ( compressData )
++              gameInfo = new QByteArray(QMC2_ARCADE_COMPRESS(QTextCodec::codecForCStrings()->fromUnicode(gameInfoString)));
++            else
++              gameInfo = new QByteArray(QTextCodec::codecForCStrings()->fromUnicode(gameInfoString));
++#endif
++            int i;
++            for (i = 0; i < gameWords.count(); i++) {
++              if ( !gameWords[i].isEmpty() )
++                qmc2GameInfoDB[gameWords[i]] = gameInfo;
++            }
++          } else {
++#if defined(QMC2_EMUTYPE_MAME) || defined(QMC2_EMUTYPE_UME)
++            QMC2_ARCADE_LOG_STR(QObject::tr("WARNING: missing '$end' in game info DB %1").arg(pathToGameInfoDB));
++#elif defined(QMC2_EMUTYPE_MESS)
++            QMC2_ARCADE_LOG_STR(QObject::tr("WARNING: missing '$end' in machine info DB %1").arg(pathToGameInfoDB));
++#endif
++          }
++        } else {
++#if defined(QMC2_EMUTYPE_MAME) || defined(QMC2_EMUTYPE_UME)
++          QMC2_ARCADE_LOG_STR(QObject::tr("WARNING: missing '$bio' in game info DB %1").arg(pathToGameInfoDB));
++#elif defined(QMC2_EMUTYPE_MESS)
++          QMC2_ARCADE_LOG_STR(QObject::tr("WARNING: missing '$bio' in machine info DB %1").arg(pathToGameInfoDB));
++#endif
++        }
++      } else if ( !ts.atEnd() ) {
++#if defined(QMC2_EMUTYPE_MAME) || defined(QMC2_EMUTYPE_UME)
++        QMC2_ARCADE_LOG_STR(QObject::tr("WARNING: missing '$info' in game info DB %1").arg(pathToGameInfoDB));
++#elif defined(QMC2_EMUTYPE_MESS)
++        QMC2_ARCADE_LOG_STR(QObject::tr("WARNING: missing '$info' in machine info DB %1").arg(pathToGameInfoDB));
++#endif
++      }
++    }
++    gameInfoDB.close();
++  } else {
++#if defined(QMC2_EMUTYPE_MAME) || defined(QMC2_EMUTYPE_UME)
++    QMC2_ARCADE_LOG_STR(QObject::tr("WARNING: can't open game info DB %1").arg(pathToGameInfoDB));
++#elif defined(QMC2_EMUTYPE_MESS)
++    QMC2_ARCADE_LOG_STR(QObject::tr("WARNING: can't open machine info DB %1").arg(pathToGameInfoDB));
++#endif
++  }
++
++#if defined(QMC2_EMUTYPE_MESS)
++  QMC2_ARCADE_LOG_STR(QObject::tr("done (loading machine info DB"));
++  QMC2_ARCADE_LOG_STR(QObject::tr("%n machine info record(s) loaded", "", qmc2GameInfoDB.count()));
++  if ( qmc2InfoStopParser ) {
++    QMC2_ARCADE_LOG_STR(QObject::tr("invalidating machine info DB"));
++#else
++  QMC2_ARCADE_LOG_STR(QObject::tr("done (loading game info DB)"));
++  QMC2_ARCADE_LOG_STR(QObject::tr("%n game info record(s) loaded", "", qmc2GameInfoDB.count()));
++  if ( qmc2InfoStopParser ) {
++    QMC2_ARCADE_LOG_STR(QObject::tr("invalidating game info DB"));
++#endif
++    clearGameInfoDB();
++  }
++}
++
++void InfoProvider::loadEmuInfoDB()
++{
++#ifdef QMC2_DEBUG
++  QMC2_ARCADE_LOG_STR(QString("DEBUG: InfoProvider::loadEmuInfoDB()"));
++#endif
++  qmc2InfoStopParser = false;
++  QMC2_ARCADE_LOG_STR(QObject::tr("loading emulator info DB"));
++
++  // clear emulator info DB
++  clearEmuInfoDB();
++
++  bool compressData = globalConfig->compressEmuInfoDB();
++  QString pathToEmuInfoDB = globalConfig->emuInfoDB();
++
++  QFile emuInfoDB(pathToEmuInfoDB);
++  emuInfoDB.open(QIODevice::ReadOnly | QIODevice::Text);
++
++  if ( emuInfoDB.isOpen() ) {
++    QTextStream ts(&emuInfoDB);
++    ts.setCodec(QTextCodec::codecForName("UTF-8"));
++    while ( !ts.atEnd() && !qmc2InfoStopParser ) {
++      QString singleLine = ts.readLine();
++      while ( !singleLine.simplified().startsWith("$info=") && !ts.atEnd() ) {
++        singleLine = ts.readLine();
++      }
++      if ( singleLine.simplified().startsWith("$info=") ) {
++        QStringList gameWords = singleLine.simplified().mid(6).split(",");
++        while ( !singleLine.simplified().startsWith("$mame") && !ts.atEnd() ) {
++          singleLine = ts.readLine();
++        }
++        if ( singleLine.simplified().startsWith("$mame") ) {
++          QString emuInfoString;
++          while ( !singleLine.simplified().startsWith("$end") && !ts.atEnd() ) {
++            singleLine = ts.readLine();
++            if ( !singleLine.simplified().startsWith("$end") )
++              emuInfoString.append(singleLine + "<br>");
++          }
++          if ( singleLine.simplified().startsWith("$end") ) {
++            // convert "two (or more) empty lines" to a paragraph delimiter
++            emuInfoString = emuInfoString.replace("<br><br><br>", "<p>").replace("<br><br>", "<p>");
++            if ( emuInfoString.startsWith("<br>") )
++              emuInfoString.remove(0, 4);
++            if ( emuInfoString.endsWith("<p>") )
++              emuInfoString.remove(emuInfoString.length() - 3, emuInfoString.length() - 1);
++            QByteArray *emuInfo;
++#if QT_VERSION >= 0x050000
++            if ( compressData )
++              emuInfo = new QByteArray(QMC2_COMPRESS(QTextCodec::codecForLocale()->fromUnicode(emuInfoString)));
++            else
++              emuInfo = new QByteArray(QTextCodec::codecForLocale()->fromUnicode(emuInfoString));
++#else
++            if ( compressData )
++              emuInfo = new QByteArray(QMC2_ARCADE_COMPRESS(QTextCodec::codecForCStrings()->fromUnicode(emuInfoString)));
++            else
++              emuInfo = new QByteArray(QTextCodec::codecForCStrings()->fromUnicode(emuInfoString));
++#endif
++            int i;
++            for (i = 0; i < gameWords.count(); i++) {
++              if ( !gameWords[i].isEmpty() )
++                qmc2EmuInfoDB[gameWords[i]] = emuInfo;
++            }
++          } else {
++            QMC2_ARCADE_LOG_STR(QObject::tr("WARNING: missing '$end' in emulator info DB %1").arg(pathToEmuInfoDB));
++          }
++        } else if ( !ts.atEnd() ) {
++          QMC2_ARCADE_LOG_STR(QObject::tr("WARNING: missing '$mame' in emulator info DB %1").arg(pathToEmuInfoDB));
++        }
++      } else if ( !ts.atEnd() ) {
++        QMC2_ARCADE_LOG_STR(QObject::tr("WARNING: missing '$info' in emulator info DB %1").arg(pathToEmuInfoDB));
++      }
++    }
++    emuInfoDB.close();
++  } else
++    QMC2_ARCADE_LOG_STR(QObject::tr("WARNING: can't open emulator info DB %1").arg(pathToEmuInfoDB));
++
++  QMC2_ARCADE_LOG_STR(QObject::tr("done (loading emulator info DB)"));
++  QMC2_ARCADE_LOG_STR(QObject::tr("%n emulator info record(s) loaded", "", qmc2EmuInfoDB.count()));
++  if ( qmc2InfoStopParser ) {
++    QMC2_ARCADE_LOG_STR(QObject::tr("invalidating emulator info DB"));
++    clearEmuInfoDB();
++  }
++}
++
++QString InfoProvider::requestInfo(const QString &id, InfoClass infoClass ) {
++
++  QString infoText("");
++  // URL replacement regexp
++  QString urlChar = QLatin1String("\\+\\-\\w\\./#@&;:=\\?~%_,\\!\\$\\*");
++  QString urlSectionRegExp = QString("[%1]+").arg(urlChar);
++  switch(infoClass) {
++
++    case InfoProvider::InfoClassGame :
++      if ( qmc2GameInfoDB.contains(id) ) {
++        QByteArray *newGameInfo = qmc2GameInfoDB[id];
++        if ( newGameInfo ) {
++#if defined(QMC2_EMUTYPE_MESS)
++          if ( globalConfig->compressGameInfoDB() )
++            infoText = QString(QMC2_ARCADE_UNCOMPRESS(*newGameInfo));
++          else
++            infoText = QString(*newGameInfo);
++#else
++          if ( globalConfig->compressGameInfoDB() )
++            infoText = QString(QMC2_ARCADE_UNCOMPRESS(*newGameInfo)).replace(QRegExp(QString("((http|https|ftp)://%1)").arg(urlSectionRegExp)), QLatin1String("<a href=\"\\1\">\\1</a>"));
++          else
++            infoText = QString(*newGameInfo).replace(QRegExp(QString("((http|https|ftp)://%1)").arg(urlSectionRegExp)), QLatin1String("<a href=\"\\1\">\\1</a>"));
++#endif
++        } else
++          infoText = "<p>" + QObject::tr("no info available") + "</p>";
++      } else
++        infoText = "<p>" + QObject::tr("no info available") + "</p>";
++      break;
++
++    case InfoProvider::InfoClassEmu :
++      if ( qmc2EmuInfoDB.contains(id) ) {
++        QByteArray *newEmuInfo = qmc2EmuInfoDB[id];
++        if ( newEmuInfo ) {
++          if ( globalConfig->compressEmuInfoDB() )
++            infoText = QString(QMC2_ARCADE_UNCOMPRESS(*newEmuInfo)).replace(QRegExp(QString("(\\w+://%1)").arg(urlSectionRegExp)), QLatin1String("<a href=\"\\1\">\\1</a>"));
++          else
++            infoText = QString(*newEmuInfo).replace(QRegExp(QString("(\\w+://%1)").arg(urlSectionRegExp)), QLatin1String("<a href=\"\\1\">\\1</a>"));
++        } else
++          infoText = "<p>" + QObject::tr("no info available") + "</p>";
++      } else
++        infoText = "<p>" + QObject::tr("no info available") + "</p>";
++      break;
++  }
++  return infoText;
++}
+Index: arcade/infoprovider.h
+===================================================================
+--- arcade/infoprovider.h	(revision 0)
++++ arcade/infoprovider.h	(working copy)
+@@ -0,0 +1,28 @@
++
++#ifndef INFOPROVIDER_H
++#define INFOPROVIDER_H
++
++#include <QMap>
++#include <QString>
++
++class InfoProvider
++{
++  public:
++    explicit InfoProvider();
++    virtual ~InfoProvider();
++
++    enum InfoClass { InfoClassGame, InfoClassEmu };
++    QString requestInfo(const QString &, InfoClass);
++
++  private:
++    void clearGameInfoDB();
++    void clearEmuInfoDB();
++    void loadGameInfoDB();
++    void loadEmuInfoDB();
++    bool qmc2InfoStopParser;
++    QMap<QString, QByteArray *> qmc2EmuInfoDB;
++    QMap<QString, QByteArray *> qmc2GameInfoDB;
++};
++
++#endif
++
+Index: arcade/pointer.cpp
+===================================================================
+--- arcade/pointer.cpp	(revision 0)
++++ arcade/pointer.cpp	(working copy)
+@@ -0,0 +1,20 @@
++
++#include "pointer.h"
++
++CursorShapeArea::CursorShapeArea(QDeclarativeItem *parent) :
++  QDeclarativeItem(parent), m_currentShape(-1) { }
++
++Qt::CursorShape CursorShapeArea::cursorShape() const
++{
++  return cursor().shape();
++}
++
++void CursorShapeArea::setCursorShape(Qt::CursorShape cursorShape)
++{
++  if (m_currentShape == (int) cursorShape)
++    return;
++  setCursor(cursorShape);
++  emit cursorShapeChanged();
++  m_currentShape = cursorShape;
++}
++
+Index: arcade/pointer.h
+===================================================================
+--- arcade/pointer.h	(revision 0)
++++ arcade/pointer.h	(working copy)
+@@ -0,0 +1,19 @@
++#ifndef CURSORSHAPEAREA_H
++#define CURSORSHAPEAREA_H
++#include <QDeclarativeItem>
++
++class CursorShapeArea : public QDeclarativeItem
++{
++  Q_OBJECT
++  Q_PROPERTY(Qt::CursorShape cursorShape READ cursorShape WRITE setCursorShape NOTIFY cursorShapeChanged)
++
++public:
++  explicit CursorShapeArea(QDeclarativeItem *parent = 0);
++  Qt::CursorShape cursorShape() const;
++  Q_INVOKABLE void setCursorShape(Qt::CursorShape cursorShape);
++private:
++  int m_currentShape;
++signals:
++  void cursorShapeChanged();
++};
++#endif // CURSORSHAPEAREA_H
+Index: arcade/qml/darkone
+===================================================================
+--- arcade/qml/darkone	(revision 4925)
++++ arcade/qml/darkone	(working copy)
+
+Property changes on: arcade/qml/darkone
+___________________________________________________________________
+Added: svn:ignore
+## -0,0 +1 ##
++images
+Index: arcade/qml/darkone/components/Button.qml
+===================================================================
+--- arcade/qml/darkone/components/Button.qml	(revision 0)
++++ arcade/qml/darkone/components/Button.qml	(working copy)
+@@ -0,0 +1,64 @@
++import QtQuick 1.1
++
++Rectangle {
++    id: buttonContainer
++    property variant text
++    signal clicked
++    height: text.height + 10
++    width: text.width + 20
++    border.width: 1
++    radius: 5
++    smooth: true
++    gradient: Gradient {
++        GradientStop {
++            id: gradientStop1
++            position: 0.0
++            color: !mouseArea.pressed ? activePalette.light : activePalette.button
++        }
++        GradientStop {
++            id: gradientStop2
++            position: 1.0
++            color: !mouseArea.pressed ? activePalette.button : activePalette.dark
++        }
++    }
++    onActiveFocusChanged: activeFocus ? border.width = 2 : border.width = 1
++    SystemPalette {
++        id: activePalette
++    }
++    MouseArea {
++        id: mouseArea
++        anchors.fill: parent
++        hoverEnabled: true
++        onClicked: {
++            buttonContainer.clicked();
++            gradientStop1.color = activePalette.light;
++            gradientStop2.color = activePalette.button;
++        }
++        onEntered: {
++            gradientStop1.color = !mouseArea.pressed ? activePalette.button : activePalette.dark;
++            gradientStop2.color = !mouseArea.pressed ? activePalette.light : activePalette.button;
++        }
++        onExited: {
++            gradientStop1.color = !mouseArea.pressed ? activePalette.light : activePalette.button;
++            gradientStop2.color = !mouseArea.pressed ? activePalette.button : activePalette.dark;
++        }
++    }
++    Text {
++        id: text
++        anchors.centerIn:parent
++        text: parent.text
++        color: activePalette.buttonText
++        font.pixelSize: 12
++        smooth: true
++    }
++    Keys.onPressed: {
++        switch ( event.key ) {
++        case Qt.Key_Enter:
++        case Qt.Key_Return:
++        case Qt.Key_Space:
++            if ( !(event.modifiers & Qt.AltModifier) )
++                clicked();
++            break;
++        }
++    }
++}
+Index: arcade/qml/darkone/components/CheckBox.qml
+===================================================================
+--- arcade/qml/darkone/components/CheckBox.qml	(revision 0)
++++ arcade/qml/darkone/components/CheckBox.qml	(working copy)
+@@ -0,0 +1,65 @@
++import QtQuick 1.1
++
++Rectangle {
++    id: checkboxContainer
++    property variant text
++    property bool checked: false
++    signal clicked
++    smooth: true
++    color: "transparent"
++    property alias textColor: checkboxText.color
++    onActiveFocusChanged: {
++        if ( activeFocus )
++            checkboxMark.border.width = 2;
++        else
++            checkboxMark.border.width = 1;
++    }
++    onClicked: checked = !checked
++    Rectangle {
++        id: checkboxMark
++        border.color: "black"
++        border.width: 1
++        smooth: true
++        anchors.left: checkboxContainer.left
++        anchors.leftMargin: 0
++        color: "white"
++        width: 16
++        radius: 2
++        anchors.bottom: parent.bottom
++        anchors.bottomMargin: 0
++        anchors.top: parent.top
++        anchors.topMargin: 0
++        Image {
++            id: checkboxMarkImage
++            source: "../images/checkmark.png"
++            smooth: true
++            anchors.fill: parent
++            anchors.margins: 1
++            fillMode: Image.PreserveAspectFit
++            visible: checkboxContainer.checked
++        }
++        MouseArea {
++            anchors.fill: parent
++            onClicked: checkboxContainer.clicked()
++        }
++    }
++    Text {
++        id: checkboxText
++        text: parent.text
++        font.pixelSize: 12
++        color: "white"
++        anchors.left: checkboxMark.right
++        anchors.leftMargin: 5
++        smooth: true
++    }
++    Keys.onPressed: {
++        switch ( event.key ) {
++        case Qt.Key_Enter:
++        case Qt.Key_Return:
++        case Qt.Key_Space:
++            if ( !(event.modifiers & Qt.AltModifier) )
++                clicked();
++            break;
++        }
++    }
++}
+Index: arcade/qml/darkone/components/Checkable.qml
+===================================================================
+--- arcade/qml/darkone/components/Checkable.qml	(revision 0)
++++ arcade/qml/darkone/components/Checkable.qml	(working copy)
+@@ -0,0 +1,85 @@
++/****************************************************************************
++**
++** Copyright (C) 2011 Nokia Corporation and/or its subsidiary(-ies).
++** All rights reserved.
++** Contact: Nokia Corporation (qt-info@nokia.com)
++**
++** This file is part of the Qt Components project.
++**
++** $QT_BEGIN_LICENSE:BSD$
++** You may use this file under the terms of the BSD license as follows:
++**
++** "Redistribution and use in source and binary forms, with or without
++** modification, are permitted provided that the following conditions are
++** met:
++**   * Redistributions of source code must retain the above copyright
++**     notice, this list of conditions and the following disclaimer.
++**   * Redistributions in binary form must reproduce the above copyright
++**     notice, this list of conditions and the following disclaimer in
++**     the documentation and/or other materials provided with the
++**     distribution.
++**   * Neither the name of Nokia Corporation and its Subsidiary(-ies) nor
++**     the names of its contributors may be used to endorse or promote
++**     products derived from this software without specific prior written
++**     permission.
++**
++** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++** OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++import QtQuick 1.1
++
++QtObject {
++    id: root
++    property bool checked: false
++    property variant value: null
++    property QtObject exclusiveGroup: null
++    property bool enabled: false
++
++    onEnabledChanged: {
++        if (!enabled) {
++            exclusiveGroup = null;
++            checked = false;
++        }
++    }
++
++    function toggle() {
++        if (!enabled)
++            return;
++        if (!exclusiveGroup) {
++            checked = !checked;
++        } else {
++            // In an exclusive group, there is no 'checked = false'. The invariant
++            // of the group doesn't allow to "uncheck" the checked item. Note that
++            // the group watches for changes in the checked variable of its items.
++            checked = true;
++        }
++    }
++
++    onExclusiveGroupChanged: {
++        if (exclusiveGroup) {
++            enabled = true;
++            // Note that we don't need to remove the previous group,
++            // since it is watching the 'exclusiveGroup' property changes
++            // in this item and will automatically remove us.
++            exclusiveGroup.__add(root);
++        }
++    }
++
++    Component.onDestruction: {
++        // If there's a previous group, it will be watching for
++        // this change and will remove this item.
++        exclusiveGroup = null;
++    }
++}
+Index: arcade/qml/darkone/components/CheckableGroup.js
+===================================================================
+--- arcade/qml/darkone/components/CheckableGroup.js	(revision 0)
++++ arcade/qml/darkone/components/CheckableGroup.js	(working copy)
+@@ -0,0 +1,171 @@
++/****************************************************************************
++**
++** Copyright (C) 2011 Nokia Corporation and/or its subsidiary(-ies).
++** All rights reserved.
++** Contact: Nokia Corporation (qt-info@nokia.com)
++**
++** This file is part of the Qt Components project.
++**
++** $QT_BEGIN_LICENSE:BSD$
++** You may use this file under the terms of the BSD license as follows:
++**
++** "Redistribution and use in source and binary forms, with or without
++** modification, are permitted provided that the following conditions are
++** met:
++**   * Redistributions of source code must retain the above copyright
++**     notice, this list of conditions and the following disclaimer.
++**   * Redistributions in binary form must reproduce the above copyright
++**     notice, this list of conditions and the following disclaimer in
++**     the documentation and/or other materials provided with the
++**     distribution.
++**   * Neither the name of Nokia Corporation and its Subsidiary(-ies) nor
++**     the names of its contributors may be used to endorse or promote
++**     products derived from this software without specific prior written
++**     permission.
++**
++** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++** OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++// This file contains the implementation of CheckableGroup.qml functionality,
++// and CheckableGroup root element is identified by 'root'.
++
++var items = [];
++var selectedItem = null;
++var completed = false;
++
++
++function add(item) {
++    // Add the item, and if it's the case, check it as well.
++    items.push(item);
++    if (item.checked) {
++        check(item);
++    } else if (items.length == 1 && completed) {
++        // If we are already completed, this enforces the invariant of
++        // having always one item checked in the group. For exception
++        // case see onCompleted() function.
++        check(item);
++    }
++
++    // Connect so we know when items left the group or are requesting
++    // a different state (check or uncheck). Note that we register
++    // passing the item to be the 'this' value when the function
++    // is called.
++    item.exclusiveGroupChanged.connect(item, onItemExclusiveGroupChange);
++    item.checkedChanged.connect(item, onItemCheckedChange);
++}
++
++function onItemExclusiveGroupChange() {
++    var item = this;
++    if (item.checkGroup !== root) {
++        remove(item);
++    }
++}
++
++function onItemCheckedChange() {
++    var item = this;
++
++    // In those two cases we know the change was caused by the group, so we can ignore it.
++    if ((item === selectedItem && item.checked) ||
++        (item !== selectedItem && !item.checked)) {
++        return;
++    }
++
++    if (item.checked) {
++        // A non-selected item was checked, so we do the real check.
++        check(item);
++    } else if (items.length == 1) {
++        // Only one item, and it was unchecked. We have to rollback
++        // because it would break the group invariant.
++        //
++        // NOTE: This cause a glitch in the item.checked variable that
++        // goes false then true, however the CheckableGroup.selectedValue
++        // remains unchanged. We could avoid this with a custom setter
++        // in the 'checked' property of an item.
++        item.checked = true;
++    } else {
++        // The selected item was unchecked, choose another one to check.
++        var idx = (items.indexOf(item) + 1) % items.length
++        check(items[idx]);
++    }
++}
++
++function remove(item) {
++    // Remove the item from the list
++    var idx = items.indexOf(item);
++    if (idx == -1) {
++        console.log("Error: removing an invalid item.");
++        return;
++    }
++    items.splice(idx, 1);
++
++    item.exclusiveGroupChanged.disconnect(item, onItemExclusiveGroupChange);
++    item.checkedChanged.disconnect(item, onItemCheckedChange);
++
++    // If we are removing the selected item, we need to find a
++    // replacement to be selected...
++    if (selectedItem === item) {
++        selectedItem = null;
++        if (items.length > 0) {
++            var otherIdx = idx % items.length;
++            check(items[otherIdx]);
++        } else {
++            // ...or simply having no selectedValue.
++            root.selectedValue = null;
++        }
++    }
++}
++
++/// Select one item, setting the selectedValue in the group
++function check(item) {
++    // It is important to have the right item in the 'selectedItem'
++    // before the changes since we use that to identify that the change
++    // was made by us.
++    var oldSelectedItem = selectedItem
++    selectedItem = item;
++    if (oldSelectedItem)
++        oldSelectedItem.checked = false;
++    item.checked = true;
++    root.selectedValue = item.value;
++}
++
++function onCompleted() {
++    completed = true;
++
++    // When the QML file is loaded, and no items on it had 'checkable: true' (which
++    // would be considered in the add() function), then we simply select one of them
++    // to enforce the rule of having one item selected.
++    //
++    // The delayed selection is useful because it allow to declare in the QML file
++    // one item as 'checked' and don't see a "glitch" in the selectedValue because
++    // another item was added before to the group (and could be selected if this was
++    // not delayed).
++    if (!selectedItem && items.length > 0) {
++        check(items[0]);
++    }
++}
++
++function clear() {
++    var itemsLength = items.length;
++    for (var i = 0; i < itemsLength; i++) {
++        var item = items[i];
++        item.exclusiveGroupChanged.disconnect(item, onItemExclusiveGroupChange);
++        item.checkedChanged.disconnect(item, onItemCheckedChange);
++        item.exclusiveGroup = null;
++    }
++
++    items = [];
++    selectedItem = null;
++    root.selectedValue = null;
++}
+Index: arcade/qml/darkone/components/CheckableGroup.qml
+===================================================================
+--- arcade/qml/darkone/components/CheckableGroup.qml	(revision 0)
++++ arcade/qml/darkone/components/CheckableGroup.qml	(working copy)
+@@ -0,0 +1,58 @@
++/****************************************************************************
++**
++** Copyright (C) 2011 Nokia Corporation and/or its subsidiary(-ies).
++** All rights reserved.
++** Contact: Nokia Corporation (qt-info@nokia.com)
++**
++** This file is part of the Qt Components project.
++**
++** $QT_BEGIN_LICENSE:BSD$
++** You may use this file under the terms of the BSD license as follows:
++**
++** "Redistribution and use in source and binary forms, with or without
++** modification, are permitted provided that the following conditions are
++** met:
++**   * Redistributions of source code must retain the above copyright
++**     notice, this list of conditions and the following disclaimer.
++**   * Redistributions in binary form must reproduce the above copyright
++**     notice, this list of conditions and the following disclaimer in
++**     the documentation and/or other materials provided with the
++**     distribution.
++**   * Neither the name of Nokia Corporation and its Subsidiary(-ies) nor
++**     the names of its contributors may be used to endorse or promote
++**     products derived from this software without specific prior written
++**     permission.
++**
++** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++** OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++import QtQuick 1.1
++
++import "CheckableGroup.js" as Private
++
++QtObject {
++    id: root
++    property variant selectedValue
++
++    // This is equivalent to setting the group of all the items
++    // to null, but without causing glitches in the selectedValue.
++    function clear() { Private.clear(); }
++
++    function __add(item) { Private.add(item); }
++
++    Component.onCompleted: {
++        Private.onCompleted();
++    }
++}
+Index: arcade/qml/darkone/darkone.js
+===================================================================
+--- arcade/qml/darkone/darkone.js	(revision 0)
++++ arcade/qml/darkone/darkone.js	(working copy)
+@@ -0,0 +1,492 @@
++
++var baseWidth = 800;
++var baseHeight = 600;
++var baseListWidth = 250;
++var lastItemText;
++var lastitemBackground;
++var resetZoom;
++var resetListHidden;
++var resetToolbarHidden;
++var flashCounter = 0;
++var inGame = false;
++var dataTypes = { "title": { key: "title", name: "title image", type: "image", path: "ttl" },
++                  "preview": { key: "preview", name: "preview image", type: "image", path: "prv" },
++                  "flyer": { key: "flyer", name: "flyer image", type: "image", path: "fly" },
++                  "cabinet": { key: "cabinet", name: "cabinet image", type: "image", path: "cab" },
++                  "controller": { key: "controller", name: "controller image", type: "image", path: "ctl" },
++                  "marquee": { key: "marquee", name: "marquee image", type: "image", path: "mrq" },
++                  "pcb": { key: "pcb", name: "pcb image", type: "image", path: "pcb" },
++                  "gameinfo": { key: "gameinfo", name: "game info", type: "text", text: "[game info]" },
++                  "emuinfo": { key: "emuinfo", name: "emulator info", type: "text", text: "[emulator info]" } }
++
++function init() {
++    if (!darkone.initialised && darkone.lastIndex == -1) {
++        viewer.loadSettings();
++        colourScheme(darkone.colourScheme);
++        viewer.loadGamelist();
++        darkone.debug && console.log("[init] lastIndex: '" + darkone.lastIndex + "', " +
++                                            "gameListModelCount: '" + gameListModelCount + "'");
++        gameListView.currentIndex = lastIndex < gameListModelCount && lastIndex > -1 ? lastIndex : 0;
++        gameListView.positionViewAtIndex(gameListView.currentIndex, ListView.Center);
++        darkone.debug && console.log("[init] lastIndex: '" + lastIndex + "', " +
++                                            "gameListModelCount: '" + gameListModelCount + "'");
++        darkone.dataTypeCurrent = darkone.dataTypePrimary;
++        listToggle(1 - (darkone.listHidden * 2));
++        if (fpsVisible)
++            toolbarShowMenuLock = true;
++        if (!keepLightOn) {
++            lightOutTimer.start();
++            lightOutScreenTimer.start();
++        }
++        darkone.keepLightOn = (darkone.lightTimeout == 0) ? true : false;
++        toolbarToggle(darkone.toolbarAutoHide ? -1 : 1 - (darkone.toolbarHidden * 2));
++        fadeIn.start();
++    } else if(!fadeIn.running) {
++        darkone.initialised = true;
++        initTimer.stop();
++        //power
++        lightOut = false;
++        lightOutScreen = false;
++    }
++}
++
++function info(context, object) {
++    console.log("[" + context + "] " +
++//                "opacity: '" + object.opacity + "'" +
++//                "x: '" + object.x + "', " +
++//                "width: '" + round(object.width, 2) + "', " +
++//                "scaleFactorX: '" + round(scaleFactorX(), 2) + "', " +
++//                "leftMargin: '" + round(object.anchors.leftMargin, 2) + "', " +
++//                "rightMargin: '" + round(object.anchors.rightMargin, 2) + "', " +
++                "y: '" + object.y + "', " +
++                "height: '" + round(object.height, 2) + "', " +
++                "scaleFactorY: '" + round(scaleFactorY(), 2) + "', " +
++                "topMargin: '" + round(object.anchors.topMargin, 2) + "', " +
++                "bottomMargin: '" + round(object.anchors.bottomMargin, 2) + "', " +
++                "")
++}
++
++function scaleFactorX() {
++    return darkone.width / baseWidth;
++}
++
++function scaleFactorY() {
++    return darkone.height / baseHeight;
++}
++
++function listWidth() {
++    return Math.floor(Math.max(baseListWidth, baseListWidth * scaleFactorX()));
++}
++
++function overlayWidth() {
++    return baseWidth * scaleFactorX() - (darkone.listHidden ? 0 : listWidth());
++}
++
++function itemEntered(itemText, itemBackground, itemCurrent) {
++    darkone.debug && console.log("[itemEntered] " +
++                                 "listWidth: '" + listWidth() + "', " +
++                                 "overlayWidth: '" + overlayWidth() + "'");
++    if ( !itemText.fontResized ) {
++        if ( lastItemText != undefined )
++            itemExited(lastItemText, lastitemBackground);
++        lastItemText = itemText;
++        itemText.fontResized = true;
++        itemText.font.pixelSize += 1;
++    }
++}
++
++function itemExited(itemText, itemBackground, itemCurrent) {
++    if ( itemText.fontResized ) {
++        itemText.fontResized = false;
++        itemText.font.pixelSize -= 1;
++    }
++}
++
++function toolbarToggle(force) {
++    darkone.debug && console.log("[toolbarToggle 1] " +
++                                 "toolbarHidden: '" + darkone.toolbarHidden + "', " +
++                                 "toolbarAutoHide: '" + darkone.toolbarAutoHide + "', " +
++                                 "force: '" + force + "'");
++    if (force > 0 || (darkone.toolbarHidden && !force)) {
++        toolbar.state = "shown"
++        darkone.toolbarHidden = false;
++    } else if ((force < 0 || (!darkone.toolbarHidden && !force)) &&
++                !toolbarShowMenuLock && !toolbarShowFpsLock) {
++        toolbar.state = "hidden"
++        darkone.toolbarHidden = true;
++    }
++    searchTextInput.focus = false;
++    darkone.debug && console.log("[toolbarToggle 2] " +
++                                 "toolbarHidden: '" + darkone.toolbarHidden + "', " +
++                                 "toolbarAutoHide: '" + darkone.toolbarAutoHide + "', " +
++                                 "force: '" + force + "'");
++}
++
++function listToggle(force) {
++
++    darkone.debug && console.log("[listToggle 1] " +
++                                 "listHidden: '" + darkone.listHidden + "', " +
++                                 "force: '" + force + "'");
++    if (toolbarShowMenuLock)
++        return
++    darkone.overlayDuration = 1000;
++    resetOverlaySnapTimer.start();
++    if (force > 0 || (darkone.listHidden && !force)) {
++        gameListView.state = "shown"
++        darkone.listHidden = false;
++        searchBox.opacity = 1.0;
++        showListButton.anchors.left = searchBox.right
++        showListButton.rotation = 270;
++    } else if (force < 0 || (!darkone.listHidden && !force)) {
++        gameListView.state = "hidden"
++        darkone.listHidden = true;
++        searchBox.opacity = 0;
++        showListButton.anchors.left = showListButton.parent.left
++        showListButton.rotation = 90;
++    }
++    searchTextInput.focus = false;
++    darkone.debug && console.log("[listToggle 2] " +
++                                 "listHidden: '" + darkone.listHidden + "', " +
++                                 "force: '" + force + "'");
++}
++
++function lightToggle(force) {
++    if (force > 0 || (darkone.lightOff && !force)) {
++        ignoreLaunch = preferencesLaunchLock ? true : false
++        lightOut = false;
++        lightOutScreen = false;
++        resetListHidden && listToggle(1);
++        resetToolbarHidden && toolbarToggle(1);
++        !darkone.disableZoom && zoom(resetZoom / darkone.overlayScale);
++        if (!keepLightOn) {
++            lightOutTimer.restart();
++            lightOutScreenTimer.restart();
++        }
++    } else if (force < 0 || (!darkone.lightOff && !force)) {
++        ignoreLaunch = true
++        resetListHidden = !darkone.listHidden;
++        listToggle(-1);
++        resetToolbarHidden = !darkone.toolbarHidden;
++        toolbarToggle(-1);
++        overlayStateBlock.opacity = 0
++        if (resetZoom == 1 && !darkone.disableZoom) {
++            resetZoom = darkone.overlayScale;
++            zoom("0.5");
++        }
++        lightOutTimer.stop();
++        lightOut = true;
++    }
++}
++
++function round(number, dp) {
++    return Math.round(number * Math.pow(10, dp)) / Math.pow(10, dp)
++}
++
++function zoom(zoom) {
++    darkone.debug && console.log(
++        "[zoom] " +
++        "scale: window (x,y): ' " + round(scaleFactorX(), 2) + "," + round(scaleFactorY(), 2) + "', " +
++        "scale: screen: '" + round(darkone.overlayScale, 2) + "', " +
++//        "scale: combined:' " + round(scaleFactorX() * darkone.overlayScale, 2) + "', " +
++//        "darkone.height: '" + round(darkone.height, 2) + "', " +
++//        "overlayScreen.anchors.topMargin: '" + round(overlayScreen.anchors.topMargin, 2) + "', " +
++//        "overlayScreen.y: '" + round(overlayScreen.y, 2) + "', " +
++//        "overlayScreen.parent.y: '" + round(overlayScreen.parent.y, 2) + "', " +
++        "overlayScreen.height: '" + round(overlayScreen.height, 2) + "', " +
++        "darkone.height: '" + round(baseHeight, 2) + "', " +
++        "overlayScreen.height scaled: '" + round(overlayScreen.height * overlayScreen.scale, 2) + "', " +
++        "overlayScreen.height scaled comp: '" + round(overlayScreen.height * scaleFactorY() * darkone.overlayScale, 2) + "', " +
++        "darkone.height scaled: '" + round(darkone.height, 2) + "'")
++
++      switch(typeof(zoom)) {
++          case "string":
++              if (zoom == "max") {
++                  darkone.debug && console.log("[zoom max 1] darkone.overlayScale: '" + darkone.overlayScale + "', " +
++                                                            "overlayScreen.scale: '" + overlayScreen.scale + "'");
++                  zoom = (darkone.height / (overlayScreen.height * scaleFactorY()));
++                  darkone.zoomDuration = Math.max(200, Math.abs(zoom - darkone.overlayScale) * 100 * 8);
++
++                  darkone.debug && console.log("[zoom max] zoom: '" + zoom + "', " +
++                                                          "duration: '" + darkone.zoomDuration + "'");
++                  darkone.overlayScale = zoom;
++                  darkone.debug && console.log("[zoom max 2] darkone.overlayScale: '" + darkone.overlayScale + "', " +
++                                                            "overlayScreen.scale: '" + overlayScreen.scale + "'");
++              }
++              break;
++        default:
++
++            darkone.zoomDuration = Math.max(200, Math.abs(zoom - darkone.overlayScale) * 100 * 8);
++            darkone.debug && console.log("[zoom] zoom: " + zoom + ", " +
++                                                "duration: " + darkone.zoomDuration + ",");
++            if (zoom > 1) {
++                darkone.debug && console.log("[zoom > 1 1] darkone.overlayScale: '" + darkone.overlayScale + "', " +
++                                                          "overlayScreen.scale: '" + overlayScreen.scale + "'");
++                darkone.debug && console.log("[zoom] testing on: '" +
++                    round(((overlayScreen.height * scaleFactorY() * darkone.overlayScale * zoom) / darkone.height), 2) + " > 0.95'");
++
++                if (((overlayScreen.height * scaleFactorY() * darkone.overlayScale * zoom) / darkone.height ) > 0.95)
++                    DarkoneJS.zoom("max");
++                else
++                    darkone.overlayScale *= zoom;
++                    darkone.debug && console.log("[zoom > 1 2] darkone.overlayScale: '" + darkone.overlayScale + "', " +
++                                                              "overlayScreen.scale: '" + overlayScreen.scale + "'");
++            } else if (zoom < 1 && overlayScreen.scale * zoom >= 0.33) {
++                darkone.debug && console.log("[zoom < 1 1] darkone.overlayScale: '" + darkone.overlayScale + "', " +
++                                                          "overlayScreen.scale: '" + overlayScreen.scale + "'");
++                darkone.overlayScale *= zoom;
++                darkone.debug && console.log("[zoom < 1 2] darkone.overlayScale: '" + darkone.overlayScale + "', " +
++                                                          "overlayScreen.scale: '" + overlayScreen.scale + "'");
++            }
++            break;
++    }
++}
++
++function launchFlash() {
++
++    if (flashCounter == darkone.flashes) {
++        launchFlashTimer.stop();
++        flashCounter = 0;
++        !darkone.disableZoom && zoom("max");
++        launchTimer.start()
++    } else {
++        if (launchButton.opacity < 1) {
++             launchButton.opacity = 1.0;
++             overlayStateBlock.opacity = 1.0;
++        } else {
++             launchButton.opacity = 0.5;
++             overlayStateBlock.opacity = 0.5;
++        }
++        flashCounter += 1;
++    }
++}
++
++function launch() {
++
++     searchTextInput.focus = false;
++     resetListHidden = !darkone.listHidden;
++     listToggle(-1);
++     resetToolbarHidden = !darkone.toolbarHidden;
++     toolbarToggle(-1);
++     resetZoom = darkone.overlayScale;
++     if (darkone.disableFlashLaunch) {
++         !darkone.disableZoom && zoom("max");
++         launchTimer.start();
++     } else {
++         launchFlashTimer.start();
++     }
++}
++
++function gameOn() {
++     darkone.debug && console.log("[gameOn]");
++     inGame = true;
++}
++
++function gameOver() {
++    if (inGame) {
++        darkone.debug && console.log("[gameOver] resetZoom: '" + resetZoom + "', " +
++                                                "resetToolbarHidden: '" + resetToolbarHidden + "', " +
++                                                "resetListHidden: '" + resetListHidden + "'");
++        inGame = false;
++        launchButton.opacity = 0.5;
++        overlayStateBlock.opacity = (lightOnAnimation.running || lightOut) ? 0 : 0.5;
++        resetListHidden && listToggle(1);
++        resetToolbarHidden && toolbarToggle(1);
++        !darkone.disableZoom && zoom(resetZoom / darkone.overlayScale);
++        !darkone.toolbarHidden ? searchTextInput.focus = true : true;
++    }
++}
++
++function gameCardHeader() {
++
++    if (!initialised)
++        return ""
++
++          var gameObject = gameListModel[gameListView.currentIndex];
++    return "<style type='text/css'>p,h2 { margin:0px }</style><h2>" + gameObject.description + "</h2><p>" + qsTr("ID") + ": " + gameObject.id + " / " + qsTr("ROM state") + ": " + viewer.romStateText(gameObject.romState) + "</p>";
++}
++
++// find datatype (object) by (property) name in (object) dataTypes, and return an 'adjacent' datatype's name
++// type: key (property) of datatype to find in datatypes
++// offset: integer, positive for next adjacent, negative for previous adjacent
++function adjDataType(type, offset) {
++    var first;
++    var current;
++    var previous;
++    var target;
++    var set = false;
++    var dataType;
++    for (dataType in dataTypes) {
++        current = dataTypes[dataType].key;
++        if (set) {
++            if (offset > 0) {
++                target = current;
++                break;
++            }
++        } else if (current == type) {
++            set = true;
++            if (offset < 0 && previous) {
++                target = previous;
++                break;
++            }
++        } else if (!first)
++            first=current
++        previous = current
++    }
++    if (set && !target) {
++        if (offset > 0)
++            target = first
++        else if (offset < 0)
++            target = current
++    }
++    darkone.debug && console.log("[adjDataType] type: '" + type + "', " +
++                                                "offset: '" + offset + "', " +
++                                                "target: '" + target + "'");
++    return target;
++}
++
++function data(type) {
++
++    if (!initialised)
++        return ""
++
++    darkone.debug && console.log("[data] type: '" + type + "', " +
++                                        "dataTypeCurrent: '" + darkone.dataTypeCurrent + "', " +
++                                        "dataTypePrimary: '" + darkone.dataTypePrimary + "', " +
++                                        "dataTypeSecondary: '" + darkone.dataTypeSecondary + "'");
++    switch (type) {
++        case "image":
++            var image = ""
++            var image2 = ""
++            if (darkone.dataHidden) {
++                if (dataTypes[darkone.dataTypePrimary].type == "image") {
++                     if ( viewer.loadImage(dataTypes[darkone.dataTypePrimary].path + "/" + gameListModel[gameListView.currentIndex].id) != "" ) {
++                         image = "image://qmc2/" + dataTypes[darkone.dataTypePrimary].path + "/" + gameListModel[gameListView.currentIndex].id;
++                         darkone.debug && console.log("[data] success using image path: '" + image + "'");
++                    }
++                }
++                if (image == "" && dataTypes[darkone.dataTypeSecondary].type == "image") {
++                    if ( viewer.loadImage(dataTypes[darkone.dataTypeSecondary].path + "/" + gameListModel[gameListView.currentIndex].id) != "") {
++                         image = "image://qmc2/" + dataTypes[darkone.dataTypeSecondary].path + "/" + gameListModel[gameListView.currentIndex].id;
++                         darkone.debug && console.log("[data] success using image path: '" + image + "'");
++                    }
++                }
++                if (image == "" && ( dataTypes[darkone.dataTypePrimary].type == "image" || dataTypes[darkone.dataTypeSecondary].type == "image"))
++                   image = "image://qmc2/ttl/default" // default
++            } else {
++                if (dataTypes[darkone.dataTypeCurrent].type == "image") {
++                    if ( viewer.loadImage(dataTypes[darkone.dataTypeCurrent].path + "/" + gameListModel[gameListView.currentIndex].id) != "") {
++                         image = "image://qmc2/" + dataTypes[darkone.dataTypeCurrent].path + "/" + gameListModel[gameListView.currentIndex].id;
++                         darkone.debug && console.log("[data] success using image path: '" + image + "'");
++                    }
++                }
++                if (image == "" && dataTypes[darkone.dataTypeCurrent].type == "image")
++                   image = "image://qmc2/ttl/default" // default
++            }
++            darkone.debug && console.log("[data] using image path: '" + image + "'");
++            return image;
++            break;
++        case "text":
++            var info = ""
++            var type = ""
++            if (darkone.dataHidden) {
++                 if (dataTypes[darkone.dataTypePrimary].type == "text") {
++                     type = dataTypes[darkone.dataTypePrimary].text
++                     info = viewer.requestInfo(gameListModel[gameListView.currentIndex].id, dataTypes[darkone.dataTypePrimary].key);
++                     if (!info.match("no info available")) {
++                         darkone.debug && console.log("[data] using text type: '" + type + "'");
++                     }
++                }
++                if (type == "" && dataTypes[darkone.dataTypeSecondary].type == "text") {
++                    type = dataTypes[darkone.dataTypeSecondary].text
++                    info = viewer.requestInfo(gameListModel[gameListView.currentIndex].id, dataTypes[darkone.dataTypeSecondary].key);
++                    if (!info.match("no info available")) {
++                        darkone.debug && console.log("[data] using text type: '" + type + "'");
++                    }
++                }
++            }
++            else {
++                if (dataTypes[darkone.dataTypeCurrent].type == "text") {
++                    type = dataTypes[darkone.dataTypeCurrent].text
++                    info = viewer.requestInfo(gameListModel[gameListView.currentIndex].id, dataTypes[darkone.dataTypeCurrent].key);
++                }
++            }
++            info.match("no info available") ? darkone.infoMissing = true : darkone.infoMissing = false;
++            darkone.debug && console.log("[data] infoMissing: '" + darkone.infoMissing + "', " +
++                                                "info: '" + "info" + "'")
++            return type == "" ? "" : "<style type='text/css'>p,h3 { margin:0px }</style>" + "<h3>" + type + "</h3>" + "<p>" + info + "</p>";
++            break;
++        case "name":
++            return dataTypes[darkone.dataTypeCurrent].name;
++            break;
++    }
++}
++
++function gameStatusColour() {
++
++    if (!initialised)
++        return "transparent"
++
++    darkone.debug && console.log("romState: '" + gameListModel[gameListView.currentIndex].romState + "'");
++    switch ( gameListModel[gameListView.currentIndex].romState ) {
++    case 0:
++        // correct
++        return "#00ce00";
++    case 1:
++        // mostly correct
++        return "#d2bc00";
++    case 2:
++        // incorrect
++        return "#ff0000";
++    case 3:
++        // notfound
++        return "#cccacb";
++    case 4:
++    default:
++        // unknown
++        return "#0030c6";
++    }
++}
++
++function validateKey(k) {
++    if ( /[^a-zA-Z0-9\*\?$]/.test(k) || k == "" )
++        return false;
++    else
++        return true;
++}
++
++function validateSpecialKey(k) {
++    if ( /[^\b$]/.test(k) || k == "" )
++        return false;
++    else
++        return true;
++}
++
++function colourScheme(scheme) {
++    switch (scheme) {
++        case "dark" :
++            colourScheme1Button.checked = true;
++            colourScheme1Button.opacity = 1.0;
++            colour1 = "#777777"; // gradient 1
++            colour2 = "#000000"; // gradient 2
++            colour3 = "#333333"; // gradient 3
++            colour4 = "#222222"; // gradient 4
++            colour5 = "#111111"; // menu
++            textColour1 = "#eeeeee"; // primary text
++            textColour2 = "#1769ff"; // list highlighted
++            break;
++        case "metal":
++            colourScheme2Button.checked = true;
++            colourScheme2Button.opacity = 1.0;
++            colour1 = "#000000";
++            colour2 = "#ffffff";
++            colour3 = "#aaaaaa";
++            colour4 = "#000000";
++            colour5 = "#999999";
++            textColour1 = "#000000"
++            textColour2 = "#0000ff"
++            break;
++    }
++    darkone.debug && console.log("[colourScheme] scheme: '" + scheme + "', " +
++                                                "colourScheme1Button.checked: '" + colourScheme1Button.checked + "', " +
++                                                "colourScheme2Button.checked: '" + colourScheme2Button.checked + "'")
++}
+Index: arcade/qml/darkone/darkone.qml
+===================================================================
+--- arcade/qml/darkone/darkone.qml	(revision 0)
++++ arcade/qml/darkone/darkone.qml	(working copy)
+@@ -0,0 +1,1714 @@
++
++import QtQuick 1.1
++import "./components";
++import Wheel 1.0;
++import Pointer 1.0;
++import "darkone.js" as DarkoneJS
++
++Rectangle {
++    id: darkone
++    z: 0
++
++    property bool initialised: false
++    property int fps: 0
++    property bool ignoreLaunch: false
++    property bool dataHidden: true
++    property bool keepLightOn: false
++    property bool lightOut: true
++    property bool lightOutScreen: true
++    property string dataTypeCurrent: "title"
++    property int zoomDuration: 250
++    property int listDuration: 750
++    property int flashes: 3
++    property int overlayDuration: 0
++    property int toolbarHideIn: 0
++    property bool preferencesLaunchLock: false
++    property bool toolbarShowMenuLock: false
++    property bool toolbarShowFpsLock: false
++    property bool infoMissing: true
++    property real backLightOpacity: 0
++    property string colour1: "#000000"
++    property string colour2: "#000000"
++    property string colour3: "#000000"
++    property string colour4: "#000000"
++    property string colour5: "#000000"
++    property string textColour1: "#000000"
++    property string textColour2: "#000000"
++    property string version: ""
++    property bool debug: false
++//    property bool debug: true
++
++    // restored properties
++    property int lastIndex: -1
++    property bool toolbarHidden: false
++    property bool listHidden: false
++    property bool fullScreen: false
++    property bool fpsVisible: false
++    property bool sortByName: false
++    property bool disableFlashLaunch: false
++    property bool disableZoom: false
++    property string dataTypePrimary: ""
++    property string dataTypeSecondary: ""
++    property real lightTimeout: 60
++    property bool backLight: true
++    property bool toolbarAutoHide: true
++    property real overlayScale: 1
++    property string colourScheme: "dark"
++
++    width: DarkoneJS.baseWidth
++    height: DarkoneJS.baseHeight
++    color: "black"
++    opacity: 0
++    state: "off"
++
++    PropertyAnimation { id: fadeIn; target: darkone; property: "opacity"; duration: 2000; from: 0; to: 1.0; easing.type: Easing.InExpo; }
++    onToolbarAutoHideChanged: { debug && console.log("toolbarAutoHide: '" + toolbarAutoHide + "'"); }
++    onLastIndexChanged: { debug && console.log("lastIndex: '" + lastIndex + "'"); }
++    Component.onCompleted: initTimer.start()
++    Connections {
++        target: viewer;
++        onEmulatorStarted: DarkoneJS.gameOn();
++        onEmulatorFinished: DarkoneJS.gameOver();
++    }
++    onStateChanged: state == "off" ? lightOffAnimation.start() : lightOnAnimation.start()
++    SequentialAnimation {
++        id: lightOnAnimation
++        PropertyAnimation { target: overlayCabinet; property: "opacity"; duration: 150; from: 0; to: 1.0; easing.type: Easing.InExpo; }
++        PropertyAnimation { target: overlayCabinet; property: "opacity"; duration: 75; from: 1.0; to: 0.25; easing.type: Easing.InExpo; }
++        PropertyAnimation { target: overlayCabinet; property: "opacity"; duration: 75; from: 0.25; to: 1.0; easing.type: Easing.InExpo; }
++        PropertyAnimation { target: overlayCabinet; property: "opacity"; duration: 75; from: 1.0; to: 0.25; easing.type: Easing.InExpo; }
++        PropertyAnimation { target: overlayCabinet; property: "opacity"; duration: 105; from: 0.25; to: 1.0; easing.type: Easing.InExpo; }
++        PropertyAnimation { target: overlayCabinet; property: "opacity"; duration: 250; from: 1.0; to: 0.75; easing.type: Easing.InExpo; }
++        PropertyAnimation { target: overlayCabinet; property: "opacity"; duration: 0; from: 0.75; to: 1.0; easing.type: Easing.InExpo; }
++        PropertyAnimation { target: overlayStateBlock; property: "opacity"; duration: 5; from: 0.0; to: 1.0; easing.type: Easing.InExpo; }
++        PropertyAnimation { target: overlayStateBlock; property: "opacity"; duration: 5; from: 0; to: 0.5; easing.type: Easing.InExpo; }
++        PropertyAnimation { target: overlayTextFlick; property: "opacity"; duration: 5; from: 0; to: 1.0; easing.type: Easing.InExpo; }
++    }
++    SequentialAnimation {
++        id: lightOffAnimation
++        PropertyAnimation { target: overlayStateBlock; property: "opacity"; duration: 0; from: overlayStateBlock.opacity; to: 0; easing.type: Easing.InExpo; }
++        PropertyAnimation { target: overlayCabinet; property: "opacity"; duration: 5; from: 1.0; to: 0.1; easing.type: Easing.InExpo; }
++        PropertyAnimation { target: overlayTextFlick; property: "opacity"; duration: 5; from: 1.0; to: 0; easing.type: Easing.InExpo; }
++    }
++    onLightOutChanged: { debug && console.log("[darkone] lightOut: '" + lightOut + ", " +
++                                                        "state before: '" + darkone.state + "'");
++                         lightOut ? darkone.state = "off" : darkone.state = "on"; }
++    onLightOutScreenChanged: { debug && console.log("[darkone] lightOutScreen: '" + lightOutScreen + ", " +
++                                                              "overlayScreen.state orig: '" + overlayScreen.state + "', " +
++                                                              "backLightOpacity: '" + backLightOpacity + "'");
++                              if (lightOutScreen) {
++                                  backLightOpacity = 0;
++                                  overlayScreen.state = "off"
++                               } else {
++                                  if (backLight)
++                                     backLightOpacity = 1.0;
++                                  overlayScreen.state = "on";
++                               } }
++
++    MouseArea {
++        anchors.fill: parent
++        hoverEnabled: true
++        onPositionChanged: { if (!keepLightOn) {
++                                 lightOutTimer.restart();
++                                 lightOutScreenTimer.restart();
++                             }
++                             if (lightOut)
++                                 DarkoneJS.lightToggle(1);
++        }
++    }
++
++    Timer {
++        id: initTimer
++        interval: 5
++        running: false
++        repeat: true
++        onTriggered: DarkoneJS.init()
++    }
++    Timer {
++        id: resetIgnoreLaunchTimer
++        interval: 100
++        running: false
++        repeat: false
++        onTriggered: darkone.ignoreLaunch = false
++    }
++    Timer {
++        //reset overlay width to snap instantantly
++        id: resetOverlaySnapTimer
++        interval: 1000
++        repeat: false
++        onTriggered: { darkone.overlayDuration = 0; }
++    }
++    Timer {
++        id: launchFlashTimer
++        interval: 750
++        running: false
++        repeat: true
++        onTriggered: DarkoneJS.launchFlash()
++    }
++    Timer {
++        id: launchTimer
++        interval: 250
++        running: false
++        repeat: true
++        onTriggered: { if (!overlayScreenScaleAnimation.running) {
++                          launchTimer.stop();
++                          viewer.launchEmulator(gameListModel[gameListView.currentIndex].id);
++                       } } }
++    Timer {
++        id: hideToolbarTimer
++        interval: 500
++        running: false
++        repeat: true
++        onTriggered: {
++            if (toolbarHideIn == 0) {
++                hideToolbarTimer.stop();
++                toolbarHideIn = 3;
++                toolbarAutoHide && DarkoneJS.toolbarToggle(-1);
++            } else
++                toolbarHideIn -= 1;
++        }
++    }
++    Timer {
++        id: lightOutTimer
++        interval: lightTimeout * 1000
++        running: false
++        repeat: true
++        onTriggered: DarkoneJS.lightToggle(-1);
++    }
++    Timer {
++        id: lightOutScreenTimer
++        interval: lightTimeout * 1000 + 2500
++        running: false
++        repeat: true
++        onTriggered: { lightOutScreen = true;
++                       lightOutScreenTimer.stop(); }
++    }
++
++/***
++* overlay
++*/
++    Rectangle {
++        id: overlay
++        z: 0
++        opacity: debug ? 0.25 : 1.0
++        width: (DarkoneJS.overlayWidth() - 15 - 15)
++        border.color: debug ? "red" : "transparent"
++        border.width: debug ? 2 : 0
++        color: debug ? "white" : "transparent"
++        anchors.top: parent.top
++        anchors.topMargin: 10
++        anchors.bottom: parent.bottom
++        anchors.bottomMargin: 10
++        anchors.right: parent.right
++        anchors.rightMargin: 15
++        Behavior on width { PropertyAnimation { duration: overlayDuration; easing.type: Easing.InOutQuad } }
++        MouseArea {
++            anchors.fill: parent
++//            onWheel: { event.angleDelta.y > 0 ? : // QT_VERSION >= 0x050000 }
++            onClicked: { debug && console.log("[overlay] clicked");
++                         searchTextInput.focus = false; }
++        }
++        WheelArea {
++            anchors.fill: parent
++            onWheel: {
++                       DarkoneJS.zoom(1 + (0.1) * (delta / Math.abs(delta)));
++                       debug && console.log("[overlay] wheel event: overlayScale: '" + overlayScale + "', " +
++                                                                   "zoom: '" + (1 + (0.1) * (delta / Math.abs(delta))) + "'");
++            }
++        }
++
++/***
++* screen
++*/
++        Rectangle {
++            id: overlayScreen
++            z: 1
++            width: 348
++            height: 256
++            scale: DarkoneJS.scaleFactorY() * overlayScale
++            anchors.top: parent.top
++            // keep the screen still under scaling, ensure margin of 30% of non-screen space
++            anchors.topMargin: (((scale * height) - height) / 2) + 0.3 * (darkone.height - 20 - (height * scale))
++            anchors.horizontalCenter: parent.horizontalCenter
++            smooth: true
++            opacity: 1.0
++            border.color: debug ? "blue" : "transparent"
++            border.width: debug ? 2 : 0
++            color: debug ? "white" : "#181818"
++            state: "on"
++            MouseArea {
++                anchors.fill: parent
++                hoverEnabled: true
++                onDoubleClicked: { debug && console.log("[overlayScreen] double-clicked");
++                                   dataHidden = !dataHidden; }
++                onEntered: { debug && console.log("[overlayScreen] entered"); }
++                onPositionChanged: { if (!keepLightOn) {
++                                         lightOutTimer.restart();
++                                         lightOutScreenTimer.restart();
++                                     }
++                                     if (lightOut)
++                                         DarkoneJS.lightToggle(1);
++                }
++            }
++            transitions: [
++                Transition {
++                    from: "on"
++                    to: "off"
++                    ParallelAnimation {
++                        PropertyAnimation { target: overlayScreen; property: "opacity"; from: 1.0; to: 0.1; duration: 500; easing.type: Easing.OutExpo }
++                        PropertyAnimation { target: overlayLighting; property: "opacity"; from: backLightOpacity; to: 0; duration: 500; easing.type: Easing.OutExpo }
++
++                    }
++                },
++                Transition {
++                    from: "off"
++                    to: "on"
++                    ParallelAnimation {
++                        PropertyAnimation { target: overlayScreen; property: "opacity"; from: 0.1; to: 1.0; duration: 500; easing.type: Easing.OutExpo }
++                        PropertyAnimation { target: overlayLighting; property: "opacity"; from: 0; to: backLightOpacity; duration: 500; easing.type: Easing.OutExpo }
++                    }
++                }
++            ]
++            Behavior on scale { PropertyAnimation { id: "overlayScreenScaleAnimation"; properties: "scale"; duration: darkone.zoomDuration; easing.type: Easing.Linear } }
++            onStateChanged: { debug && console.log("[overlayScreen] state changed, state: '" + state + "', " +
++                                                                   "backLightOpacity: '" + backLightOpacity + "'"); }
++
++/***
++* display
++*/
++            Rectangle {
++                id: overlayDisplay
++                z: 2 // must be above other layers (in the same hierarchy!) for flickable actions
++                width: parent.width
++                height: parent.height
++                anchors.fill: parent
++                anchors.horizontalCenter: parent.horizontalCenter
++                anchors.horizontalCenterOffset: 0
++                opacity: 1.0
++                smooth: true
++                state: "shown"
++                color: "transparent"
++                MouseArea {
++                    anchors.fill: parent
++//                    cursorShape: Qt.CrossCursor // QT_VERSION >= 0x050000
++                    onDoubleClicked: { debug && console.log("[overlayDisplay] double-clicked");
++                                       dataHidden = !dataHidden; }
++                }
++                CursorShapeArea {
++                    anchors.fill: parent
++                    cursorShape: Qt.CrossCursor
++                }
++                Behavior on anchors.topMargin { PropertyAnimation { duration: darkone.zoomDuration; easing.type: Easing.Linear } }
++                Behavior on anchors.bottomMargin { PropertyAnimation { duration: darkone.zoomDuration; easing.type: Easing.Linear } }
++
++                Image {
++                    id: overlayImage
++                    z: 0
++                    source: DarkoneJS.data("image")
++                    smooth: true
++                    anchors.fill: parent
++                    anchors.horizontalCenter: parent.horizontalCenter
++                    anchors.verticalCenter: parent.verticalCenter
++                    anchors.centerIn: parent
++                    fillMode: Image.PreserveAspectFit
++                    MouseArea {
++                        anchors.fill: parent
++                        onDoubleClicked: { debug && console.log("[overlayImage] double-clicked");
++                                           dataHidden = !dataHidden; }
++                    }
++                    WheelArea {
++                        anchors.fill: parent
++                        onWheel: {
++                            DarkoneJS.zoom(1 + (0.1) * (delta / Math.abs(delta)));
++                        }
++                    }
++                }
++
++                Rectangle {
++                    id: overlayTextWrap
++                    z: 1
++                    color: debug ? "blue" : "transparent"
++                    anchors.fill: parent
++                    height: parent.height
++                    width: parent.width
++
++                    Flickable {
++                        id: overlayTextFlick
++                        interactive: true
++                        contentHeight: Math.max(parent.height, overlayText.paintedHeight)  // no flickable without this set. vertical alignment dependent on this also
++                        anchors.fill: parent
++                        anchors.topMargin: 5
++                        anchors.bottomMargin: 5
++                        anchors.leftMargin: 8
++                        anchors.rightMargin: 8
++                        anchors.verticalCenter: parent.verticalCenter
++                        boundsBehavior: Flickable.StopAtBounds
++                        flickableDirection: Flickable.VerticalFlick
++                        clip: true
++                        maximumFlickVelocity : 100
++                        MouseArea {
++                            anchors.fill: parent
++                            onDoubleClicked: { debug && console.log("[overlayTextFlick] double-clicked");
++                                               dataHidden = !dataHidden; }
++                        }
++                        WheelArea {
++                            anchors.fill: parent
++                            onWheel: {
++                                DarkoneJS.zoom(1 + (0.1) * (delta / Math.abs(delta)));
++                            }
++                        }
++                        Text {
++                            id: overlayText
++                            anchors.fill: parent
++                            text: DarkoneJS.data("text")
++                            color: "white"
++                            font.bold: false
++                            font.pixelSize: 8
++                            verticalAlignment: Text.AlignTop
++                            horizontalAlignment: Text.AlignLeft
++                            wrapMode: Text.WordWrap
++                            smooth: true
++                            state: "found"
++                            states: [
++                                State {
++                                    name: "found"
++                                    PropertyChanges { target: overlayText; verticalAlignment: Text.AlignTop }
++                                    PropertyChanges { target: overlayText; horizontalAlignment: Text.AlignLeft }
++                                },
++                                State {
++                                    name: "missing"
++                                    PropertyChanges { target: overlayText; verticalAlignment: Text.AlignVCenter }
++                                    PropertyChanges { target: overlayText; horizontalAlignment: Text.AlignHCenter }
++                                }
++                            ]
++                        }
++                    }
++                }
++            } // overlayDisplay
++
++            Rectangle {
++                id: overlayData
++                z: 1
++                width: parent.width
++                height: parent.height
++                anchors.fill: parent
++                anchors.horizontalCenter: parent.horizontalCenter
++                anchors.horizontalCenterOffset: 0
++                opacity: 1.0
++                state: "hidden"
++                color: "transparent"
++                MouseArea {
++                    anchors.fill: parent
++//                    cursorShape: Qt.CrossCursor // QT_VERSION >= 0x050000
++                }
++                CursorShapeArea {
++                    anchors.fill: parent
++                    cursorShape: Qt.CrossCursor
++                }
++                transitions: [
++                    Transition {
++                        from: "hidden"
++                        to: "shown"
++                        SequentialAnimation {
++                            ParallelAnimation
++{
++                                PropertyAnimation { target: overlayDisplay; property: "anchors.topMargin"; from: 0; to: overlayDataHeader.height; duration: 450; easing.type: Easing.InExpo }
++                                PropertyAnimation { target: overlayDataHeader; property: "anchors.topMargin"; from: -overlayDataHeader.height - 5; to: 0; duration: 450; easing.type: Easing.InExpo }
++                                PropertyAnimation { target: overlayDataHeader; property: "opacity"; from: 0; to: 1.0; duration: 450; easing.type: Easing.InExpo }
++
++                                PropertyAnimation { target: overlayDisplay; property: "anchors.bottomMargin"; from: 0; to: overlayDataNav.height; duration: 450; easing.type: Easing.InExpo }
++                                PropertyAnimation { target: overlayDataNav; property: "anchors.bottomMargin"; from: -overlayDataNav.height - 5; to: 0; duration: 450; easing.type: Easing.InExpo }
++                                PropertyAnimation { target: overlayDataNav; property: "opacity"; from: 0; to: 1.0; duration: 450; easing.type: Easing.OutExpo }
++
++                            }
++                        }
++                    },
++                    Transition {
++                        from: "shown"
++                        to: "hidden"
++                        SequentialAnimation {
++                            ParallelAnimation {
++
++                                PropertyAnimation { target: overlayDisplay; property: "anchors.topMargin"; from: overlayDataHeader.height; to: 0; duration: 450; easing.type: Easing.OutExpo }
++                                PropertyAnimation { target: overlayDataHeader; property: "anchors.topMargin"; from: 0; to: -overlayDataHeader.height - 5; duration: 450; easing.type: Easing.OutExpo }
++                                PropertyAnimation { target: overlayDataHeader; property: "opacity"; from: 1.0; to: 0; duration: 450; easing.type: Easing.OutExpo }
++
++                                PropertyAnimation { target: overlayDisplay; property: "anchors.bottomMargin"; from: overlayDataNav.height; to: 0; duration: 450; easing.type: Easing.OutExpo }
++                                PropertyAnimation { target: overlayDataNav; property: "anchors.bottomMargin"; from: 0; to: -overlayDataNav.height - 5; duration: 450; easing.type: Easing.OutExpo }
++                                PropertyAnimation { target: overlayDataNav; property: "opacity"; from: 1.0; to: 0; duration: 450; easing.type: Easing.OutExpo }
++
++                            }
++                        }
++                    }
++                ]
++                Behavior on scale { PropertyAnimation { properties: "scale"; duration: darkone.zoomDuration; easing.type: Easing.Linear } }
++                Rectangle {
++                    id: overlayDataHeader
++                    height: overlayDataTitle.paintedHeight + 10
++                    width: parent.width
++                    anchors.top: parent.top
++                    anchors.horizontalCenter: parent.horizontalCenter
++                    opacity: 0
++                    smooth: true
++                    color: debug ? "yellow" : "transparent"
++//                    Behavior on anchors.topMargin { PropertyAnimation { easing.type: Easing.Linear; duration: 0 } } // it can't work this way
++                    MouseArea {
++                        anchors.fill: parent
++                        onClicked: { dataHidden = !dataHidden; }
++                    }
++                    Text {
++                          id: overlayDataTitle
++                          text: DarkoneJS.gameCardHeader()
++                          font.pixelSize: 10
++                          anchors.top: parent.top
++                          anchors.topMargin: 5
++                          anchors.horizontalCenter: parent.horizontalCenter
++                          width: parent.width - 20
++                          horizontalAlignment: Text.AlignHCenter
++                          verticalAlignment: Text.AlignVCenter
++                          color: "white"
++                          wrapMode: Text.WordWrap
++                          onTextChanged: { debug &&  console.log("[overlayDataHeader] changed");
++                                           parent.height = paintedHeight + 5;  // force update
++                                           if (!dataHidden)
++                                               overlayDisplay.anchors.topMargin = paintedHeight + 5
++                                         } // force update
++                    }
++                }
++                Rectangle {
++                    id: overlayDataNav
++                    height: 30
++                    width: parent.width
++                    anchors.horizontalCenter: parent.horizontalCenter
++                    anchors.bottom: parent.bottom
++//                    anchors.bottomMargin: dataHidden? -height : 0 // it can't work this way
++                    color: debug ? "red" : parent.color
++                    opacity: 0
++                    smooth: true
++//                    Behavior on anchors.bottomMargin { PropertyAnimation { easing.type: Easing.Linear; duration: 0 } } // it can't work this way
++                    MouseArea {
++                        anchors.fill: parent
++//                        cursorShape: Qt.CrossCursor // QT_VERSION >= 0x050000
++                        onClicked: { debug && console.log("[overlayDataNav] clicked"); }
++                    }
++
++                    Rectangle {
++                        id: overlayDataNavSeparator
++                        height: 1
++                        width: parent.width * 0.5
++                        anchors.horizontalCenter: parent.horizontalCenter
++                        anchors.top: parent.top
++                        anchors.topMargin: 5
++                        color: "white"
++                        opacity: 0.75
++                        smooth: true
++                    }
++                    Rectangle {
++                        id: overlayDataTypeSetPrimaryButton
++                        height: 14
++                        width: 10
++                        anchors.bottom: parent.bottom
++                        anchors.bottomMargin: 5
++                        anchors.left: parent.left
++                        anchors.leftMargin: 10
++                        color: "white"
++                        border.width: 2
++                        border.color: "black"
++                        opacity: 0.75
++                        MouseArea {
++                            anchors.fill: parent
++//                            cursorShape: Qt.CrossCursor // QT_VERSION >= 0x050000
++                            onClicked: { darkone.dataTypePrimary = darkone.dataTypeCurrent;
++                                         debug && console.log("[overlayDataTypeSetPrimaryButton clicked]"); }
++                        }
++                        CursorShapeArea {
++                            anchors.fill: parent
++                            cursorShape: Qt.CrossCursor
++                        }
++                        Text {
++                            id: overlayDataTypeSetPrimaryText
++                            text: "1"
++                            color: "black"
++                            font.bold: true
++                            font.pixelSize: 8
++                            anchors.fill: parent
++                            anchors.centerIn: parent
++                            horizontalAlignment: Text.AlignHCenter
++                            verticalAlignment: Text.AlignVCenter
++                            smooth: true
++                        }
++                    }
++                    Rectangle {
++                        id: overlayDataTypeSetSecondaryButton
++                        height: 14
++                        width: 10
++                        anchors.bottom: parent.bottom
++                        anchors.bottomMargin: 5
++                        anchors.left: overlayDataTypeSetPrimaryButton.right
++                        anchors.leftMargin: 3
++                        color: "white"
++                        border.width: 2
++                        border.color: "black"
++                        opacity: 0.75
++                        MouseArea {
++                            anchors.fill: parent
++//                            cursorShape: Qt.CrossCursor // QT_VERSION >= 0x050000
++                            onClicked: { darkone.dataTypeSecondary = darkone.dataTypeCurrent;
++                                         debug && console.log("[overlayDataTypeSetSecondaryButton clicked]"); }
++                        }
++                        CursorShapeArea {
++                            anchors.fill: parent
++                            cursorShape: Qt.CrossCursor
++                        }
++                        Text {
++                            id: overlayDataTypeSetSecondaryText
++                            text: "2"
++                            color: "black"
++                            font.bold: true
++                            font.pixelSize: 8
++                            anchors.fill: parent
++                            anchors.centerIn: parent
++                            horizontalAlignment: Text.AlignHCenter
++                            verticalAlignment: Text.AlignVCenter
++                            smooth: true
++                        }
++                    }
++                    Image {
++                        id: overlayDataTypePreviousButton
++                        opacity: 0.5
++                        height: 12
++                        anchors.top: parent.top
++                        anchors.topMargin: 5 + 1 + (parent.height - 5 - 1 - height) / 2
++                        anchors.left: parent.left
++                        anchors.leftMargin: parent.width / 4
++                        source: "images/arrow.png"
++                        mirror: true
++                        fillMode: Image.PreserveAspectFit
++                        smooth: true
++                        MouseArea {
++                            anchors.fill: parent
++                            hoverEnabled: true
++                            onContainsMouseChanged: containsMouse ? parent.opacity = 1.0 : parent.opacity = 0.75
++                            onClicked: {
++                                dataTypeCurrent = DarkoneJS.adjDataType(dataTypeCurrent, -1);
++                                searchTextInput.focus = false;
++                            }
++                        }
++                    }
++                    Text {
++                        id: overlayDataTypeText
++                        text: DarkoneJS.data("name")
++                        color: "white"
++                        font.bold: true
++                        font.pixelSize: 12
++                        anchors.fill: parent
++                        anchors.topMargin: 5 + 1
++                        anchors.horizontalCenter: parent.horizontalCenter
++                        anchors.verticalCenter: parent.verticalCenter
++                        verticalAlignment: Text.AlignVCenter
++                        horizontalAlignment: Text.AlignHCenter
++                        smooth: true
++                    }
++                    Image {
++                        id: overlayDataTypeNextButton
++                        opacity: 0.5
++                        height: 12
++                        anchors.top: parent.top
++                        anchors.topMargin: 5 + 1 + (parent.height - 5 - 1 - height) / 2
++                        anchors.right: parent.right
++                        anchors.rightMargin: parent.width / 4
++                        source: "images/arrow.png"
++                        fillMode: Image.PreserveAspectFit
++                        smooth: true
++                        MouseArea {
++                            anchors.fill: parent
++                            hoverEnabled: true
++                            onContainsMouseChanged: containsMouse ? parent.opacity = 1.0 : parent.opacity = 0.75
++                            onClicked: { dataTypeCurrent = DarkoneJS.adjDataType(dataTypeCurrent, 1); }
++                        }
++                    }
++                }
++            } // overlayData
++        } // overlayScreen
++
++/***
++* cabinet
++*/
++        Image {
++            id: overlayCabinet
++            z: 2
++            source: "images/cabinet.png"
++            fillMode: Image.PreserveAspectFit
++            scale: DarkoneJS.scaleFactorY() * overlayScale
++            anchors.top: parent.top
++            //keep the cabinet still under scaling, then shift it by the same amount as the screen is shift, then offet the image to match the screen
++            anchors.topMargin: (((scale * height) - height) / 2) + 0.3 * (darkone.height - 20 - (overlayScreen.height * overlayScreen.scale)) - (559 * scale)
++            anchors.horizontalCenter: overlayScreen.horizontalCenter
++            anchors.horizontalCenterOffset: 3 + 2 * overlayScale
++            smooth: true
++            opacity: 1.0
++            Behavior on scale { ParallelAnimation {
++                                  PropertyAnimation { properties: "scale"; duration: darkone.zoomDuration; easing.type: Easing.Linear }
++                                  PropertyAnimation { target: overlayLighting; properties: "scale"; duration: darkone.zoomDuration; easing.type: Easing.Linear } } }
++        }
++        Image {
++            z: 0
++            id: overlayLighting
++            source: "images/backlight.png"
++            fillMode: Image.PreserveAspectFit
++            scale: overlayCabinet.scale
++            anchors.top: parent.top
++            //keep the cabinet still under scaling, then shift it by the same amount as the screen is shift, then offet the image to match the screen
++            anchors.topMargin: (((scale * height) - height) / 2) + 0.3 * (darkone.height - 20 - (overlayScreen.height * overlayScreen.scale)) - (559 * scale)
++            anchors.horizontalCenter: overlayScreen.horizontalCenter
++            anchors.horizontalCenterOffset: overlayCabinet.anchors.horizontalCenterOffset
++            smooth: true
++            opacity: backLight ? backLightOpacity : 0
++//            Behavior on scale { PropertyAnimation { properties: "scale"; duration: darkone.zoomDuration; easing.type: Easing.Linear } }
++        }
++        Rectangle {
++            id: overlayStateBlock
++            z: 0
++            width: 150
++            height: 275
++            scale: DarkoneJS.scaleFactorY() * overlayScale
++            anchors.top: parent.top
++            anchors.topMargin: (((scale * height) - height) / 2) + 0.3 * (darkone.height - 20 - (overlayScreen.height * overlayScreen.scale)) + (300 * scale)
++            anchors.horizontalCenter: overlayCabinet.horizontalCenter
++            anchors.horizontalCenterOffset: 0
++            color: DarkoneJS.gameStatusColour()
++            smooth: true
++            opacity: 0.0
++            Behavior on scale { PropertyAnimation { properties: "scale"; duration: darkone.zoomDuration; easing.type: Easing.Linear } }
++        }
++        Rectangle {
++            id: overlayButtonBlock
++            z: 2
++            width: 25
++            height: 35
++            scale: DarkoneJS.scaleFactorY() * overlayScale
++            anchors.top: parent.top
++            anchors.topMargin: (((scale * height) - height) / 2) + 0.3 * (darkone.height - 20 - (overlayScreen.height * overlayScreen.scale)) + (319 * scale)
++            anchors.horizontalCenter: overlayCabinet.horizontalCenter
++            anchors.horizontalCenterOffset: 2 * overlayScale
++            color: debug ? "white" : "transparent"
++            Behavior on scale { PropertyAnimation { properties: "scale"; duration: darkone.zoomDuration; easing.type: Easing.Linear } }
++            MouseArea {
++                anchors.fill: parent
++                hoverEnabled: true
++//                  cursorShape: Qt.CrossCursor // QT_VERSION >= 0x050000
++                onEntered: { overlayStateBlock.opacity = (lightOnAnimation.running || lightOut) ? 0 : 1.0; }
++                onExited: { overlayStateBlock.opacity = (lightOnAnimation.running || lightOut) ? 0 : 0.5; }
++                onClicked: { if (!ignoreLaunch) {
++                                 gameListView.positionViewAtIndex(lastIndex, ListView.Center);
++                                 DarkoneJS.launch(); }
++                }
++            }
++            CursorShapeArea {
++                anchors.fill: parent
++                cursorShape: Qt.CrossCursor
++            }
++        }
++        Rectangle {
++            id: overlayGridBlock
++            z: 2
++            width: 120
++            height: 40
++            scale: DarkoneJS.scaleFactorY() * overlayScale
++            anchors.top: parent.top
++            anchors.topMargin: (((scale * height) - height) / 2) + 0.3 * (darkone.height - 20 - (overlayScreen.height * overlayScreen.scale)) + (500 * scale)
++            anchors.horizontalCenter: overlayCabinet.horizontalCenter
++            anchors.horizontalCenterOffset: 1 * overlayScale
++            color: debug ? "white" : "transparent"
++            Behavior on scale { PropertyAnimation { properties: "scale"; duration: darkone.zoomDuration; easing.type: Easing.Linear } }
++            MouseArea {
++                anchors.fill: parent
++//                cursorShape: Qt.CrossCursor // QT_VERSION >= 0x050000
++                hoverEnabled: true
++                onEntered: { overlayStateBlock.opacity = (lightOnAnimation.running || lightOut) ? 0 : 1.0; }
++                onExited: { overlayStateBlock.opacity = (lightOnAnimation.running || lightOut) ? 0 : 0.5; }
++                onClicked: { if (!ignoreLaunch) {
++                                 gameListView.positionViewAtIndex(lastIndex, ListView.Center);
++                                 DarkoneJS.launch(); }
++                }
++            }
++            CursorShapeArea {
++                anchors.fill: parent
++                cursorShape: Qt.CrossCursor
++            }
++        }
++    } // overlay
++    onDataHiddenChanged: { dataHidden ? overlayData.state = "hidden" : overlayData.state = "shown"; }
++    onInfoMissingChanged: { infoMissing ? overlayText.state = "missing" : overlayText.state = "found"; }
++
++/***
++* list
++*/
++    ListView {
++        id: gameListView
++        property int itemHeight: 24
++        z: 3
++        height: parent.height - (toolbarHidden ? 2 : toolbar.height) - gameListView.itemHeight - gameListView.itemHeight
++        width: DarkoneJS.listWidth()
++        anchors.top: parent.top
++        anchors.topMargin: gameListView.itemHeight
++        anchors.left: parent.left
++        anchors.leftMargin: 15
++        model: gameListModel
++        spacing: 10
++        clip: true
++        orientation: ListView.Vertical
++        flickableDirection: Flickable.VerticalFlick
++        flickDeceleration: 1000
++        maximumFlickVelocity: 5000
++        interactive: true
++        keyNavigationWraps: false
++        currentIndex: darkone.lastIndex || 0
++        preferredHighlightBegin: (height / 2) - (gameListView.itemHeight / 2)
++        preferredHighlightEnd: (height / 2) + (gameListView.itemHeight / 2)
++//        snapMode: ListView.SnapToItem
++//        highlightFollowsCurrentItem: true  // keep list stationary
++//        highlightRangeMode: ListView.StrictlyEnforceRange  // keep list stationary
++        states: [
++            State {
++                name: "hidden"
++                PropertyChanges { target: gameListView; anchors.leftMargin: -DarkoneJS.listWidth() - 15 }
++            },
++            State {
++                name: "shown"
++                PropertyChanges { target: gameListView; anchors.leftMargin: 15 }
++            }
++        ]
++        transitions: Transition {
++            from: "hidden"
++            to: "shown"
++            reversible: true
++            PropertyAnimation { properties: "anchors.leftMargin"; duration: listDuration; easing.type: Easing.InOutQuad }
++        }
++        onCurrentIndexChanged: { darkone.lastIndex = currentIndex; }
++
++        /* item */
++        delegate: Component {
++            id: gameListItemDelegate
++            Rectangle {
++                width: parent.width
++                height: gameListView.itemHeight
++                id: gameListItemBackground
++                smooth: true
++                border.color: "#333333"
++                border.width: 1
++                gradient: Gradient {
++                              GradientStop { position: 0.0; color: colour1 }
++                              GradientStop { position: 0.2; color: colour2 }
++                              GradientStop { position: 0.7; color: colour3 }
++                              GradientStop { position: 1.0; color: colour4 } }
++                opacity: 0.75
++                Text {
++                    property bool fontResized: false
++                    id: gameListItemText
++                    anchors.fill: parent
++                    anchors.margins: 10
++                    verticalAlignment: Text.AlignVCenter
++                    horizontalAlignment: Text.AlignHCenter
++                    text: model.modelData.description
++                    color: gameListItemBackground.ListView.isCurrentItem ? textColour2: textColour1
++                    font.bold: true
++                    font.pixelSize: 13
++                    elide: Text.ElideRight
++                    smooth: true
++                }
++                MouseArea {
++                    id: gameListItemMouseArea
++                    anchors.fill: parent
++                    hoverEnabled: true
++                    acceptedButtons: Qt.LeftButton
++                    onContainsMouseChanged: {
++                        if ( mapToItem(toolbar, mouseX, mouseY).y < 0 ) {
++                            if ( containsMouse )
++                                DarkoneJS.itemEntered(gameListItemText, gameListItemBackground, mapToItem(toolbar, mouseX, mouseY));
++                            else
++                                DarkoneJS.itemExited(gameListItemText, gameListItemBackground, mapToItem(toolbar, mouseX, mouseY));
++                        }
++                    }
++                    onDoubleClicked: { if (!ignoreLaunch) {
++                                          gameListView.currentIndex = index;
++                                          gameListView.positionViewAtIndex(lastIndex, ListView.Center) ;
++                                          DarkoneJS.launch(); }
++                    }
++                    onClicked: {
++                        gameListView.currentIndex = index;
++                        debug && console.log("[gameListView] setting index: '" + index + "'")
++                        searchTextInput.focus = false;
++                    }
++                }
++            }
++        }
++
++        function firstVisibleItem() { return - Math.floor(((height / 2) / (gameListView.itemHeight + 10))); } // relatives 'work'
++        function lastVisibleItem() { return + Math.floor(((height / 2) / (gameListView.itemHeight + 10))); } // relatives 'work'
++        function itemsPerPage() { debug && console.log("contentX: '" + contentX + "', " +
++                                                       "contentY: '" + contentY + "', " +
++                                                       "firstVisibleItem: '" + firstVisibleItem() + "', " +
++                                                       "lastVisibleItem: '" + lastVisibleItem() + "', " +
++                                                       "itemsPerPage: '" + height / (gameListView.itemHeight + 10) + "'");
++                                           return lastVisibleItem() - firstVisibleItem() + 1 }
++        Keys.onPressed: {
++            if (!keepLightOn) {
++                lightOutTimer.restart();
++                lightOutScreenTimer.restart();
++            }
++            if (lightOut)
++                 DarkoneJS.lightToggle(1);
++            switch ( event.key ) {
++            case Qt.Key_PageUp:
++                if ( currentIndex - (itemsPerPage() - 1) > 0 ) {
++                    currentIndex -= (itemsPerPage() - 1)
++                    gameListView.positionViewAtIndex(currentIndex, ListView.Contain);
++                } else {
++                    gameListView.positionViewAtBeginning();
++                    currentIndex = 0;
++                }
++                event.accepted = true;
++                break;
++            case Qt.Key_PageDown:
++                if ( currentIndex + (itemsPerPage() - 1) < gameListModelCount ) {
++                    currentIndex += (itemsPerPage() - 1)
++                    gameListView.positionViewAtIndex(currentIndex, ListView.Contain);
++                } else {
++                    gameListView.positionViewAtEnd();
++                    currentIndex = gameListModelCount - 1;
++                }
++                event.accepted = true;
++                break;
++            case Qt.Key_End:
++                positionViewAtEnd();
++                event.accepted = true;
++                break;
++            case Qt.Key_Home:
++                positionViewAtBeginning();
++                event.accepted = true;
++                break;
++            case Qt.Key_Enter:
++            case Qt.Key_Return:
++                if ( !searchTextInput.focus && !(event.modifiers & Qt.AltModifier) && !ignoreLaunch ) {
++                    gameListView.positionViewAtIndex(lastIndex, ListView.Center);
++                    DarkoneJS.launch();
++                }
++                break;
++            }
++        }
++    }
++
++/***
++* preferences menu
++*/
++
++    Rectangle {
++        id: preferencesDialog
++        z: 4
++        property int itemHeight: 12
++        property int itemSpacing: 8
++        smooth: true
++        x: preferencesButton.x - 10
++        y: parent.height - toolbar.height - 5 - height
++        width: 180
++        height: (itemHeight + itemSpacing) * (10 + 1) + 10
++        border.color: "black"
++        border.width: 1
++        color: colour5
++        opacity: 1.0
++        state: "hidden"
++        MouseArea { anchors.fill: parent; }
++        onStateChanged: {
++            if ( state == "shown" ) {
++                ignoreLaunch = true;
++                preferencesLaunchLock = true;
++                fpsCheckBox.focus = true;
++                toolbarShowMenuLock = true;
++            } else {
++                preferencesLaunchLock = false;
++                ignoreLaunch = false;
++                toolbarShowMenuLock = false;
++            }
++        }
++        states: [
++            State {
++                name: "hidden"
++                PropertyChanges { target: preferencesDialog; opacity: 0.0 }
++            },
++            State {
++                name: "shown"
++                PropertyChanges { target: preferencesDialog; opacity: 1.0 }
++            }
++        ]
++        transitions: Transition {
++            from: "hidden"
++            to: "shown"
++            reversible: true
++            PropertyAnimation { property: "opacity"; duration: 100 }
++        }
++        onFocusChanged: darkone.focus = !focus;
++
++        Text {
++            id: headerText
++            property int index: 1
++            text: qsTr("Preferences")
++            height: parent.itemHeight
++            anchors.top: parent.top
++            anchors.topMargin: index * (parent.itemHeight + parent.itemSpacing) - parent.itemSpacing
++            anchors.left: parent.left
++            anchors.leftMargin: 10
++            font.pixelSize: 12
++            font.bold: true
++            color: textColour1
++            smooth: true
++        }
++
++        CheckBox {
++            id: fpsCheckBox
++            property int index: 2
++            height: parent.itemHeight
++            anchors.top: parent.top
++            anchors.topMargin: index * (parent.itemHeight + parent.itemSpacing)
++            anchors.left: parent.left
++            anchors.leftMargin: 10
++            anchors.right: parent.right
++            anchors.rightMargin: 10
++            checked: fpsVisible
++            text: qsTr("FPS counter")
++            textColor: textColour1
++            smooth: true
++            focus: true
++            onClicked: {
++                fpsVisible = checked;
++                resetIgnoreLaunchTimer.restart();
++                toolbarShowFpsLock = checked ? toolbarAutoHide : false;
++            }
++            KeyNavigation.up: KeyNavigation.backtab
++            KeyNavigation.down: KeyNavigation.tab
++            KeyNavigation.backtab: colourScheme2Button
++            KeyNavigation.tab: sortByNameCheckBox
++        }
++/*
++        CheckBoxItem {
++            id: fpsCheckBox
++            property int index: 2
++            text: qsTr("FPS counter")
++            onClicked: {
++                fpsVisible = checked;
++                resetIgnoreLaunchTimer.restart();
++                toolbarShowFpsLock = checked ? toolbarAutoHide : false;
++            }
++        }
++*/
++        CheckBox {
++            id: sortByNameCheckBox
++            property int index: 3
++            height: parent.itemHeight
++            anchors.top: parent.top
++            anchors.topMargin: index * (parent.itemHeight + parent.itemSpacing)
++            anchors.left: parent.left
++            anchors.leftMargin: 10
++            anchors.right: parent.right
++            anchors.rightMargin: 10
++            checked: sortByName
++            text: qsTr("sort by name?")
++            textColor: textColour1
++            smooth: true
++            onClicked: { sortByName = checked;
++                         var desc = gameListModel[gameListView.currentIndex].description
++                         viewer.saveSettings();
++                         viewer.loadGamelist();
++                         gameListView.currentIndex = viewer.findIndex(desc, gameListView.currentIndex);
++                         gameListView.positionViewAtIndex(lastIndex, ListView.Center);
++                         debug && console.log("[sortByName] desc: '" + desc + "', " +
++                                                           "result: '" + viewer.findIndex(desc, gameListView.currentIndex) + "'");
++            }
++            KeyNavigation.up: KeyNavigation.backtab
++            KeyNavigation.down: KeyNavigation.tab
++            KeyNavigation.backtab: fpsCheckBox
++            KeyNavigation.tab: autoHideToolbarCheckBox
++        }
++        CheckBox {
++            id: autoHideToolbarCheckBox
++            property int index: 4
++            height: parent.itemHeight
++            anchors.top: parent.top
++            anchors.topMargin: index * (parent.itemHeight + parent.itemSpacing)
++            anchors.left: parent.left
++            anchors.leftMargin: 10
++            anchors.right: parent.right
++            anchors.rightMargin: 10
++            checked: toolbarAutoHide
++            text: qsTr("auto-hide toolbar")
++            textColor: textColour1
++            smooth: true
++            onClicked: toolbarAutoHide = checked;
++            KeyNavigation.up: KeyNavigation.backtab
++            KeyNavigation.down: KeyNavigation.tab
++            KeyNavigation.backtab: sortByNameCheckBox
++            KeyNavigation.tab: disableLaunchFlashCheckBox
++        }
++        CheckBox {
++            id: disableLaunchFlashCheckBox
++            property int index: 5
++            height: parent.itemHeight
++            anchors.top: parent.top
++            anchors.topMargin: index * (parent.itemHeight + parent.itemSpacing)
++            anchors.left: parent.left
++            anchors.leftMargin: 10
++            anchors.right: parent.right
++            anchors.rightMargin: 10
++            checked: disableFlashLaunch
++            text: qsTr("disable launch flash?")
++            textColor: textColour1
++            smooth: true
++            onFocusChanged: darkone.focus = !focus;
++            KeyNavigation.up: KeyNavigation.backtab
++            KeyNavigation.down: KeyNavigation.tab
++            KeyNavigation.backtab: autoHideToolbarCheckBox
++            KeyNavigation.tab: disableLaunchZoomCheckBox
++        }
++        CheckBox {
++            id: disableLaunchZoomCheckBox
++            property int index: 6
++            height: parent.itemHeight
++            anchors.top: parent.top
++            anchors.topMargin: index * (parent.itemHeight + parent.itemSpacing)
++            anchors.left: parent.left
++            anchors.leftMargin: 10
++            anchors.right: parent.right
++            anchors.rightMargin: 10
++            checked: disableZoom
++            text: qsTr("disable launch zoom?")
++            textColor: textColour1
++            smooth: true
++            onClicked: disableZoom = checked;
++            KeyNavigation.up: KeyNavigation.backtab
++            KeyNavigation.down: KeyNavigation.tab
++            KeyNavigation.backtab: disableLaunchFlashCheckBox
++            KeyNavigation.tab: backLightCheckBox
++        }
++        CheckBox {
++            id: backLightCheckBox
++            property int index: 7
++            height: parent.itemHeight
++            anchors.top: parent.top
++            anchors.topMargin: index * (parent.itemHeight + parent.itemSpacing)
++            anchors.left: parent.left
++            anchors.leftMargin: 10
++            anchors.right: parent.right
++            anchors.rightMargin: 10
++            checked: backLight
++            text: qsTr("back lighting")
++            textColor: textColour1
++            smooth: true
++            onClicked: { backLightOpacity = checked ? darkone.opacity : 0;
++                         backLight = checked; }
++            KeyNavigation.up: KeyNavigation.backtab
++            KeyNavigation.down: KeyNavigation.tab
++            KeyNavigation.backtab: disableLaunchZoomCheckBox
++            KeyNavigation.tab: lightOutTextInput
++        }
++        Rectangle {
++            id: lightOutInputBox
++            property int index: 8
++            height: parent.itemHeight + 2
++            width: 30
++            anchors.top: parent.top
++            anchors.topMargin: index * (parent.itemHeight + parent.itemSpacing)
++            anchors.left: parent.left
++            anchors.leftMargin: 10
++            smooth: true
++            color: "white"
++            TextInput {
++                id: lightOutTextInput
++                anchors.verticalCenter: parent.verticalCenter
++                anchors.left: parent.left
++                anchors.topMargin: 2
++                anchors.bottomMargin: 2
++                anchors.leftMargin: 2
++                anchors.right: parent.right
++                anchors.rightMargin: 2
++                horizontalAlignment: Text.AlignHCenter
++                font.pointSize: parent.height - 5
++                smooth: true
++                focus: false
++                text: lightTimeout
++//                inputMask: "0000;" // annoying 'optional' white space
++                cursorDelegate: Rectangle {
++                    color: "black"
++                    width: 1
++                    anchors.verticalCenter: parent.verticalCenter
++                    visible: parent.activeFocus
++                }
++                onAccepted: {
++                    var valid = text.match(/\D/) ? false : true
++                    text = text.replace(/\D/g, "");
++                    lightTimeout = text == "" ? 0 : text
++                    darkone.keepLightOn = (lightTimeout == 0) ? true : false;
++                    if (darkone.keepLightOn) {
++                        lightOutTimer.stop();
++                        lightOutScreenTimer.stop();
++                    } else {
++                        lightOutTimer.start();
++                        lightOutScreenTimer.start();
++                    }
++                    if (valid) {
++                        colourScheme1Button.focus = true;
++                        focus = false;
++                    }
++                }
++                KeyNavigation.up: KeyNavigation.backtab
++                KeyNavigation.down: KeyNavigation.tab
++                KeyNavigation.backtab: backLightCheckBox
++                KeyNavigation.tab: colourScheme1Button
++            }
++            Text {
++                opacity: 1.0
++                anchors.left: lightOutTextInput.right
++                anchors.leftMargin: 7
++                text: qsTr("lights out (secs)")
++                font.pixelSize: 12
++                color: textColour1
++                smooth: true
++            }
++        }
++        CheckableGroup { id: group }
++        Rectangle {
++            Checkable {
++                id: checkable1
++                exclusiveGroup: group
++                enabled: true
++            }
++            property alias exclusiveGroup: checkable1.exclusiveGroup
++            property alias checked: checkable1.checked
++            id: colourScheme1Button
++            property int index: 9
++            opacity: 0.5
++            height: parent.itemHeight - 2
++            width: height
++            anchors.top: parent.top
++            anchors.topMargin: index * (parent.itemHeight + parent.itemSpacing) + 1
++            anchors.left: parent.left
++            anchors.leftMargin: 13
++            radius: height / 2
++            smooth: true
++            MouseArea {
++                anchors.fill: parent
++                onClicked: { parent.checked = true;
++                             darkone.colourScheme = "dark";
++                             DarkoneJS.colourScheme(darkone.colourScheme); } }
++            onCheckedChanged: { opacity = checked ? 1.0 : 0.5 }
++            KeyNavigation.up: KeyNavigation.backtab
++            KeyNavigation.down: KeyNavigation.tab
++            KeyNavigation.backtab: lightOutInputBox
++            KeyNavigation.tab: colourScheme2Button
++        }
++        Text {
++            opacity: 1.0
++            anchors.left: colourScheme1Button.right
++            anchors.leftMargin: 6
++            anchors.verticalCenter: colourScheme1Button.verticalCenter
++            anchors.verticalCenterOffset: 0
++            verticalAlignment: Text.AlignVCenter
++            text: qsTr("dark colour scheme")
++            font.pixelSize: 12
++            color: textColour1
++            smooth: true
++        }
++        Rectangle {
++            Checkable {
++                id: checkable2
++                exclusiveGroup: group
++                enabled: true
++            }
++            property alias exclusiveGroup: checkable2.exclusiveGroup
++            property alias checked: checkable2.checked
++            id: colourScheme2Button
++            property int index: 10
++            opacity: 0.5
++            height: parent.itemHeight - 2
++            width: height
++            anchors.top: parent.top
++            anchors.topMargin: index * (parent.itemHeight + parent.itemSpacing) + 1
++            anchors.left: parent.left
++            anchors.leftMargin: 13
++            radius: height / 2
++            smooth: true
++            MouseArea {
++                anchors.fill: parent
++                onClicked: { parent.checked = true;
++                             darkone.colourScheme = "metal";
++                             DarkoneJS.colourScheme(darkone.colourScheme); } }
++            onCheckedChanged: { opacity = checked ? 1.0 : 0.5 }
++            KeyNavigation.up: KeyNavigation.backtab
++            KeyNavigation.down: KeyNavigation.tab
++            KeyNavigation.backtab: colourScheme1Button
++            KeyNavigation.tab: fpsCheckBox
++        }
++        Text {
++            opacity: 1.0
++            anchors.left: colourScheme2Button.right
++            anchors.leftMargin: 6
++            anchors.verticalCenter: colourScheme2Button.verticalCenter
++            anchors.verticalCenterOffset: 0
++            verticalAlignment: Text.AlignVCenter
++            text: qsTr("metal colour scheme")
++            font.pixelSize: 12
++            color: textColour1
++            smooth: true
++        }
++    }
++
++/***
++* toolbar
++*/
++
++    Rectangle {
++        id: toolbar
++        x: 0
++        z: 4
++        width: DarkoneJS.baseWidth * DarkoneJS.scaleFactorX()
++        height: 36
++        anchors.horizontalCenter: parent.horizontalCenter
++        anchors.bottom: parent.bottom
++        anchors.bottomMargin: 0
++        opacity: 0.75
++        smooth: true
++        state: "shown"
++        gradient: Gradient {
++            GradientStop { position: 0.0; color: colour1 }
++            GradientStop { position: 0.2; color: colour2 }
++            GradientStop { position: 0.7; color: colour3 }
++            GradientStop { position: 1.0; color: colour4 }
++        }
++        MouseArea {
++            anchors.fill: parent
++            hoverEnabled: true
++            onEntered: { toolbarAutoHide && toolbarHidden && !DarkoneJS.inGame && DarkoneJS.toolbarToggle(); hideToolbarTimer.stop(); }
++            onExited: { hideToolbarTimer.start(); }
++            onPositionChanged: { if (!keepLightOn) {
++                                     lightOutTimer.restart();
++                                     lightOutScreenTimer.restart();
++                                 }
++                                 if (lightOut)
++                                     DarkoneJS.lightToggle(1);
++            }
++        }
++/*
++        states: [
++            State {
++                name: "hidden"
++//                PropertyChanges { target: toolbar; anchors.bottomMargin: -(toolbar.height - 2) }
++            },
++            State {
++                name: "shown"
++//                PropertyChanges { target: toolbar; anchors.bottomMargin: 0 }
++            }
++        ]
++*/
++        transitions: [
++            Transition {
++                from: "hidden"
++                to: "shown"
++                ParallelAnimation {
++                    PropertyAnimation { target: toolbar; property: "anchors.bottomMargin"; from: -(toolbar.height - 2); to: 0; duration: 500; easing.type: Easing.OutCubic }
++                    PropertyAnimation { target: gameListView; property: "anchors.bottomMargin"; from: 2 + gameListView.itemHeight; to: toolbar.height + gameListView.itemHeight; duration: 500; easing.type: Easing.OutCubic }
++                }
++            },
++            Transition {
++                from: "shown"
++                to: "hidden"
++                ParallelAnimation {
++                    PropertyAnimation { target: toolbar; property: "anchors.bottomMargin"; from: 0; to: -(toolbar.height - 2); duration: 500; easing.type: Easing.OutCubic }
++                    PropertyAnimation { target: gameListView; property: "anchors.bottomMargin"; from: toolbar.height + gameListView.itemHeight; to: 2 + gameListView.itemHeight; duration: 500; easing.type: Easing.OutCubic }
++                }
++            }
++        ]
++        Item {
++            id: searchBox
++            width: DarkoneJS.listWidth()
++            height: 24
++            anchors.verticalCenter: parent.verticalCenter
++            anchors.left: parent.left
++            anchors.leftMargin: 15
++            opacity: listHidden ? 0 : 1.0
++            Image {
++                id: searchButton
++                source: "images/find.png"
++                height: 16
++                anchors.right: searchTextInputBox.left
++                anchors.rightMargin: 5
++                anchors.verticalCenter: parent.verticalCenter
++                fillMode: Image.PreserveAspectFit
++                smooth: true
++                opacity: 0.75
++                MouseArea {
++                    anchors.fill: parent
++                    hoverEnabled: true
++                    onEntered: { toolbarAutoHide && toolbarHidden && !DarkoneJS.inGame && DarkoneJS.toolbarToggle(); hideToolbarTimer.stop(); parent.opacity = 1.0 }
++                    onExited: { hideToolbarTimer.start(); parent.opacity = 0.75 }
++                    onClicked: {
++                        parent.opacity = 1.0;
++                        gameListView.currentIndex = viewer.findIndex(searchTextInput.text, gameListView.currentIndex)
++                        gameListView.positionViewAtIndex(gameListView.currentIndex, ListView.Center);
++                        searchTextInput.focus = false;
++                    }
++                }
++            }
++            Rectangle {
++                id: searchTextInputBox
++                height: 18
++                width: DarkoneJS.listWidth() - searchButton.width - 5 - clearButton.width - 5
++                anchors.horizontalCenter: parent.horizontalCenter
++                anchors.verticalCenter: parent.verticalCenter
++                radius: height - 2
++                smooth: true
++                TextInput {
++                    id: searchTextInput
++                    anchors.verticalCenter: parent.verticalCenter
++                    anchors.left: parent.left
++                    anchors.topMargin: 2
++                    anchors.bottomMargin: 2
++                    anchors.leftMargin: 8
++                    anchors.right: parent.right
++                    anchors.rightMargin: 8
++                    font.pointSize: parent.height - 6
++                    smooth: true
++                    focus: false
++                    cursorDelegate: Rectangle {
++                        id: searchTextCursorDelegate
++                        color: "black"
++                        width: 1
++                        height: 0.5
++                        anchors.verticalCenter: parent.verticalCenter
++                        visible: parent.activeFocus
++                    }
++                    onAccepted: { gameListView.currentIndex = viewer.findIndex(searchTextInput.text, gameListView.currentIndex)
++                                  gameListView.positionViewAtIndex(gameListView.currentIndex, ListView.Center);
++                    }
++                    onFocusChanged: {
++                        if ( !focus )
++                            darkone.focus = true;
++                    }
++                }
++            }
++            Image {
++                id: clearButton
++                source: "images/clear.png"
++                height: 18
++                anchors.verticalCenter: parent.verticalCenter
++                anchors.left: searchTextInputBox.right
++                anchors.leftMargin: 5
++                fillMode: Image.PreserveAspectFit
++                smooth: true
++                opacity: 0.75
++                MouseArea {
++                    anchors.fill: parent
++                    hoverEnabled: true
++                    onEntered: parent.opacity = 1.0
++                    onExited: parent.opacity = 0.75
++                    onClicked: {
++                        parent.opacity = 1.0;
++                        searchTextInput.text = "";
++                        searchTextInput.focus = false;
++                    }
++                }
++            }
++//            }
++        }
++        Image {
++            id: showListButton
++            source: "images/list_toggle.png"
++            height: 18
++            anchors.bottom: parent.bottom
++            anchors.bottomMargin: (toolbar.height - height) / 2
++            anchors.left: searchBox.right
++            anchors.leftMargin: 15
++            fillMode: Image.PreserveAspectFit
++            opacity: 0.75
++            rotation: listHidden ? 90 : 270
++            smooth: true
++            z: 5
++            MouseArea {
++                anchors.fill: parent
++                hoverEnabled: true
++                onEntered: parent.opacity = 1.0
++                onExited: parent.opacity = 0.75
++                onClicked: { DarkoneJS.listToggle(); }
++            }
++        }
++        Image {
++            id: preferencesButton
++            height: 16
++            anchors.verticalCenter: parent.verticalCenter
++            anchors.left: showListButton.right
++            anchors.leftMargin: 10
++            source: "images/preferences.png"
++            smooth: true
++            opacity: 0.75
++            fillMode: Image.PreserveAspectFit
++            MouseArea {
++                anchors.fill: parent
++                hoverEnabled: true
++                onEntered: parent.opacity = 1.0
++                onExited: parent.opacity = 0.6
++                onClicked: {
++                    debug && console.log("[preferencesButton clicked] state: '" + preferencesDialog.state + "'")
++                    debug && DarkoneJS.info("[preferencesButton clicked]", preferencesDialog)
++                    parent.opacity = 1.0;
++                    if (preferencesDialog.state == "shown") {
++                        preferencesDialog.state = "hidden";
++                        searchTextInput.focus = true;
++                    } else {
++                        preferencesDialog.state = "shown";
++                        searchTextInput.focus = false;
++                    }
++                }
++            }
++        }
++        Image {
++            id: fullScreenToggleButton
++            height: 16
++            anchors.verticalCenter: parent.verticalCenter
++            anchors.left: preferencesButton.right
++            anchors.leftMargin: 10
++            source: "images/fullscreen.png"
++            state: darkone.fullScreen ? "fullscreen" : "windowed"
++            smooth: true
++            opacity: 0.75
++            fillMode: Image.PreserveAspectFit
++            MouseArea {
++                anchors.fill: parent
++                hoverEnabled: true
++                onEntered: parent.opacity = 1.0
++                onExited: parent.opacity = 0.6
++                onClicked: {
++                    if ( fullScreenToggleButton.state == "windowed" ) {
++                        fullScreenToggleButton.state = "fullscreen"
++                        darkone.fullScreen = true;
++                    } else {
++                        fullScreenToggleButton.state = "windowed"
++                        darkone.fullScreen = false;
++                    }
++                    parent.opacity = 1.0;
++                    searchTextInput.focus = false;
++                }
++            }
++            states: [
++                State {
++                    name: "fullscreen"
++                    PropertyChanges { target: fullScreenToggleButton; source: "images/windowed.png" }
++                },
++                State {
++                    name: "windowed"
++                    PropertyChanges { target: fullScreenToggleButton; source: "images/fullscreen.png" }
++                }
++            ]
++        }
++        Text {
++            id: fpsText
++            anchors.verticalCenter: parent.verticalCenter
++            anchors.left: fullScreenToggleButton.right
++            anchors.leftMargin: 15
++            color: textColour1
++            text: qsTr("FPS") + ": " + darkone.fps.toString()
++            visible: darkone.fpsVisible
++        }
++        Rectangle {
++            id: launchBox
++            height: 20
++            width: 40
++            anchors.verticalCenter: parent.verticalCenter
++            anchors.right: parent.right
++            anchors.rightMargin: (overlayButtonBlock.x + overlayButtonBlock.width / 2) - (width / 2)
++            opacity: 0.5
++            color: "transparent"
++            gradient: Gradient {
++                GradientStop { position: 0.0; color: "transparent" }
++                GradientStop { position: 0.25; color: DarkoneJS.gameStatusColour() }
++                GradientStop { position: 0.75; color: DarkoneJS.gameStatusColour() }
++                GradientStop { position: 1.0; color: "transparent" }
++            }
++            Image {
++                id: launchButton
++                source: "images/launch.png"
++                height: 16
++                width: 40
++                anchors.verticalCenter: parent.verticalCenter
++                anchors.horizontalCenter: parent.horizontalCenter
++                MouseArea {
++                    anchors.fill: parent
++//                    cursorShape: Qt.CrossCursor // QT_VERSION >= 0x050000
++                    hoverEnabled: true
++                    onEntered: { parent.opacity = 1.0
++                                 parent.parent.opacity = 1.0
++                                 overlayStateBlock.opacity = (lightOnAnimation.running || lightOut) ? 0 : 1.0;
++                    }
++                    onExited: { parent.opacity = 0.75
++                                parent.parent.opacity = 0.5
++                                overlayStateBlock.opacity = (lightOnAnimation.running || lightOut) ? 0 : 0.5;
++                    }
++                    onClicked: { if (!ignoreLaunch) {
++                                     gameListView.positionViewAtIndex(lastIndex, ListView.Center);
++                                     DarkoneJS.launch(); }
++                    }
++                }
++                CursorShapeArea {
++                    anchors.fill: parent
++                    cursorShape: Qt.CrossCursor
++                }
++            }
++        }
++        Image {
++            id: exitButton
++            height: 18
++            anchors.verticalCenter: parent.verticalCenter
++            anchors.right: parent.right
++            anchors.rightMargin: 15
++//            anchors.rightMargin: 15 + 18 + 10
++            source: "images/exit.png"
++            smooth: true
++            opacity: 0.25
++            fillMode: Image.PreserveAspectFit
++            MouseArea {
++                anchors.fill: parent
++                hoverEnabled: true
++                onEntered: parent.opacity = 1.0
++                onExited: parent.opacity = 0.6
++                onClicked: {
++                    parent.opacity = 1.0;
++                    darkone.ignoreLaunch = true;
++                    Qt.quit();
++                }
++            }
++        }
++
++    }
++
++/***
++* show/hide toolbar button
++*/
++
++/*
++    Image {
++        id: showHideToolbarButton
++        source: "images/toolbar_toggle.png"
++        height: 18
++        anchors.bottom: parent.bottom
++        anchors.bottomMargin: (toolbar.height - height) / 2
++        anchors.right: parent.right
++//        anchors.rightMargin: 10 + 18 + 5
++        anchors.rightMargin: 10
++        fillMode: Image.PreserveAspectFit
++        opacity: 0.75
++        rotation: darkone.toolbarHidden ? 0 : 180
++        smooth: true
++        z: 5
++        MouseArea {
++            anchors.fill: parent
++            hoverEnabled: true
++            onEntered: parent.opacity = 1.0
++            onExited: parent.opacity = 0.75
++            onClicked: DarkoneJS.toolbarToggle()
++        }
++    }
++*/
++
++    focus: true
++    Keys.onPressed: {
++        switch ( event.key ) {
++        case Qt.Key_Left:
++            if (!listHidden)
++                DarkoneJS.listToggle();
++            event.accepted = true;
++            break;
++        case Qt.Key_Right:
++            if (listHidden && preferencesDialog.state == "hidden")
++                DarkoneJS.listToggle();
++            event.accepted = true;
++            break;
++       case Qt.Key_Escape:
++            if ( searchTextInput.focus )
++                searchTextInput.focus = false;
++            else if ( preferencesDialog.state == "shown" )
++                preferencesDialog.state = "hidden";
++            event.accepted = true;
++            break;
++        case Qt.Key_F1:
++            break;
++        case Qt.Key_F11:
++            fullScreen = !fullScreen;
++            event.accepted = true;
++            break;
++        case Qt.Key_F:
++        case Qt.Key_Enter:
++        case Qt.Key_Return:
++            if ( event.modifiers & Qt.AltModifier ) {
++                fullScreen = !fullScreen;
++                event.accepted = true;
++            }
++            break;
++        default:
++            if ( event.modifiers & Qt.ControlModifier) {
++                switch ( event.key ) {
++                case Qt.Key_Q:
++                    Qt.quit();
++                    break;
++                case Qt.Key_P:
++                    !darkone.ignoreLaunch && DarkoneJS.launch();
++                    event.accepted = true;
++                    break;
++                case Qt.Key_O:
++                    preferencesDialog.state = preferencesDialog.state == "shown" ? "hidden" : "shown";
++                    event.accepted = true;
++                    break;
++                case Qt.Key_M:
++                    darkone.toolbarHidden = !darkone.toolbarHidden;
++                    event.accepted = true;
++                    break;
++                case Qt.Key_X:
++                    if ( confirmQuitDialog.state == "hidden" )
++                        confirmQuitDialog.state = "shown";
++                    else
++                        confirmQuitDialog.state = "hidden";
++                    event.accepted = true;
++                    break;
++                case Qt.Key_F:
++                    if ( !darkone.toolbarHidden ) {
++                        searchTextInput.text = "";
++                        searchTextInput.focus = true;
++                    }
++                    break;
++                }
++            } else if ( !darkone.toolbarHidden ) {
++                if ( DarkoneJS.validateKey(event.text) ) {
++                    searchTextInput.text += event.text;
++                    searchTextInput.focus = true;
++                } else if ( DarkoneJS.validateSpecialKey(event.text) ) {
++                    searchTextInput.focus = true;
++                    switch ( event.text ) {
++                    case "\b":
++                        if ( searchTextInput.text.length > 0)
++                            searchTextInput.text = searchTextInput.text.substring(0, searchTextInput.text.length - 1);
++                        break;
++                    }
++                }
++            }
++        }
++    }
++    Keys.forwardTo: [gameListView]
++    onFullScreenChanged: {
++        if ( !DarkoneJS.initialising ) {
++            if ( fullScreen ) {
++                viewer.switchToFullScreen();
++                fullScreenToggleButton.state = "fullscreen";
++            } else {
++                viewer.switchToWindowed();
++                fullScreenToggleButton.state = "windowed";
++            }
++        }
++    }
++}
++
+Index: arcade/wheel.h
+===================================================================
+--- arcade/wheel.h	(revision 0)
++++ arcade/wheel.h	(working copy)
+@@ -0,0 +1,22 @@
++#ifndef WHEELAREA_H
++#define WHEELAREA_H
++
++#include <QDeclarativeItem>
++#include <QGraphicsSceneWheelEvent>
++
++class WheelArea : public QDeclarativeItem
++{
++    Q_OBJECT
++public:
++    explicit WheelArea(QDeclarativeItem *parent = 0) : QDeclarativeItem(parent) {}
++
++protected:
++    void wheelEvent(QGraphicsSceneWheelEvent *event) {
++        emit wheel(event->delta());
++    }
++signals:
++//    void wheel(QGraphicsSceneWheelEvent *event);
++    void wheel(int delta);
++};
++
++#endif
