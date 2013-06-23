@@ -1,12 +1,31 @@
 
 # qmc2 'darkone' arcade theme
 
-## installation
+## notes
+-this work was accepted and committed upstream in r4926, and was part of the QMC2-0.39 release following many fixes and improvements
+
+## installation (legacy)
 -pull qmc2 rev 4925
 -apply patches from the 'patch' dir
 -copy 'images' folder from under this repo's 'binary' dir to 'QMC-SRC/arcade/qml/darkone/'
 -build (make arcade)
 -run (qmc2-arcade -theme darkone)
+
+## documentation
+-zooming is controlled by mouse-scroll over (most parts) of the cabinet image, or via the slider control in the preferences menu. note zooming is also affected by window resizing
+-mouse-left-clicking the cabinet's little game start buttons or its grid, or the game button on the toolbar, or hitting keyboard-RET, will launch the currently selected title*
+-mouse-double-left-clicking a title on the list will select and launch that title*
+-the toolbar menu auto-hides by default*. position the mouse cursor on the botton few pixels of the window to unhide it
+-double-left clicking the arcade screen will reveal the game data navigator
+--navigate images / info with by mouse-left-clicking the arrows
+--mouse-left-click on the buttons marked '1' or '2' to set the current data item (eg. 'preview') to be the primary / secondary source of display data
+--mixing image and info data types as primary / secondary sources will result in text overlaying image
+--info on the screen is scrollable by mouse-left-down followed by mouse-move (up/down), as is the game list
+-if the 'flash effect' is enabled, you can hit keyboard-ESC to immediately back out of the pending game launch
+-Keyboard-Ctrl-q quits the application
+
+*not when the preferences menu is open
+**not when the FPS counter is enabled
 
 ## changes (from ToxicWaste)
 ### aesthetics
@@ -56,9 +75,11 @@
 -removed flipable
 
 ## todo
--play in window [pipe dream! ..or libmame and a lot of effort]
+-play in window [libmame and a lot of effort, or possibly just the qt embedded window]
+-improve documentation?!
+-enable scrollbar for info
 
-## devs
+## devs (legacy)
 -tested solely with gnu/linux qt 4.8.4 / qtquick 1.1
 -patch 'diff-r4925.diff' targets modified (existing) files
 -patch 'add-r4925.diff' targets additional files
@@ -69,4 +90,4 @@
 -the additional components were sourced from qt-components (licence intact) / qt-forums (generic samples)
 -wheel.h/pointer.h are deprecated as of qt5. i looked at ways to implement both, but options are limited. push .qml through a pp or use multiple files
 -there's an excessive amount of comments. i like comments
--thanks to the original author for doing the hard work
+-thanks to the original authors for doing the hard work
