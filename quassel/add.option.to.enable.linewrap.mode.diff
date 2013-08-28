@@ -1,0 +1,152 @@
+From 329846c87e5138e9476455046d22d104c448e38b Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Wed, 28 Aug 2013 11:42:36 +0100
+Subject: add option to enable linewrap mode
+
+---
+ src/qtui/inputwidget.cpp                          |  9 +++++++++
+ src/qtui/inputwidget.h                            |  1 +
+ src/qtui/settingspages/inputwidgetsettingspage.ui | 16 ++++++++++++++++
+ src/qtui/topicwidget.cpp                          |  2 +-
+ src/uisupport/multilineedit.cpp                   | 16 ++++++++--------
+ src/uisupport/multilineedit.h                     |  4 +---
+ 6 files changed, 36 insertions(+), 12 deletions(-)
+
+diff --git a/src/qtui/inputwidget.cpp b/src/qtui/inputwidget.cpp
+index c246f2e..0194eab 100644
+--- a/src/qtui/inputwidget.cpp
++++ b/src/qtui/inputwidget.cpp
+@@ -122,6 +122,9 @@ InputWidget::InputWidget(QWidget *parent)
+     s.notify("EnableScrollBars", this, SLOT(setScrollBarsEnabled(QVariant)));
+     setScrollBarsEnabled(s.value("EnableScrollBars", true));
+ 
++    s.notify("EnableLineWrap", this, SLOT(setLineWrapEnabled(QVariant)));
++    setLineWrapEnabled(s.value("EnableLineWrap", false));
++
+     s.notify("EnableMultiLine", this, SLOT(setMultiLineEnabled(QVariant)));
+     setMultiLineEnabled(s.value("EnableMultiLine", true));
+ 
+@@ -209,6 +212,12 @@ void InputWidget::setScrollBarsEnabled(const QVariant &v)
+ }
+ 
+ 
++void InputWidget::setLineWrapEnabled(const QVariant &v)
++{
++    ui.inputEdit->setLineWrapEnabled(v.toBool());
++}
++
++
+ void InputWidget::setMultiLineEnabled(const QVariant &v)
+ {
+     ui.inputEdit->setMode(v.toBool() ? MultiLineEdit::MultiLine : MultiLineEdit::SingleLine);
+diff --git a/src/qtui/inputwidget.h b/src/qtui/inputwidget.h
+index 5fa4193..35c09dd 100644
+--- a/src/qtui/inputwidget.h
++++ b/src/qtui/inputwidget.h
+@@ -61,6 +61,7 @@ private slots:
+     void setShowStyleButtons(const QVariant &);
+     void setEnablePerChatHistory(const QVariant &);
+     void setMaxLines(const QVariant &);
++    void setLineWrapEnabled(const QVariant &);
+     void setMultiLineEnabled(const QVariant &);
+     void setScrollBarsEnabled(const QVariant &);
+     void onTextEntered(const QString &text);
+diff --git a/src/qtui/settingspages/inputwidgetsettingspage.ui b/src/qtui/settingspages/inputwidgetsettingspage.ui
+index 41b2d05..b7415ec 100644
+--- a/src/qtui/settingspages/inputwidgetsettingspage.ui
++++ b/src/qtui/settingspages/inputwidgetsettingspage.ui
+@@ -122,6 +122,22 @@
+     </widget>
+    </item>
+    <item>
++    <widget class="QCheckBox" name="enableLineWrapMode">
++     <property name="toolTip">
++      <string>Enables line wrapping for input.</string>
++     </property>
++     <property name="text">
++      <string>Line wrapping</string>
++     </property>
++     <property name="settingsKey" stdset="0">
++      <string notr="true">EnableLineWrap</string>
++     </property>
++     <property name="defaultValue" stdset="0">
++      <bool>false</bool>
++     </property>
++    </widget>
++   </item>
++   <item>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="title">
+       <string>Multi-Line Editing</string>
+diff --git a/src/qtui/topicwidget.cpp b/src/qtui/topicwidget.cpp
+index 8b8e16d..25ef83e 100644
+--- a/src/qtui/topicwidget.cpp
++++ b/src/qtui/topicwidget.cpp
+@@ -30,7 +30,7 @@ TopicWidget::TopicWidget(QWidget *parent)
+ {
+     ui.setupUi(this);
+     ui.topicEditButton->setIcon(SmallIcon("edit-rename"));
+-    ui.topicLineEdit->setWordWrapEnabled(true);
++    ui.topicLineEdit->setLineWrapEnabled(true);
+     ui.topicLineEdit->installEventFilter(this);
+ 
+     connect(ui.topicLabel, SIGNAL(clickableActivated(Clickable)), SLOT(clickableActivated(Clickable)));
+diff --git a/src/uisupport/multilineedit.cpp b/src/uisupport/multilineedit.cpp
+index aed4af7..5ad3ff8 100644
+--- a/src/uisupport/multilineedit.cpp
++++ b/src/uisupport/multilineedit.cpp
+@@ -53,7 +53,7 @@ MultiLineEdit::MultiLineEdit(QWidget *parent)
+ #endif
+ 
+     setMode(SingleLine);
+-    setWordWrapEnabled(false);
++    setLineWrapEnabled(false);
+     reset();
+ 
+     connect(this, SIGNAL(textChanged()), this, SLOT(on_textChanged()));
+@@ -98,6 +98,13 @@ void MultiLineEdit::setMode(Mode mode)
+ }
+ 
+ 
++void MultiLineEdit::setLineWrapEnabled(bool enable)
++{
++    setLineWrapMode(enable ? WidgetWidth : NoWrap);
++    updateSizeHint();
++}
++
++
+ void MultiLineEdit::setMinHeight(int lines)
+ {
+     if (lines == _minHeight)
+@@ -207,13 +214,6 @@ void MultiLineEdit::setSpellCheckEnabled(bool enable)
+ }
+ 
+ 
+-void MultiLineEdit::setWordWrapEnabled(bool enable)
+-{
+-    setLineWrapMode(enable ? WidgetWidth : NoWrap);
+-    updateSizeHint();
+-}
+-
+-
+ void MultiLineEdit::setPasteProtectionEnabled(bool enable, QWidget *)
+ {
+     _pasteProtectionEnabled = enable;
+diff --git a/src/uisupport/multilineedit.h b/src/uisupport/multilineedit.h
+index 70daa53..4b2d81e 100644
+--- a/src/uisupport/multilineedit.h
++++ b/src/uisupport/multilineedit.h
+@@ -81,9 +81,7 @@ public slots:
+     void setScrollBarsEnabled(bool enable = true);
+     void setSpellCheckEnabled(bool enable = true);
+     void setPasteProtectionEnabled(bool enable = true, QWidget *msgBoxParent = 0);
+-
+-    // Note: Enabling wrap will make isSingleLine() not work correctly, so only use this if minHeight() > 1!
+-    void setWordWrapEnabled(bool enable = true);
++    void setLineWrapEnabled(bool enable = false);
+ 
+     inline void setHistory(QStringList history) { _history = history; }
+     inline void setTempHistory(QHash<int, QString> tempHistory) { _tempHistory = tempHistory; }
+-- 
+1.8.2
+

@@ -1,0 +1,5 @@
+
+# add.option.to.enable.linewrap.mode.diff [git sha:815c628e93f34d546eed234adabe58a76d83e7fd | committed]
+
+-re-enable line wrapping for the input line (previously dubbed 'WORD-wrapping' - incorrectly)
+

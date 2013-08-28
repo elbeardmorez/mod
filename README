@@ -7,6 +7,9 @@ a dumping ground for patches which modify or add functionality
 ### qmc2
 -darkone-arcade-theme [svn r4926 | committed]
 
+### quassel
+-add.option.to.enable.linewrap.mode.diff [git sha:815c628e93f34d546eed234adabe58a76d83e7fd | committed]
+
 ### awstats
 -enable.more.error.code.based.reports.diff [git sha:e1711b2d683d0a0c050cf6eb2cd5470bff0c64bf | committed]
 -optionally.add.host.column.in.error.code.reports.diff [git sha:95c15e5ff7a636d1852ce406d552e4edf825d2b3 | committed]
