@@ -1,0 +1,93 @@
+From 6c977dd1a6d5f64441bc79e5733d04c6dcb958b8 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Wed, 11 Sep 2013 19:35:19 +0100
+Subject: add negative regex match-type for ingo sieve rules
+
+-Sieve regex rules are based on Posix which has no support for enhanced  
+(Perl/Java) features such as lookarounds
+-negating a complex regexp as would be made possible by this patch is
+simpler than jumping through hoops by use of multiple rules
+-Ingo appears to support the 'not regex' case for other backends
+
+---
+ ingo/config/fields.php    |    2 +-
+ ingo/lib/Script/Sieve.php |   14 ++++++++++++++
+ ingo/lib/Storage.php      |    3 ++-
+ 3 files changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/ingo/config/fields.php b/ingo/config/fields.php
+index 613724e..4ec9a3c 100644
+--- a/ingo/config/fields.php
++++ b/ingo/config/fields.php
+@@ -107,7 +107,7 @@ $ingo_fields = array(
+         'tests' => array(
+             'contains', 'not contain', 'is', 'not is', 'begins with',
+             'not begins with', 'ends with', 'not ends with', 'regex',
+-            'matches', 'not matches'
++            'not regex', 'matches', 'not matches'
+         )
+     )
+ );
+diff --git a/ingo/lib/Script/Sieve.php b/ingo/lib/Script/Sieve.php
+index 9ebff8f..0b87960 100644
+--- a/ingo/lib/Script/Sieve.php
++++ b/ingo/lib/Script/Sieve.php
+@@ -94,6 +94,7 @@ class Ingo_Script_Sieve extends Ingo_Script_Base
+         'greater than',
+         'greater than or equal to',
+         'regex',
++        'not regex',
+         'matches',
+         'not matches'
+     );
+@@ -657,6 +658,7 @@ class Ingo_Script_Sieve extends Ingo_Script_Base
+                 case 'ends with':
+                 case 'not ends with':
+                 case 'regex':
++                case 'not regex':
+                 case 'matches':
+                 case 'not matches':
+                     $comparator = (isset($condition['case']) &&
+@@ -873,6 +875,18 @@ class Ingo_Script_Sieve extends Ingo_Script_Base
+                         $test->addTest($tmp);
+                         break;
+ 
++                    case 'not regex':
++                        $vals['match-type'] = ':regex';
++                        if ($use_address_test) {
++                            $tmp = new Ingo_Script_Sieve_Test_Address($vals);
++                        } elseif ($condition['field'] == 'Body') {
++                            $tmp = new Ingo_Script_Sieve_Test_Body($vals);
++                        } else {
++                            $tmp = new Ingo_Script_Sieve_Test_Header($vals);
++                        }
++                        $test->addTest(new Ingo_Script_Sieve_Test_Not($tmp));
++                        break;
++
+                     case 'matches':
+                         $vals['match-type'] = ':matches';
+                         if ($use_address_test) {
+diff --git a/ingo/lib/Storage.php b/ingo/lib/Storage.php
+index 80610ac..8790f81 100644
+--- a/ingo/lib/Storage.php
++++ b/ingo/lib/Storage.php
+@@ -267,6 +267,7 @@ class Ingo_Storage
+             'exists' =>  _("Exists"),
+             'not exist' => _("Doesn't exist"),
+             'regex' => _("Regular expression"),
++            'not regex' => _("Doesn't match regular expression"),
+             'matches' => _("Matches (with placeholders)"),
+             'not matches' => _("Doesn't match (with placeholders)"),
+             'less than' => _("Less than"),
+@@ -289,7 +290,7 @@ class Ingo_Storage
+             'text' => array(
+                 'contains', 'not contain', 'is', 'not is', 'begins with',
+                 'not begins with', 'ends with', 'not ends with', 'regex',
+-                'matches', 'not matches'
++                'not regex', 'matches', 'not matches'
+             )
+         );
+ 
+-- 
+1.7.4.4
+

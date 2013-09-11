@@ -1,0 +1,8 @@
+
+# add.negative.regex.match.type.for.ingo.sieve.rules.diff [git sha:45cb1fbf633134c156d4098328f82407c3fb44d1 | pending]
+-Sieve regex rules are based on Posix which has no support for enhanced  
+(Perl/Java) features such as lookarounds
+-negating a complex regexp as would be made possible by this patch is
+simpler than jumping through hoops by use of multiple rules
+-Ingo appears to support the 'not regex' case for other backends
+
