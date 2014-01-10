@@ -7,6 +7,9 @@ a dumping ground for patches which modify or add functionality
 ### qmc2
 -darkone-arcade-theme [svn r4926 | committed]
 
+### awstats
+-enable.more.error.code.based.reports.diff [git sha:e1711b2d683d0a0c050cf6eb2cd5470bff0c64bf | committed]
+
 ### subtitleeditor
 -find-and-replace.regex.references [svn r858 | committed]
 
