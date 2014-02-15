@@ -1,0 +1,5 @@
+
+# find-and-replace.regex.references.diff [svn r855 | pending]
+-add ability to use regular expression submatches in the find-and-replace
+ replacement string
+
