@@ -1,0 +1,24 @@
+From 8d7cea2e18f146fafd1743ee94423828a4cdde4d Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Tue, 4 Mar 2014 10:36:43 +0000
+Subject: PulseOutputPlugin: set icon name
+
+---
+ src/output/plugins/PulseOutputPlugin.cxx | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/output/plugins/PulseOutputPlugin.cxx b/src/output/plugins/PulseOutputPlugin.cxx
+index 09394ec..4fb6dbe 100644
+--- a/src/output/plugins/PulseOutputPlugin.cxx
++++ b/src/output/plugins/PulseOutputPlugin.cxx
+@@ -329,6 +329,7 @@ pulse_output_init(const config_param &param, Error &error)
+ 	PulseOutput *po;
+ 
+ 	setenv("PULSE_PROP_media.role", "music", true);
++	setenv("PULSE_PROP_application.icon_name", "mpd", true);
+ 
+ 	po = new PulseOutput();
+ 	if (!po->base.Configure(param, error)) {
+-- 
+1.8.4
+

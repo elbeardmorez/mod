@@ -5,8 +5,11 @@ a dumping ground for patches which modify or add functionality
 ## projects
 
 ### qmc2
-- darkone-arcade-theme [svn r4926 | committed]
+-darkone-arcade-theme [svn r4926 | committed]
 
 ### subtitleeditor
-- find-and-replace.regex.references [svn r858 | committed]
+-find-and-replace.regex.references [svn r858 | committed]
+
+### mpd
+-PulseOutputPlugin_.set.icon.name.diff [git sha:503ed9c331426d625ddcfef25356d222c13af8a | pending]
 

@@ -1,0 +1,4 @@
+
+# PulseOutputPlugin_.set.icon.name.diff [git sha:503ed9c331426d625ddcfef25356d222c13af8a | pending]
+-set icon name to 'mpd' so pavucontrol et al. can display an icon for the stream
+
