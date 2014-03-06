@@ -11,5 +11,5 @@ a dumping ground for patches which modify or add functionality
 -find-and-replace.regex.references [svn r858 | committed]
 
 ### mpd
--PulseOutputPlugin_.set.icon.name.diff [git sha:503ed9c331426d625ddcfef25356d222c13af8a | pending]
-
+-PulseOutputPlugin_.set.icon.name.diff [git sha:3a3fb98f79de9863e3d78f57bb254064a9de4b09 | committed]
+-PulseOutputPlugin_.support.non-static.output.sinks.diff [git sha:3d8d936fcd828a14f5af6d3d862c9 | pending]

@@ -1,0 +1,72 @@
+From 52943dc71094718621caef8cd40f38d8e21f219b Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Thu, 6 Mar 2014 17:35:59 +0000
+Subject: [PATCH] PulseOutputPlugin: support non-static output sinks
+
+-update default output sink on any change to the current stream's sink
+-re-initialisation of audio output device, e.g. on audio file format
+change, no longer results in reversion to the statically configured
+default sink
+---
+ src/output/plugins/PulseOutputPlugin.cxx | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/src/output/plugins/PulseOutputPlugin.cxx b/src/output/plugins/PulseOutputPlugin.cxx
+index ec3725a..9c537d4 100644
+--- a/src/output/plugins/PulseOutputPlugin.cxx
++++ b/src/output/plugins/PulseOutputPlugin.cxx
+@@ -37,15 +37,18 @@
+ #include <assert.h>
+ #include <stddef.h>
+ #include <stdlib.h>
++#include <string>
+ 
+ #define MPD_PULSE_NAME "Music Player Daemon"
+ 
+ struct PulseOutput {
+ 	AudioOutput base;
+ 
++	//static
+ 	const char *name;
+ 	const char *server;
+-	const char *sink;
++	//dynamic
++	std::string sink;
+ 
+ 	PulseMixer *mixer;
+ 
+@@ -226,7 +229,13 @@ pulse_output_subscribe_cb(pa_context *context,
+ 	    idx == pa_stream_get_index(po->stream) &&
+ 	    (type == PA_SUBSCRIPTION_EVENT_NEW ||
+ 	     type == PA_SUBSCRIPTION_EVENT_CHANGE))
++	{
++		if (po->sink != pa_stream_get_device_name(po->stream))
++		{
++			po->sink = std::string(pa_stream_get_device_name(po->stream));
++		}
+ 		pulse_mixer_on_change(*po->mixer, context, po->stream);
++	}
+ }
+ 
+ /**
+@@ -337,7 +346,7 @@ pulse_output_init(const config_param &param, Error &error)
+ 
+ 	po->name = param.GetBlockValue("name", "mpd_pulse");
+ 	po->server = param.GetBlockValue("server");
+-	po->sink = param.GetBlockValue("sink");
++	po->sink = std::string(param.GetBlockValue("sink"));
+ 
+ 	po->mixer = nullptr;
+ 	po->mainloop = nullptr;
+@@ -595,7 +604,7 @@ pulse_output_open(AudioOutput *ao, AudioFormat &audio_format,
+ 
+ 	/* .. and connect it (asynchronously) */
+ 
+-	if (pa_stream_connect_playback(po->stream, po->sink,
++	if (pa_stream_connect_playback(po->stream, po->sink.c_str(),
+ 				       nullptr, pa_stream_flags_t(0),
+ 				       nullptr, nullptr) < 0) {
+ 		pulse_output_delete_stream(po);
+-- 
+1.8.2
+
