@@ -17,3 +17,7 @@ a dumping ground for patches which modify or add functionality
 ### mpd
 -PulseOutputPlugin_.set.icon.name.diff [git sha:3a3fb98f79de9863e3d78f57bb254064a9de4b09 | committed]
 -PulseOutputPlugin_.support.non-static.output.sinks.diff [git sha:3d8d936fcd828a14f5af6d3d862c9 | pending]
+
+### pulseaudio
+-alsa_.use.card.description.in.default.sink.source.prefix.when.available.diff [git sha:85891571f45744ef62cf8bc6aee7ba2d01f39af7 | pending]
+

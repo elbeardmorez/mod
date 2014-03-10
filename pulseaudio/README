@@ -1,0 +1,6 @@
+
+# alsa_.use.card.description.in.default.sink.source.prefix.when.available.diff [git sha:85891571f45744ef62cf8bc6aee7ba2d01f39af7 | pending]
+-given an explicit device.description in card_properties, prefer this
+information over other default prefixes (e.g. 'Built-in Audio') when
+constructing sink/source descriptions
+
