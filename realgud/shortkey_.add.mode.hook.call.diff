@@ -1,0 +1,27 @@
+From e034855c327201931fb46ff75a729c7b1b7872bc Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Tue, 11 Mar 2014 15:24:30 +0000
+Subject: shortkey, add mode hook call at setup
+
+-enable 'realgud-short-key-mode-hook' for those who might need it
+---
+ realgud/common/shortkey.el | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/realgud/common/shortkey.el b/realgud/common/shortkey.el
+index bd38410..e6169d1 100644
+--- a/realgud/common/shortkey.el
++++ b/realgud/common/shortkey.el
+@@ -71,7 +71,8 @@ MODE-ON? a boolean which specifies if we are going into or out of this mode."
+                 (progn
+                   (realgud-srcbuf-info-was-read-only?= buffer-read-only)
+                   (local-set-key [M-insert] 'realgud-short-key-mode)
+-                  (setq buffer-read-only t))
++                  (setq buffer-read-only t)
++                  (run-mode-hooks 'realgud-short-key-mode-hook))
+                 ;; Mode is being turned off: restore read-only state.
+                 (setq buffer-read-only
+                   (realgud-sget 'srcbuf-info 'was-read-only?))))))
+-- 
+1.8.2
+

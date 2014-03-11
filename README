@@ -21,3 +21,6 @@ a dumping ground for patches which modify or add functionality
 ### pulseaudio
 -alsa_.use.card.description.in.default.sink.source.prefix.when.available.diff [git sha:85891571f45744ef62cf8bc6aee7ba2d01f39af7 | pending]
 
+### realgud
+-shortkey_.add.mode.hook.call.diff [git sha:e034855c327201931fb46ff75a729c7b1b7872bc | pending]
+
