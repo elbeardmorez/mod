@@ -1,0 +1,44 @@
+From 150670a265d2d44f2ab5f7114027d545e2334fdc Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Tue, 11 Mar 2014 16:09:33 +0000
+Subject: add customisable variable to control source buffer locking
+
+-allow users to control whether the source buffers associated with
+the debugger process(es) are locked (read-only mode enabled) when
+debugging is in progress
+---
+ realgud/common/custom.el   | 6 ++++++
+ realgud/common/shortkey.el | 2 +-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/realgud/common/custom.el b/realgud/common/custom.el
+index 9631efb..c428b72 100644
+--- a/realgud/common/custom.el
++++ b/realgud/common/custom.el
+@@ -6,4 +6,10 @@
+   :type 'string
+   :group 'realgud)
+ 
++(defcustom realgud-srcbuf-lock t
++  "Set source buffers read-only when the debugger is active.
++A setting of `nil` allows editing, but Short-Key-mode use may inhibit this."
++  :type 'boolean
++  :group 'realgud)
++
+ (provide-me "realgud-")
+diff --git a/realgud/common/shortkey.el b/realgud/common/shortkey.el
+index e6169d1..c508418 100644
+--- a/realgud/common/shortkey.el
++++ b/realgud/common/shortkey.el
+@@ -71,7 +71,7 @@ MODE-ON? a boolean which specifies if we are going into or out of this mode."
+                 (progn
+                   (realgud-srcbuf-info-was-read-only?= buffer-read-only)
+                   (local-set-key [M-insert] 'realgud-short-key-mode)
+-                  (setq buffer-read-only t)
++                  (when realgud-srcbuf-lock (setq buffer-read-only t))
+                   (run-mode-hooks 'realgud-short-key-mode-hook))
+                 ;; Mode is being turned off: restore read-only state.
+                 (setq buffer-read-only
+-- 
+1.8.2
+
