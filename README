@@ -19,7 +19,8 @@ a dumping ground for patches which modify or add functionality
 -PulseOutputPlugin_.support.non-static.output.sinks.diff [git sha:3d8d936fcd828a14f5af6d3d862c9 | pending]
 
 ### pulseaudio
--alsa_.use.card.description.in.default.sink.source.prefix.when.available.diff [git sha:85891571f45744ef62cf8bc6aee7ba2d01f39af7 | pending]
+-alsa_.use.card.description.in.default.sink.source.prefix.when.available.diff [git sha:85891571f45744ef62cf8bc6aee7ba2d01f39af7 | rejected]
+-alsa_.use.card.description.in.default.sink.source.prefix.when.available.v2.diff [git sha:f6de525860419d59ad062e7b29051ff272247c3c | pending]
 
 ### realgud
 -shortkey_.add.mode.hook.call.diff [git sha:e034855c327201931fb46ff75a729c7b1b7872bc | pending]
