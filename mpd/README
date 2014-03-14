@@ -4,5 +4,8 @@
 
 # PulseOutputPlugin_.support.non-static.output.sinks.diff [git sha:3d8d936fcd828a14f5af6d3d862c9 | pending]
 -update default output sink on any change to the current stream's sink
--re-initialisation of audio output device, e.g. on audio file format change, no longer results in reversion to the statically configured default sink
-
+-re-initialisation of audio output device, e.g. on player stop/start or
+audio file format change, no longer results in reversion to statically
+configured default sink
+-revert to server-side choice of sink if connection to statically
+configured default sink fails
