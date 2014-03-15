@@ -1,4 +1,4 @@
-From 5828dc933a10e856c5dabb83bec63aa9aac7b949 Mon Sep 17 00:00:00 2001
+From e4849ff0ce7eed71ab6010f1ec98e3f2b9849ceb Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Thu, 6 Mar 2014 17:35:59 +0000
 Subject: PulseOutputPlugin: support non-static output sinks
@@ -10,11 +10,11 @@ configured default sink
 -revert to server-side choice of sink if connection to statically
 configured default sink fails
 ---
- src/output/plugins/PulseOutputPlugin.cxx | 34 ++++++++++++++++++++++----------
- 1 file changed, 24 insertions(+), 10 deletions(-)
+ src/output/plugins/PulseOutputPlugin.cxx | 43 ++++++++++++++++++++++++--------
+ 1 file changed, 33 insertions(+), 10 deletions(-)
 
 diff --git a/src/output/plugins/PulseOutputPlugin.cxx b/src/output/plugins/PulseOutputPlugin.cxx
-index ec3725a..746420b 100644
+index ec3725a..6fb67aa 100644
 --- a/src/output/plugins/PulseOutputPlugin.cxx
 +++ b/src/output/plugins/PulseOutputPlugin.cxx
 @@ -37,15 +37,18 @@
@@ -28,11 +28,11 @@ index ec3725a..746420b 100644
  struct PulseOutput {
  	AudioOutput base;
  
-+	//static
++	/* static */
  	const char *name;
  	const char *server;
 -	const char *sink;
-+	//dynamic
++	/* dynamic */
 +	std::string sink;
  
  	PulseMixer *mixer;
@@ -60,7 +60,7 @@ index ec3725a..746420b 100644
  
  	po->mixer = nullptr;
  	po->mainloop = nullptr;
-@@ -595,16 +604,21 @@ pulse_output_open(AudioOutput *ao, AudioFormat &audio_format,
+@@ -595,16 +604,16 @@ pulse_output_open(AudioOutput *ao, AudioFormat &audio_format,
  
  	/* .. and connect it (asynchronously) */
  
@@ -68,20 +68,15 @@ index ec3725a..746420b 100644
 +	if (pa_stream_connect_playback(po->stream,
 +				       po->sink.empty() ? nullptr : po->sink.c_str(),
  				       nullptr, pa_stream_flags_t(0),
--				       nullptr, nullptr) < 0) {
+ 				       nullptr, nullptr) < 0) {
 -		pulse_output_delete_stream(po);
-+				       nullptr, nullptr) < 0)
-+		/* fall back to the default - let the pa server decide */
-+		if (!po->sink.empty() && pa_stream_connect_playback(po->stream,
-+				           nullptr, nullptr, pa_stream_flags_t(0),
-+				           nullptr, nullptr) < 0) {
-+			pulse_output_delete_stream(po);
- 
+-
 -		SetError(error, po->context,
 -			 "pa_stream_connect_playback() has failed");
 -		pa_threaded_mainloop_unlock(po->mainloop);
 -		return false;
 -	}
++			pulse_output_delete_stream(po);
 +			SetError(error, po->context,
 +				 "pa_stream_connect_playback() has failed");
 +			pa_threaded_mainloop_unlock(po->mainloop);
@@ -89,6 +84,27 @@ index ec3725a..746420b 100644
 +		}
  
  	pa_threaded_mainloop_unlock(po->mainloop);
+ 
+@@ -730,6 +739,20 @@ pulse_output_play(AudioOutput *ao, const void *chunk, size_t size,
+ 
+ 	if (!pulse_output_wait_stream(po, error)) {
+ 		pa_threaded_mainloop_unlock(po->mainloop);
++		if (error.GetCode() == 5 && !po->sink.empty()) {
++			/* No such entity, fall back to pulseaudio server sink selection */
++			LogInfo(pulse_output_domain, "sink playback failure, falling "
++			                             "back to pa server sink selection");
++			po->sink = "";
++			AudioFormat af = ao->in_audio_format;
++			pulse_output_open(ao, af, IgnoreError());
++
++			pa_threaded_mainloop_lock(po->mainloop);
++			if (!pulse_output_wait_stream(po, error)) {
++				pa_threaded_mainloop_unlock(po->mainloop);
++				return 0;
++			}
++		} else
+ 		return 0;
+ 	}
  
 -- 
 1.8.2
