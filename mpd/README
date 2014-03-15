@@ -9,3 +9,18 @@ audio file format change, no longer results in reversion to statically
 configured default sink
 -revert to server-side choice of sink if connection to statically
 configured default sink fails
+
+# PulseOutputPlugin_.revert.sink.selection.to.pa.server.diff [git sha: 85d2bff82fba6829c99f93abc747fb62e01bc2e2 | pending]
+-revert to pa server sink selection for the remainder of the session
+when an output sink has been configured explicitly, and it is either
+invalid, or movement of the mpd stream is detected
+
+-protects against a configured sink which is removed during the
+session resulting in no mpd playback until the same sink returns
+
+-deals with the scenario where re-initialisation of the audio output
+device (e.g. on player stop/start, or audio file format change) causes
+an undesired reversion of the mpd stream to an explicitly configured
+output sink when the stream has been moved elsewhere during the
+session
+

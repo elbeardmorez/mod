@@ -1,0 +1,82 @@
+From 980671f513c3205e4ebb753c9d2961d78e59b56e Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sat, 15 Mar 2014 15:46:53 +0000
+Subject: PulseOutputPlugin: revert sink selection to pa server
+
+-revert to pa server sink selection for the remainder of the session
+when an output sink has been configured explicitly, and it is either
+invalid, or movement of the mpd stream is detected
+
+-protects against a configured sink which is removed during the
+session resulting in no mpd playback until the same sink returns
+
+-deals with the scenario where re-initialisation of the audio output
+device (e.g. on player stop/start, or audio file format change) causes
+an undesired reversion of the mpd stream to an explicitly configured
+output sink when the stream has been moved elsewhere during the
+session
+---
+ src/output/plugins/PulseOutputPlugin.cxx | 25 ++++++++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
+
+diff --git a/src/output/plugins/PulseOutputPlugin.cxx b/src/output/plugins/PulseOutputPlugin.cxx
+index ec3725a..d41717f 100644
+--- a/src/output/plugins/PulseOutputPlugin.cxx
++++ b/src/output/plugins/PulseOutputPlugin.cxx
+@@ -37,6 +37,7 @@
+ #include <assert.h>
+ #include <stddef.h>
+ #include <stdlib.h>
++#include <string.h>
+ 
+ #define MPD_PULSE_NAME "Music Player Daemon"
+ 
+@@ -226,7 +227,14 @@ pulse_output_subscribe_cb(pa_context *context,
+ 	    idx == pa_stream_get_index(po->stream) &&
+ 	    (type == PA_SUBSCRIPTION_EVENT_NEW ||
+ 	     type == PA_SUBSCRIPTION_EVENT_CHANGE))
++	{
++		if (po->sink && strcmp(po->sink, pa_stream_get_device_name(po->stream))) {
++		  LogInfo(pulse_output_domain, "stream moved, reverting to pa server "
++		                               "sink selection for this session");
++		  po->sink = nullptr;
++		}
+ 		pulse_mixer_on_change(*po->mixer, context, po->stream);
++	}
+ }
+ 
+ /**
+@@ -337,6 +345,7 @@ pulse_output_init(const config_param &param, Error &error)
+ 
+ 	po->name = param.GetBlockValue("name", "mpd_pulse");
+ 	po->server = param.GetBlockValue("server");
++	/* this may be set to nullptr during runtime */
+ 	po->sink = param.GetBlockValue("sink");
+ 
+ 	po->mixer = nullptr;
+@@ -730,7 +739,21 @@ pulse_output_play(AudioOutput *ao, const void *chunk, size_t size,
+ 
+ 	if (!pulse_output_wait_stream(po, error)) {
+ 		pa_threaded_mainloop_unlock(po->mainloop);
+-		return 0;
++		if (error.GetCode() == 5 && po->sink) {
++			/* No such entity, fall back to pulseaudio server sink selection */
++			LogInfo(pulse_output_domain, "sink playback failure, falling "
++			                             "back to pa server sink selection");
++			po->sink = nullptr;
++			AudioFormat af = ao->in_audio_format;
++			pulse_output_open(ao, af, IgnoreError());
++
++			pa_threaded_mainloop_lock(po->mainloop);
++			if (!pulse_output_wait_stream(po, error)) {
++				pa_threaded_mainloop_unlock(po->mainloop);
++				return 0;
++			}
++		} else
++			return 0;
+ 	}
+ 
+ 	assert(po->context != nullptr);
+-- 
+1.8.2
+

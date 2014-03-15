@@ -25,6 +25,7 @@ a dumping ground for patches which modify or add functionality
 ### mpd
 -PulseOutputPlugin_.set.icon.name.diff [git sha:3a3fb98f79de9863e3d78f57bb254064a9de4b09 | committed]
 -PulseOutputPlugin_.support.non-static.output.sinks.diff [git sha:e4849ff0ce7eed71ab6010f1ec98e3f2b9849ceb | rejected (superseded)]
+-PulseOutputPlugin_.revert.sink.selection.to.pa.server.diff [git sha: 85d2bff82fba6829c99f93abc747fb62e01bc2e2 | pending]
 
 ### pulseaudio
 -alsa_.use.card.description.in.default.sink.source.prefix.when.available.diff [git sha:85891571f45744ef62cf8bc6aee7ba2d01f39af7 | rejected]
