@@ -38,3 +38,6 @@ a dumping ground for patches which modify or add functionality
 ### pyimport-relative
 -support.compound.paths.which.overlap.existing.module.namespaces_paths.diff [git sha: 5fe5105b262dd596a8591b47815b2896313ef9ac | pending]
 
+### trepan
+-don't.overnest.pyfiles.results.diff [git sha:4c77e04e0f2171d8918d5051609c56542d144e59 | pending]
+

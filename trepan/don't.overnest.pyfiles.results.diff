@@ -1,0 +1,44 @@
+From 4c77e04e0f2171d8918d5051609c56542d144e59 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Tue, 18 Mar 2014 14:13:13 +0000
+Subject: don't overnest pyfiles() results
+
+---
+ trepan/io/__init__.py        | 2 +-
+ trepan/lib/__init__.py       | 2 +-
+ trepan/processor/__init__.py | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/trepan/io/__init__.py b/trepan/io/__init__.py
+index 91ea1ce..186a178 100644
+--- a/trepan/io/__init__.py
++++ b/trepan/io/__init__.py
+@@ -18,4 +18,4 @@ __docformat__ = 'restructuredtext'
+ 
+ from import_relative import import_relative
+ Mmisc = import_relative('misc', '..', 'trepan')
+-__all__ = [ Mmisc.pyfiles() ]
++__all__ = Mmisc.pyfiles()
+diff --git a/trepan/lib/__init__.py b/trepan/lib/__init__.py
+index 3d976f6..44e6c9d 100644
+--- a/trepan/lib/__init__.py
++++ b/trepan/lib/__init__.py
+@@ -16,4 +16,4 @@ __import__('pkg_resources').declare_namespace(__name__)
+ 
+ from import_relative import import_relative
+ Mmisc = import_relative('misc', '..', 'trepan')
+-__all__ = [ Mmisc.pyfiles() ]
++__all__ = Mmisc.pyfiles()
+diff --git a/trepan/processor/__init__.py b/trepan/processor/__init__.py
+index 4492625..68584cd 100644
+--- a/trepan/processor/__init__.py
++++ b/trepan/processor/__init__.py
+@@ -14,4 +14,4 @@
+ from import_relative import import_relative
+ __import__('pkg_resources').declare_namespace(__name__)
+ Mmisc = import_relative('misc', '..', 'trepan')
+-__all__ = [ Mmisc.pyfiles() ]
++__all__ = Mmisc.pyfiles()
+-- 
+1.8.2
+

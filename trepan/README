@@ -1,0 +1,5 @@
+
+# don't.overnest.pyfiles.results.diff [git sha:4c77e04e0f2171d8918d5051609c56542d144e59 | pending]
+
+-although the over-nesting doesn't affect 'import_relative traces', it is still inconsistent with other '__all__' lists, e.g. 'trepan/__init__.py'
+
