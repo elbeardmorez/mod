@@ -35,3 +35,6 @@ a dumping ground for patches which modify or add functionality
 -shortkey_.add.mode.hook.call.diff [git sha:e034855c327201931fb46ff75a729c7b1b7872bc | committed]
 -add.customisable.variable.to.control.source.buffer.locking.diff [git sha:150670a265d2d44f2ab5f7114027d545e2334fdc | committed]
 
+### pyimport-relative
+-support.compound.paths.which.overlap.existing.module.namespaces_paths.diff [git sha: 5fe5105b262dd596a8591b47815b2896313ef9ac | pending]
+

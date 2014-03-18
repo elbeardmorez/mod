@@ -1,0 +1,21 @@
+
+# support.compound.paths.which.overlap.existing.module.namespaces_paths.diff [git sha: 5fe5105b262dd596a8591b47815b2896313ef9ac | pending]
+
+-don't replace a temporily nuked' module prematurely. ensure that
+removed 'top_modules' stay removed until the complete compound path
+has been searched for
+
+fixes e.g. import_relative('io.input', '...trepan', '')
+
+-ensure that modules for all successful searches are placed in the
+'sys.modules' dictionary. previously, duplicate searches were made
+for some non-compound imports
+
+-cleanup code:
+--bring the initial module search into 'fallback' loop to avoid code
+duplication
+--trim fat e.g. pass statements
+--improve comments detailing the routine
+
+-added (and left in) debug statements to ease trace comparisons
+
