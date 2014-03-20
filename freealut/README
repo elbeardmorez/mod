@@ -1,0 +1,19 @@
+
+# loosen.unnecessary.ABI.restriction.diff [git sha:6fdc3652705ac33967062bea27e921969460d4cb | pending]
+
+[issue reported by Michael Zeilfelder]
+
+-given the low level of development seen on this library, such a
+restrictive SOVERSION is unnecessary. changes to ABI would usually
+entail a bump at the MAJOR_VERSION level, not the BUILD_VERSION
+level
+-currently, cmake builds won't be a drop in replacement for consumers
+of existing builds, who will be forced to rebuild whole applications
+unnecessarily
+
+pre-commit
+> readelf -a ./libalut.so.0.1.0 | grep SONAME -
+ 0x000000000000000e (SONAME)      Library soname: [libalut.so.0.1.0]
+post-commit
+> readelf -a ./libalut.so.0.1.0 | grep SONAME -
+

@@ -1,0 +1,41 @@
+From 6fdc3652705ac33967062bea27e921969460d4cb Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Thu, 20 Mar 2014 16:31:43 +0000
+Subject: loosen unnecessary ABI restriction
+
+[issue reported by Michael Zeilfelder]
+
+-given the low level of development seen on this library, such a
+restrictive SOVERSION is unnecessary. changes to ABI would usually
+entail a bump at the MAJOR_VERSION level, not the BUILD_VERSION
+level
+-currently, cmake builds won't be a drop in replacement for consumers
+of existing builds, who will be forced to rebuild whole applications
+unnecessarily
+
+pre-commit
+> readelf -a ./libalut.so.0.1.0 | grep SONAME -
+ 0x000000000000000e (SONAME)      Library soname: [libalut.so.0.1.0]
+post-commit
+> readelf -a ./libalut.so.0.1.0 | grep SONAME -
+ 0x000000000000000e (SONAME)      Library soname: [libalut.so.0]
+---
+ src/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 3d6563b..b72d1a1 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -78,7 +78,7 @@ set_target_properties(alut
+ 	VERSION
+ 	${MAJOR_VERSION}
+ 	SOVERSION
+-	${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION})
++	${MAJOR_VERSION})
+ target_link_libraries(alut ${OPENAL_LIBRARY})
+ if(UNIX)
+ 	target_link_libraries(alut m)
+-- 
+1.8.2
+
