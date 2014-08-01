@@ -1,0 +1,26 @@
+From 152168984d257d9ed8dae3ce7cac1ea02e219dd1 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Fri, 1 Aug 2014 22:53:58 +0100
+Subject: make contact address in context menu selectable
+
+-add 'allowTextSelection' class to context menu's contact address element
+---
+ imp/js/dimpcore.js | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/imp/js/dimpcore.js b/imp/js/dimpcore.js
+index 5688cc5..70537ba 100644
+--- a/imp/js/dimpcore.js
++++ b/imp/js/dimpcore.js
+@@ -345,7 +345,7 @@ var DimpCore = {
+ 
+                 if (!tmp2.g && tmp2.p) {
+                     tmp.show().insert({ top: new Element('DIV', { className: 'sep' }) })
+-                        .insert({ top: new Element('DIV', { className: 'contactAddr' }).insert(tmp2.b.escapeHTML()) });
++                        .insert({ top: new Element('DIV', { className: 'contactAddr allowTextSelection' }).insert(tmp2.b.escapeHTML()) });
+                 }
+             }
+             break;
+-- 
+1.8.4
+

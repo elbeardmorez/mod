@@ -46,4 +46,5 @@ a dumping ground for patches which modify or add functionality
 
 ### horde
 -add.negative.regex.match.type.for.ingo.sieve.rules.diff [git sha:45cb1fbf633134c156d4098328f82407c3fb44d1 | pending]
+-make.contact.address.in.context.menu.selectable.diff [git sha:15ce290db754182af9d7c1a82b07c8b676191cd5 | pending]
 

@@ -6,3 +6,6 @@
 simpler than jumping through hoops by use of multiple rules
 -Ingo appears to support the 'not regex' case for other backends
 
+# make.contact.address.in.context.menu.selectable.diff [git sha:15ce290db754182af9d7c1a82b07c8b676191cd5 | pending]
+-add 'allowTextSelectable' class to context menu's contact address element
+
