@@ -42,7 +42,7 @@ a dumping ground for patches which modify or add functionality
 -don't.overnest.pyfiles.results.diff [git sha:4c77e04e0f2171d8918d5051609c56542d144e59 | pending]
 
 ### freealut
--loosen.unnecessary.ABI.restriction.diff [git sha:6fdc3652705ac33967062bea27e921969460d4cb | pending]
+-loosen.unnecessary.ABI.restriction.diff [git sha:6fdc3652705ac33967062bea27e921969460d4cb | committed]
 
 ### horde
 -add.negative.regex.match.type.for.ingo.sieve.rules.diff [git sha:45cb1fbf633134c156d4098328f82407c3fb44d1 | pending]
