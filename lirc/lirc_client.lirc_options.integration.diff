@@ -1,0 +1,244 @@
+From 107994f2d1d8196df1357f2f5ae4ca06c0219c60 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Mon, 4 Aug 2014 17:10:44 +0100
+Subject: lirc_client lirc_options integration
+
+-allows for simple client modification of lircd socket
+---
+ lib/Makefile.am    |  6 +++-
+ lib/ciniparser.c   |  2 +-
+ lib/lirc_client.c  | 81 ++++++++++++++++++++++++++++++++++++++++++++++--------
+ lib/lirc_client.h  | 11 ++++++++
+ lib/lirc_options.c |  9 ++++++
+ lib/lirc_options.h | 10 +++++++
+ 6 files changed, 105 insertions(+), 14 deletions(-)
+
+diff --git a/lib/Makefile.am b/lib/Makefile.am
+index 96403cf..23222d0 100644
+--- a/lib/Makefile.am
++++ b/lib/Makefile.am
+@@ -22,7 +22,11 @@ liblirc_la_SOURCES          = config_file.c \
+                               serial.c \
+                               transmit.c
+ 
+-liblirc_client_la_SOURCES   = lirc_client.c lirc_client.h lirc_log.c lirc_log.h
++liblirc_client_la_SOURCES   = lirc_client.c lirc_client.h \
++                              lirc_log.c lirc_log.h \
++                              dictionary.c dictionary.h \
++                              ciniparser.c ciniparser.h \
++                              lirc_options.c lirc_options.h
+ liblirc_client_la_LDFLAGS   = -version-info 2:1:2
+ liblirc_client_la_LIBADD    = liblirc.la
+ 
+diff --git a/lib/ciniparser.c b/lib/ciniparser.c
+index 5129d7d..8547075 100644
+--- a/lib/ciniparser.c
++++ b/lib/ciniparser.c
+@@ -33,7 +33,7 @@
+  */
+ 
+ #include <ctype.h>
+-#include <ciniparser.h>
++#include "ciniparser.h"
+ 
+ #define ASCIILINESZ      (1024)
+ #define INI_INVALID_KEY  ((char*) NULL)
+diff --git a/lib/lirc_client.c b/lib/lirc_client.c
+index d924ef8..a679cf1 100644
+--- a/lib/lirc_client.c
++++ b/lib/lirc_client.c
+@@ -29,6 +29,7 @@
+ #include <sys/wait.h>
+ 
+ #include "lirc_client.h"
++#include "lirc_options.h"
+ 
+ /* internal defines */
+ #define MAX_INCLUDES 10
+@@ -96,6 +97,7 @@ static int lirc_lircd;
+ static int lirc_verbose = 0;
+ static char *lirc_prog = NULL;
+ static char *lirc_buffer = NULL;
++char *lirc_option = NULL;
+ 
+ static void lirc_printf(char *format_str, ...)
+ {
+@@ -117,23 +119,48 @@ static void lirc_perror(const char *s)
+ 	perror(s);
+ }
+ 
+-int lirc_init(char *prog, int verbose)
+-{
+-	struct sockaddr_un addr;
+-
+-	/* connect to lircd */
++int lirc_init(char *prog, int verbose) {
++	if (lirc_options == NULL)
++		lirc_options = dictionary_new(0);
++	const char* const defaults[] = {
++		options_name(lirc_option, prog, "name"), prog,
++		options_name(lirc_option, prog, "debug"), verbose ? "True" : "False",
++		(const char*)NULL, (const char*)NULL
++	};
++	options_add_defaults(defaults);
++	return lirc_init_wopt(prog);
++}
+ 
+-	if (prog == NULL || lirc_prog != NULL)
+-		return (-1);
+-	lirc_prog = strdup(prog);
+-	lirc_verbose = verbose;
+-	if (lirc_prog == NULL) {
+-		lirc_printf("%s: out of memory\n", prog);
++int lirc_init_wopt(const char *optprefix)
++{
++	if (optprefix == NULL) {
++		fprintf(stderr, "no program name specified for options prefix");
+ 		return (-1);
+ 	}
+ 
++	struct sockaddr_un addr;
++	const char* const defaults[] = {
++		options_name(lirc_option, optprefix, "name"), optprefix,
++		options_name(lirc_option, optprefix, "debug"), 0,
++		options_name(lirc_option, optprefix, "socket"), LIRCD,
++#ifndef USE_SYSLOG
++		options_name(lirc_option, optprefix, "logfile"), LOGFILE_CLIENTS,
++#endif
++		(const char*)NULL, (const char*)NULL
++	};
++	lirc_opt_add_defaults(defaults);
++
++	lirc_prog =
++		strdup(options_getstring(options_name(lirc_option, optprefix, "name")));
++	/* ensure logging */
++#ifndef USE_SYSLOG
++	lirc_set_logfile(options_getstring(options_name(lirc_option, optprefix, "logfile")));
++#endif
++	lirc_log_open(options_getstring(options_name(lirc_option, optprefix, "name")), 0,
++	              options_getint(options_name(lirc_option, optprefix, "debug")));
++	/* connect to lircd */
+ 	addr.sun_family = AF_UNIX;
+-	strcpy(addr.sun_path, LIRCD);
++	strcpy(addr.sun_path, options_getstring(options_name(lirc_option, optprefix, "socket")));
+ 	lirc_lircd = socket(AF_UNIX, SOCK_STREAM, 0);
+ 	if (lirc_lircd == -1) {
+ 		lirc_printf("%s: could not open socket\n", lirc_prog);
+@@ -163,6 +190,11 @@ int lirc_deinit(void)
+ 		free(lirc_buffer);
+ 		lirc_buffer = NULL;
+ 	}
++	if (lirc_option != NULL) {
++		free(lirc_option);
++		lirc_option = NULL;
++	}
++	dictionary_del(lirc_options);
+ 	return (close(lirc_lircd));
+ }
+ 
+@@ -1714,3 +1746,28 @@ int lirc_identify(int sockfd)
+ 	(void)lirc_send_command(sockfd, command, NULL, NULL, &success);
+ 	return success;
+ }
++
++/* lirc_option.h wrappers */
++void lirc_opt_set(char* key, char* value) {
++	options_set_opt(key, value);
++}
++char* lirc_opt_getstring(char* key) {
++	return options_getstring(key);
++}
++int lirc_opt_getint(char* key) {
++	return options_getint(key);
++}
++int lirc_opt_getboolean(char* key) {
++	return options_getboolean(key);
++}
++void lirc_opt_add_defaults(const char* const defaults[]) {
++	options_add_defaults(defaults);
++}
++char* lirc_opt_name(char* target, const char* pre, const char* name) {
++	return options_name(target, pre, name);
++}
++void lirc_opt_load(int argc, char **argv,
++		const char* options_file,
++		void (*parse_options)(int, char**)) {
++	options_load(argc, argv, options_file, parse_options);
++}
+diff --git a/lib/lirc_client.h b/lib/lirc_client.h
+index 2713df3..d57e422 100644
+--- a/lib/lirc_client.h
++++ b/lib/lirc_client.h
+@@ -74,6 +74,7 @@ extern "C" {
+ 	};
+ 
+ 	int lirc_init(char *prog, int verbose);
++	int lirc_init_wopt(const char *optprefix);
+ 	int lirc_deinit(void);
+ 
+ 	int lirc_readconfig(char *file, struct lirc_config **config, int (check) (char *s));
+@@ -94,6 +95,16 @@ extern "C" {
+ 	const char *lirc_getmode(struct lirc_config *config);
+ 	const char *lirc_setmode(struct lirc_config *config, const char *mode);
+ 
++/* lirc_option.h wrappers */
++	void lirc_opt_set(char* key, char* value);
++	char* lirc_opt_getstring(char* key);
++	int lirc_opt_getint(char* key);
++	int lirc_opt_getboolean(char* key);
++	void lirc_opt_add_defaults(const char* const defaults[]);
++	char* lirc_opt_name(char* target, const char* pre, const char* name);
++	void lirc_opt_load(int argc, char **argv,
++		const char* options_file,
++		void (*options_load)(int, char**));
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/lib/lirc_options.c b/lib/lirc_options.c
+index 7da5911..56da7c3 100644
+--- a/lib/lirc_options.c
++++ b/lib/lirc_options.c
+@@ -100,6 +100,8 @@ void options_add_defaults(const char* const defaults[])
+ 	const char* key;
+ 	const char* value;
+ 
++	if (lirc_options == NULL)
++		lirc_options = dictionary_new(0);
+ 	for(i = 0; defaults[i] != NULL; i += 2){
+ 		key = defaults[i];
+ 		value = defaults[i + 1];
+@@ -107,3 +109,10 @@ void options_add_defaults(const char* const defaults[])
+ 			options_set_opt((char*)key, (char*)value);
+ 	}
+ }
++
++char* options_name(char* target, const char* prefix, const char* option) {
++  target = realloc(target, strlen(prefix) + strlen(option) + 2);
++  if (target != NULL)
++    sprintf(target, "%s:%s", prefix, option);
++  return target;
++}
+diff --git a/lib/lirc_options.h b/lib/lirc_options.h
+index 792e279..2b39fe1 100644
+--- a/lib/lirc_options.h
++++ b/lib/lirc_options.h
+@@ -26,6 +26,16 @@ int options_getboolean(char* key);
+  */
+ void options_add_defaults(const char* const defaults[]);
+ 
++/*
++ * Construct an option name
++ * Arguments:
++ *   - target: string buffer
++ *   - prefix: name of program
++ *   - option: name of option
++ * Return:
++ *   - target string buffer or NULL
++ */
++char* options_name(char* target, const char* prefix, const char* option);
+ 
+ /*
+  *   Parse global option file and command line. On exit, all values
+-- 
+1.8.4
+

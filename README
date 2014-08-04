@@ -48,3 +48,6 @@ a dumping ground for patches which modify or add functionality
 -add.negative.regex.match.type.for.ingo.sieve.rules.diff [git sha:45cb1fbf633134c156d4098328f82407c3fb44d1 | pending]
 -make.contact.address.in.context.menu.selectable.diff [git sha:15ce290db754182af9d7c1a82b07c8b676191cd5 | pending]
 
+### lirc
+-lirc_client.lirc_options.integration.diff [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
+
