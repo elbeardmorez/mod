@@ -50,4 +50,5 @@ a dumping ground for patches which modify or add functionality
 
 ### lirc
 -lirc_client.lirc_options.integration.diff [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
+-lirc_options,.dictionary.and.ciniparser.usability.diff [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
 

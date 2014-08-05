@@ -2,3 +2,16 @@
 # lirc_client.lirc_options.integration.diff [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
 -allows for simple client modification of lircd socket
 
+# lirc_options,.dictionary.and.ciniparser.usability.diff [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
+-ensure existing options exist post ciniparser_load
+-meaningful return value for dictionary_del
+-only ever allocate lirc_options dict if NULL
+-allow option_set to create the new global dictionary, supporting
+
+  if (socket)
+     lirc_opt_set("client.app:socket", socket);
+  lircdfd = lirc_init_wopt("client.app")
+
+alternative lircd socket location creation
+-update a few doc strings
+
