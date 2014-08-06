@@ -24,3 +24,5 @@ counterpart to fascilate client wrapper lirc_log()
 -use logfile options from client applications
 -add lirc_log_deinit() to clean up (now) dynamic vars
 
+# convert.lirc_client.print.calls.to.new.format.diff [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
+
