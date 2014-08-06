@@ -15,3 +15,12 @@
 alternative lircd socket location creation
 -update a few doc strings
 
+# lirc_client.lirc_log.integration.diff [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
+-decouple lirc_log from exclusive lircd use
+-add new default LOGFILE_CLIENTS file 'lircc'
+-convert variadic logprintf function to wrapper for va_list
+counterpart to fascilate client wrapper lirc_log()
+-hides log creation from client applications
+-use logfile options from client applications
+-add lirc_log_deinit() to clean up (now) dynamic vars
+
