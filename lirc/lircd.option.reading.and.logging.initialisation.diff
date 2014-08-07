@@ -1,0 +1,128 @@
+From 65e940055090d94e177b64c766389da3be7b511b Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Thu, 7 Aug 2014 15:21:38 +0100
+Subject: lircd option reading and logging initialisation
+
+-rework initialisation to cope with user log file option
+-improve debug option wording
+---
+ daemons/lircd.c | 50 ++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 32 insertions(+), 18 deletions(-)
+
+diff --git a/daemons/lircd.c b/daemons/lircd.c
+index f81b3e6..5a93c35 100644
+--- a/daemons/lircd.c
++++ b/daemons/lircd.c
+@@ -2105,7 +2105,7 @@ static void lircd_help(void)
+ 	printf("\t -L --logfile=file\t\tdaemon log file\n");
+ #       endif
+ #       ifdef DEBUG
+-	printf("\t -D[debug_level] --debug[=debug_level]\n");
++	printf("\t -D[X] --debug[=X]\t\tenable log, optional verbosity level 1..10\n");
+ #       endif
+ 	printf("\t -r --release[=suffix]\t\tauto-generate release events\n");
+ 	printf("\t -a --allow-simulate\t\taccept SIMULATE command\n");
+@@ -2143,7 +2143,7 @@ static void lircd_add_defaults(void)
+ 
+ static void lircd_parse_options(int argc, char** argv)
+ {
+-	int c;
++	strncpy(progname, "lircd", sizeof(progname));
+ 	const char* optstring =  "O:hvnp:H:d:o:U:P:l::c:r::aR:"
+ #       if defined(__linux__)
+ 		"u"
+@@ -2155,13 +2155,10 @@ static void lircd_parse_options(int argc, char** argv)
+ 		"D::"
+ #       endif
+ 	;
+-
+-	strncpy(progname, "lircd", sizeof(progname));
+ 	optind = 1;
+-	lircd_add_defaults();
++	int c;
+ 	while ((c = getopt_long(argc, argv, optstring, lircd_options, NULL))
+-		!= -1 )
+-	{
++		!= -1) {
+ 		switch (c) {
+ 		case 'h':
+ 			lircd_help();
+@@ -2187,11 +2184,11 @@ static void lircd_parse_options(int argc, char** argv)
+ 		case 'P':
+ 			options_set_opt("lircd:pidfile", optarg);
+ 			break;
+-#               ifndef USE_SYSLOG
++# ifndef USE_SYSLOG
+ 		case 'L':
+ 			options_set_opt("lircd:logfile", optarg);
+ 			break;
+-#               endif
++# endif
+ 		case 'o':
+ 			options_set_opt("lircd:output", optarg);
+ 			break;
+@@ -2202,12 +2199,11 @@ static void lircd_parse_options(int argc, char** argv)
+ 		case 'c':
+ 			options_set_opt("lircd:connect", optarg);
+ 			break;
+-#               ifdef DEBUG
++# ifdef DEBUG
+ 		case 'D':
+ 			options_set_opt("lircd:debug", optarg ? optarg : "1");
+-			debug = 1;
+ 			break;
+-#               endif
++# endif
+ 		case 'a':
+ 			options_set_opt("lircd:allow-simulate", "True");
+ 			break;
+@@ -2232,10 +2228,10 @@ static void lircd_parse_options(int argc, char** argv)
+ 			exit(EXIT_FAILURE);
+ 		}
+ 	}
+-	if (optind == argc - 1) {
+-		options_set_opt("lircd:configfile", argv[optind]);
+-	} else if (optind != argc) {
+-		fprintf(stderr, "%s: invalid argument count\n", progname);
++	if (optind == argc - 1)
++		options_set_opt("lircd:configfile", optind == argc - 1 ? argv[argc - 1] : NULL);
++	else if (optind < argc - 1) {
++		fprintf(stderr, "%s: too many unprocessed arguments\n", progname);
+ 		exit(EXIT_FAILURE);
+ 	}
+ }
+@@ -2251,11 +2247,29 @@ int main(int argc, char **argv)
+ 	char* opt;
+ 	int debug = 0;
+ 
+-	lirc_log_open("lircd", 0, LOG_INFO);
+ 	address.s_addr = htonl(INADDR_ANY);
+ 	hw_choose_driver(NULL);
+-	options_load(argc, argv, NULL, lircd_parse_options);
+ 
++	/* set default options */
++	lircd_add_defaults();
++	/* set up default logging */
++# ifndef USE_SYSLOG
++	/* catch 'pre-log' messages in LOGFILE*/
++	lirc_set_logfile(options_getstring("lircd:logfile"));
++# endif
++	lirc_log_open("lircd", 0, LOG_INFO);
++	/* set command line and file options */
++	options_load(argc, argv, NULL, lircd_parse_options);
++# ifndef USE_SYSLOG
++	if (strcmp(lirc_get_logfile(), options_getstring("lircd:logfile")) != 0) {
++		/* update log file location */
++		lirc_log_close();
++		lirc_set_logfile(options_getstring("lircd:logfile"));
++		lirc_log_open("lircd", 0, LOG_INFO);
++	}
++# endif
++		/* update log level */
++	lirc_log_setlevel(options_getstring("lircd:debug"));
+ 	nodaemon = options_getboolean("lircd:nodaemon");
+ 	opt = options_getstring("lircd:permission");
+ 	if (oatoi(opt) == -1) {
+-- 
+1.8.4
+

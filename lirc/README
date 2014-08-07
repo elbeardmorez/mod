@@ -33,3 +33,7 @@ it can use the client library log functions
 -harmonise initialisation code with lircd
 -improve --help information
 
+# lircd.option.reading.and.logging.initialisation.diff [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
+-rework initialisation to cope with user log file option
+-improve debug option wording
+
