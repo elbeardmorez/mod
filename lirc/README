@@ -26,3 +26,10 @@ counterpart to fascilate client wrapper lirc_log()
 
 # convert.lirc_client.print.calls.to.new.format.diff [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
 
+# irexec_lircrcd.clients.option.and.log.integration.diff [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
+-expose socket, logfile and debug options
+-remove redundant lirc_log.h include from lircrcd. as a client app
+it can use the client library log functions
+-harmonise initialisation code with lircd
+-improve --help information
+

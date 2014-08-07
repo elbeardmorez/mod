@@ -1,0 +1,596 @@
+From b067f9278c21d0edec2ed9496c19612abe58e157 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Thu, 7 Aug 2014 15:14:08 +0100
+Subject: irexec/lircrcd clients option and log integration
+
+-expose socket, logfile and debug options
+-remove redundant lirc_log.h include from lircrcd. as a client app
+it can use the client library log functions
+-harmonise initialisation code with lircd
+-improve --help information
+---
+ tools/irexec.c  | 117 +++++++++++++++++++++++++-----------
+ tools/lircrcd.c | 181 ++++++++++++++++++++++++++++++++++++--------------------
+ 2 files changed, 199 insertions(+), 99 deletions(-)
+
+diff --git a/tools/irexec.c b/tools/irexec.c
+index bc1e242..5c45bb3 100644
+--- a/tools/irexec.c
++++ b/tools/irexec.c
+@@ -21,68 +21,119 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <getopt.h>
++#include <syslog.h>
+ #include "lirc_client.h"
+ 
+-char *progname;
++static int debug;
++const char *progname = "irexec";
+ 
+ int main(int argc, char *argv[])
+ {
+ 	struct lirc_config *config;
+-	int daemonize = 0;
+-	char *program = "irexec";
+ 
+-	progname = "irexec " VERSION;
+-	while (1) {
+-		int c;
+-		static struct option long_options[] = {
+-			{"help", no_argument, NULL, 'h'},
+-			{"version", no_argument, NULL, 'v'},
+-			{"daemon", no_argument, NULL, 'd'},
+-			{"name", required_argument, NULL, 'n'},
+-			{0, 0, 0, 0}
+-		};
+-		c = getopt_long(argc, argv, "hvdn:", long_options, NULL);
+-		if (c == -1)
+-			break;
++	debug = 0;
++
++	const char* const defaults[] = {
++		"irexec:daemon", 	"False",
++		"irexec:name", 		progname,
++		"irexec:socket", 	LIRCD,
++		"irexec:logfile", 	LOGFILE_CLIENTS,
++		"irexec:debug", 	"False",
++		(const char*)NULL, 	(const char*)NULL
++	};
++	lirc_opt_add_defaults(defaults);
++
++	static struct option long_options[] = {
++		{"help", no_argument, NULL, 'h'},
++		{"version", no_argument, NULL, 'v'},
++		{"daemon", no_argument, NULL, 'd'},
++		{"name", required_argument, NULL, 'n'},
++		{"socket", required_argument, NULL, 's'},
++# ifndef USE_SYSLOG
++		{"logfile", required_argument, NULL, 'L'},
++# endif
++# ifdef DEBUG
++		{"debug", optional_argument, NULL, 'D'},
++# endif
++		{0, 0, 0, 0}
++	};
++
++	const char* optstring = "hvdn:s:"
++#       ifndef USE_SYSLOG
++		"L:"
++#       endif
++#       ifdef DEBUG
++		"D::"
++#       endif
++	;
++	optind = 1;
++	int c;
++	while ((c = getopt_long(argc, argv, optstring, long_options, NULL)) 
++		!= -1) {
+ 		switch (c) {
+ 		case 'h':
+ 			printf("Usage: %s [options] [config_file]\n", argv[0]);
+ 			printf("\t -h --help\t\tdisplay usage summary\n");
+ 			printf("\t -v --version\t\tdisplay version\n");
+ 			printf("\t -d --daemon\t\trun in background\n");
+-			printf("\t -n --name\t\tuse this program name\n");
++			printf("\t -n --name=NAME\t\tuse alternative program name "
++			       "[default: %s]\n", progname);
++			printf("\t -s --socket=SOCKET\tlircd socket filename "
++			       "[default: %s]\n", LIRCD);
++# ifndef USE_SYSLOG
++			printf("\t -L --logfile=FILE\tclient log filename "
++             "[default: %s]\n", LOGFILE_CLIENTS);
++# endif
++# ifdef DEBUG
++			printf("\t -D[X] --debug[=X]\tenable log, optional verbosity level 1..10 "
++			       "[default: 1]\n");
++# endif
+ 			return (EXIT_SUCCESS);
+ 		case 'v':
+-			printf("%s\n", progname);
++			printf("%s %s\n", progname, VERSION);
+ 			return (EXIT_SUCCESS);
+ 		case 'd':
+-			daemonize = 1;
++			lirc_opt_set("irexec:daemon", "True");
+ 			break;
+ 		case 'n':
+-			program = optarg;
++			lirc_opt_set("irexec:name", optarg);
++			break;
++		case 's':
++			lirc_opt_set("irexec:socket", optarg);
+ 			break;
++# ifndef USE_SYSLOG
++		case 'L':
++			lirc_opt_set("irexec:logfile", optarg);
++			break;
++# endif
++# ifdef DEBUG
++		case 'D':
++			lirc_opt_set("irexec:debug", optarg ? optarg : "1");
++			break;
++# endif
+ 		default:
+ 			printf("Usage: %s [options] [config_file]\n", argv[0]);
+ 			return (EXIT_FAILURE);
+ 		}
+ 	}
+-	if (optind < argc - 1) {
+-		fprintf(stderr, "%s: too many arguments\n", progname);
+-		return (EXIT_FAILURE);
++	if (optind == argc - 1)
++		lirc_opt_set("irexec:config", optind == argc - 1 ? argv[argc - 1] : NULL);
++	else if (optind < argc - 1) {
++		fprintf(stderr, "%s: too many unprocessed arguments\n", progname);
++		exit(EXIT_FAILURE);
+ 	}
+ 
+-	if (lirc_init(program, daemonize ? 0 : 1) == -1)
++	if (lirc_init_wopt(progname) == -1)
+ 		exit(EXIT_FAILURE);
+-
+-	if (lirc_readconfig(optind != argc ? argv[optind] : NULL, &config, NULL) == 0) {
++	if (lirc_readconfig(lirc_opt_getstring("irexec:config"), &config, NULL) == 0) {
+ 		char *code;
+ 		char *c;
+ 		int ret;
+ 
+-		if (daemonize) {
++		if (lirc_opt_getboolean("irexec:daemon")) {
+ 			if (daemon(0, 0) == -1) {
+-				fprintf(stderr, "%s: can't daemonize\n", progname);
+-				perror(progname);
++				lirc_log(LOG_ERR, "can't daemonize\n", progname);
++				lirc_log_err(LOG_ERR, "");
+ 				lirc_freeconfig(config);
+ 				lirc_deinit();
+ 				exit(EXIT_FAILURE);
+@@ -92,11 +143,9 @@ int main(int argc, char *argv[])
+ 			if (code == NULL)
+ 				continue;
+ 			while ((ret = lirc_code2char(config, code, &c)) == 0 && c != NULL) {
+-#ifdef DEBUG
+-				if (!daemonize) {
+-					printf("Execing command \"%s\"\n", c);
+-				}
+-#endif
++# ifdef DEBUG
++				lirc_log(LOG_DEBUG, "executing command \"%s\"\n", c);
++# endif
+ 				system(c);
+ 			}
+ 			free(code);
+diff --git a/tools/lircrcd.c b/tools/lircrcd.c
+index bafe4b6..0008011 100644
+--- a/tools/lircrcd.c
++++ b/tools/lircrcd.c
+@@ -32,7 +32,6 @@
+ #include <syslog.h>
+ 
+ #include "lirc_client.h"
+-#include "lirc/lirc_log.h"
+ 
+ #define MAX_CLIENTS 100
+ #define PACKET_SIZE (256)
+@@ -98,6 +97,8 @@ char *protocol_string[] = {
+ 	"SIGHUP\n"
+ };
+ 
++int debug = 0;
++const char *progname = "lircrcd";
+ 
+ static sig_atomic_t term = 0;
+ static int termsig;
+@@ -205,15 +206,15 @@ inline int read_timeout(int fd, char *buf, int len, int timeout)
+ 	}
+ 	while (ret == -1 && errno == EINTR);
+ 	if (ret == -1) {
+-		logprintf(LOG_ERR, "select() failed");
+-		logperror(LOG_ERR, "");
++		lirc_log(LOG_ERR, "select() failed");
++		lirc_log_err(LOG_ERR, "");
+ 		return (-1);
+ 	} else if (ret == 0)
+ 		return (0);	/* timeout */
+ 	n = read(fd, buf, len);
+ 	if (n == -1) {
+-		logprintf(LOG_ERR, "read() failed");
+-		logperror(LOG_ERR, "");
++		lirc_log(LOG_ERR, "read() failed");
++		lirc_log_err(LOG_ERR, "");
+ 		return (-1);
+ 	}
+ 	return (n);
+@@ -275,7 +276,7 @@ static void remove_client(int i)
+ 		free(clis[i].pending_code);
+ 	free_event_info(clis[i].first_event);
+ 
+-	LOGPRINTF(1, "removed client");
++	lirc_log(1, "removed client");
+ 
+ 	clin--;
+ 	for (; i < clin; i++) {
+@@ -293,13 +294,13 @@ void add_client(int sock)
+ 	clilen = sizeof(client_addr);
+ 	fd = accept(sock, (struct sockaddr *)&client_addr, &clilen);
+ 	if (fd == -1) {
+-		logprintf(LOG_ERR, "accept() failed for new client");
+-		logperror(LOG_ERR, "");
++		lirc_log(LOG_ERR, "accept() failed for new client");
++		lirc_log_err(LOG_ERR, "");
+ 		return;
+ 	};
+ 
+ 	if (fd >= FD_SETSIZE || clin >= MAX_CLIENTS) {
+-		logprintf(LOG_ERR, "connection rejected");
++		lirc_log(LOG_ERR, "connection rejected");
+ 		shutdown(fd, 2);
+ 		close(fd);
+ 		return;
+@@ -309,7 +310,7 @@ void add_client(int sock)
+ 	if (flags != -1) {
+ 		fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+ 	}
+-	LOGPRINTF(1, "accepted new client");
++	lirc_log(LOG_INFO, "accepted new client");
+ 	clis[clin].fd = fd;
+ 	clis[clin].ident_string = NULL;
+ 	clis[clin].first_event = NULL;
+@@ -410,16 +411,16 @@ static int code_func(int fd, char *message, char *arguments)
+ 		return send_error(fd, message, "protocol error\n");
+ 	}
+ 
+-	LOGPRINTF(3, "%s asking for code -%s-", clis[index].ident_string, arguments);
++	lirc_log(LOG_DEBUG, "%s asking for code -%s-", clis[index].ident_string, arguments);
+ 
+ 	ei = clis[index].first_event;
+ 	if (ei != NULL) {
+-		LOGPRINTF(3, "compare: -%s- -%s-", ei->code, arguments);
++		lirc_log(LOG_DEBUG, "compare: -%s- -%s-", ei->code, arguments);
+ 		if (strcmp(ei->code, arguments) == 0) {
+ 
+ 			ci = ei->first;
+ 			if (ci != NULL) {
+-				LOGPRINTF(3, "result: -%s-", ci->config_string);
++				lirc_log(LOG_DEBUG, "result: -%s-", ci->config_string);
+ 				ret = send_result(fd, message, ci->config_string);
+ 				ei->first = ci->next;
+ 				free(ci->config_string);
+@@ -450,7 +451,7 @@ static int ident_func(int fd, char *message, char *arguments)
+ 	if (arguments == NULL) {
+ 		return send_error(fd, message, "protocol error\n");
+ 	}
+-	LOGPRINTF(2, "IDENT %s", arguments);
++	lirc_log(LOG_NOTICE, "IDENT %s", arguments);
+ 	index = get_client_index(fd);
+ 	if (clis[index].ident_string != NULL) {
+ 		return send_error(fd, message, "protocol error\n");
+@@ -460,7 +461,7 @@ static int ident_func(int fd, char *message, char *arguments)
+ 		return send_error(fd, message, "out of memory\n");
+ 	}
+ 
+-	LOGPRINTF(1, "%s connected", clis[index].ident_string);
++	lirc_log(LOG_INFO, "%s connected", clis[index].ident_string);
+ 	return (send_success(fd, message));
+ }
+ 
+@@ -469,7 +470,7 @@ static int getmode_func(int fd, char *message, char *arguments)
+ 	if (arguments != NULL) {
+ 		return send_error(fd, message, "protocol error\n");
+ 	}
+-	LOGPRINTF(2, "GETMODE");
++	lirc_log(LOG_NOTICE, "GETMODE");
+ 	if (lirc_getmode(config)) {
+ 		return send_result(fd, message, lirc_getmode(config));
+ 	}
+@@ -480,7 +481,7 @@ static int setmode_func(int fd, char *message, char *arguments)
+ {
+ 	const char *mode = NULL;
+ 
+-	LOGPRINTF(2, arguments != NULL ? "SETMODE %s" : "SETMODE", arguments);
++	lirc_log(LOG_NOTICE, arguments != NULL ? "SETMODE %s" : "SETMODE", arguments);
+ 	if ((mode = lirc_setmode(config, arguments))) {
+ 		return send_result(fd, message, mode);
+ 	}
+@@ -530,8 +531,8 @@ static int send_error(int fd, char *message, char *format_str, ...)
+ 		s1[0] = 0;
+ 	if (s2 != NULL)
+ 		s2[0] = 0;
+-	logprintf(LOG_ERR, "error processing command: %s", message);
+-	logprintf(LOG_ERR, "%s", buffer);
++	lirc_log(LOG_ERR, "error processing command: %s", message);
++	lirc_log(LOG_ERR, "%s", buffer);
+ 	if (s1 != NULL)
+ 		s1[0] = '\n';
+ 	if (s2 != NULL)
+@@ -568,12 +569,12 @@ static int get_command(int fd)
+ 		buffer[length] = 0;
+ 		end = strchr(buffer, '\n');
+ 		if (end == NULL) {
+-			logprintf(LOG_ERR, "bad send packet: \"%s\"", buffer);
++			lirc_log(LOG_ERR, "bad send packet: \"%s\"", buffer);
+ 			/* remove clients that behave badly */
+ 			return (0);
+ 		}
+ 		end[0] = 0;
+-		LOGPRINTF(1, "received command: \"%s\"", buffer);
++		lirc_log(LOG_INFO, "received command: \"%s\"", buffer);
+ 		packet_length = strlen(buffer) + 1;
+ 
+ 		strcpy(backup, buffer);
+@@ -630,7 +631,7 @@ static void loop(int sockfd, int lircdfd)
+ 		do {
+ 			/* handle signals */
+ 			if (term) {
+-				logprintf(LOG_NOTICE, "caught signal");
++				lirc_log(LOG_NOTICE, "caught signal");
+ 				return;
+ 			}
+ 			FD_ZERO(&fds);
+@@ -642,12 +643,12 @@ static void loop(int sockfd, int lircdfd)
+ 				FD_SET(clis[i].fd, &fds);
+ 				maxfd = max(maxfd, clis[i].fd);
+ 			}
+-			LOGPRINTF(3, "select");
++			lirc_log(LOG_DEBUG, "select");
+ 			ret = select(maxfd + 1, &fds, NULL, NULL, NULL);
+ 
+ 			if (ret == -1 && errno != EINTR) {
+-				logprintf(LOG_ERR, "select() failed");
+-				logperror(LOG_ERR, "");
++				lirc_log(LOG_ERR, "select() failed");
++				lirc_log_err(LOG_ERR, "");
+ 				raise(SIGTERM);
+ 				continue;
+ 			}
+@@ -661,14 +662,14 @@ static void loop(int sockfd, int lircdfd)
+ 					remove_client(i);
+ 					i--;
+ 					if (clin == 0) {
+-						logprintf(LOG_INFO, "last client disconnected, shutting down");
++						lirc_log(LOG_INFO, "last client disconnected, shutting down");
+ 						return;
+ 					}
+ 				}
+ 			}
+ 		}
+ 		if (FD_ISSET(sockfd, &fds)) {
+-			LOGPRINTF(1, "registering local client");
++			lirc_log(LOG_INFO, "registering local client");
+ 			add_client(sockfd);
+ 		}
+ 		if (FD_ISSET(lircdfd, &fds)) {
+@@ -676,7 +677,7 @@ static void loop(int sockfd, int lircdfd)
+ 				while (clin > 0) {
+ 					remove_client(0);
+ 				}
+-				logprintf(LOG_ERR, "connection lost");
++				lirc_log(LOG_ERR, "connection lost");
+ 				return;
+ 			}
+ 		}
+@@ -687,7 +688,7 @@ static int schedule(int index, char *config_string)
+ {
+ 	struct event_info *e;
+ 	struct config_info *c, *n;
+-	LOGPRINTF(2, "schedule(%s): -%s-", clis[index].ident_string, config_string);
++	lirc_log(LOG_NOTICE, "schedule(%s): -%s-", clis[index].ident_string, config_string);
+ 
+ 	e = clis[index].first_event;
+ 	while (e->next)
+@@ -728,7 +729,7 @@ static int handle_input()
+ 	struct event_info *e, *n;
+ 	int i;
+ 
+-	LOGPRINTF(1, "input from lircd");
++	lirc_log(LOG_INFO, "input from lircd");
+ 	if (lirc_nextcode(&code) != 0) {
+ 		return 0;
+ 	}
+@@ -763,11 +764,11 @@ static int handle_input()
+ 			e->next = n;
+ 		}
+ 	}
+-	LOGPRINTF(3, "input from lircd: \"%s\"", code);
++	lirc_log(LOG_DEBUG, "input from lircd: \"%s\"", code);
+ 	while ((ret = lirc_code2charprog(config, code, &config_string, &prog)) == 0 && config_string != NULL) {
+ 		int i;
+ 
+-		LOGPRINTF(3, "%s: -%s-", prog, config_string);
++		lirc_log(LOG_DEBUG, "%s: -%s-", prog, config_string);
+ 		for (i = 0; i < clin; i++) {
+ 			if (strcmp(prog, clis[i].ident_string) == 0) {
+ 				if (!schedule(i, config_string)) {
+@@ -781,7 +782,7 @@ static int handle_input()
+ 			char message[strlen(clis[i].pending_code) + 1];
+ 			char *backup;
+ 
+-			LOGPRINTF(3, "pending_code(%s): -%s-", clis[i].ident_string, clis[i].pending_code);
++			lirc_log(LOG_DEBUG, "pending_code(%s): -%s-", clis[i].ident_string, clis[i].pending_code);
+ 			backup = clis[i].pending_code;
+ 			clis[i].pending_code = NULL;
+ 
+@@ -797,8 +798,6 @@ static int handle_input()
+ 
+ int main(int argc, char **argv)
+ {
+-	char *configfile;
+-	const char *socketfile = NULL;
+ 	mode_t permission = S_IRUSR | S_IWUSR;
+ 	int socket;
+ 	int lircdfd;
+@@ -806,26 +805,61 @@ int main(int argc, char **argv)
+ 	struct sockaddr_un addr;
+ 	char dir[FILENAME_MAX + 1] = { 0 };
+ 
+-	lirc_log_open("lircrcd", 0, 0);
+-	while (1) {
+-		int c;
+-		static struct option long_options[] = {
+-			{"help", no_argument, NULL, 'h'},
+-			{"version", no_argument, NULL, 'v'},
+-			{"permission", required_argument, NULL, 'p'},
+-			{"output", required_argument, NULL, 'o'},
+-			{0, 0, 0, 0}
+-		};
+-		c = getopt_long(argc, argv, "hvp:o:", long_options, NULL);
+-		if (c == -1)
+-			break;
++	const char* const defaults[] = {
++		"lircrcd:name", 		progname,
++		"lircrcd:socket", 	LIRCD,
++		"lircrcd:logfile", 	LOGFILE_CLIENTS,
++		"lircrcd:debug", 	"False",
++		(const char*)NULL, 	(const char*)NULL
++	};
++	lirc_opt_add_defaults(defaults);
++
++	static struct option long_options[] = {
++		{"help", no_argument, NULL, 'h'},
++		{"version", no_argument, NULL, 'v'},
++		{"permission", required_argument, NULL, 'p'},
++		{"output", required_argument, NULL, 'o'},
++		{"socket", required_argument, NULL, 's'},
++# ifndef USE_SYSLOG
++		{"logfile", required_argument, NULL, 'L'},
++# endif
++# ifdef DEBUG
++		{"debug", optional_argument, NULL, 'D'},
++# endif
++		{0, 0, 0, 0}
++	};
++
++	const char* optstring = "hvp:o:s:"
++#       ifndef USE_SYSLOG
++		"L:"
++#       endif
++#       ifdef DEBUG
++		"D::"
++#       endif
++	;
++	optind = 1;
++	int c;
++	while ((c = getopt_long(argc, argv, optstring, long_options, NULL))
++		!= -1) {
+ 		switch (c) {
+ 		case 'h':
+ 			printf("Usage: %s [options] config-file\n", progname);
+-			printf("\t -h --help\t\t\tdisplay this message\n");
+-			printf("\t -v --version\t\t\tdisplay version\n");
+-			printf("\t -p --permission=mode\t\tfile permissions for socket\n");
+-			printf("\t -o --output=socket\t\toutput socket filename\n");
++			printf("\t -h --help\t\tdisplay this message\n");
++			printf("\t -v --version\t\tdisplay version\n");
++			printf("\t -p --permission=MODE\tfile permissions for socket "
++			       "[default: 0600]\n");
++			printf("\t -o --output=SOCKET\toutput socket filename "
++			       "[default: %s/%sd]\n", getenv("HOME"), LIRCRC_USER_FILE);
++			printf("\t -s --socket=SOCKET\tlircd socket filename "
++			       "[default: %s]\n", LIRCD);
++# ifndef USE_SYSLOG
++			printf("\t -L --logfile=FILE\tclient log filename "
++			       "[default: %s]\n", LOGFILE_CLIENTS);
++# endif
++# ifdef DEBUG
++			printf("\t -D[X] --debug[=X]\tenable log, optional verbosity level 1..10 "
++			       "[default: 1]\n");
++# endif
+ 			return (EXIT_SUCCESS);
+ 		case 'v':
+ 			printf("%s %s\n", progname, VERSION);
+@@ -838,33 +872,50 @@ int main(int argc, char **argv)
+ 			permission = oatoi(optarg);
+ 			break;
+ 		case 'o':
+-			socketfile = optarg;
++			lirc_opt_set("lircrcd:output", optarg);
++			break;
++		case 's':
++			lirc_opt_set("lircrcd:socket", optarg);
+ 			break;
++# ifndef USE_SYSLOG
++		case 'L':
++			lirc_opt_set("lircrcd:logfile", optarg);
++			break;
++# endif
++# ifdef DEBUG
++		case 'D':
++			lirc_opt_set("lircrcd:debug", optarg ? optarg : "1");
++			break;
++# endif
+ 		default:
+ 			printf("Usage: %s [options] config-file\n", progname);
+ 			return (EXIT_FAILURE);
+ 		}
+ 	}
+-	if (optind == argc - 1) {
+-		configfile = argv[optind];
+-	} else {
+-		fprintf(stderr, "%s: invalid argument count\n", progname);
+-		return EXIT_FAILURE;
++	if (optind == argc) {
++		fprintf(stderr, "%s: missing config-file argument\n", progname);
++		exit(EXIT_FAILURE);
++	} else if (optind == argc - 1)
++		lirc_opt_set("lircrcd:config", argv[argc - 1]);
++	else if (optind < argc - 1) {
++		fprintf(stderr, "%s: too many unprocessed arguments\n", progname);
++		exit(EXIT_FAILURE);
+ 	}
+ 
+-	lircdfd = lirc_init("lircrcd", 0);
+-	if (lircdfd == -1) {
+-		return EXIT_FAILURE;
+-	}
++	lircdfd = lirc_init_wopt(progname);
++	if (lircdfd == -1)
++		exit(EXIT_FAILURE);
+ 
+ 	/* read config file */
+-	if (lirc_readconfig_only(configfile, &config, NULL) != 0) {
++	if (lirc_readconfig_only(lirc_opt_getstring("lircrcd:config"), &config, NULL) != 0) {
+ 		lirc_deinit();
+ 		return EXIT_FAILURE;
+ 	}
+ 
+ 	/* open socket */
+-	socket = opensocket(configfile, socketfile, permission, &addr);
++	socket = opensocket(lirc_opt_getstring("lircrcd:config"),
++	                    lirc_opt_getstring("lircrcd:output"),
++	                    permission, &addr);
+ 	if (socket == -1) {
+ 		lirc_freeconfig(config);
+ 		lirc_deinit();
+@@ -894,7 +945,7 @@ int main(int argc, char **argv)
+ 	sigaction(SIGINT, &act, NULL);
+ 	sigaction(SIGHUP, &act, NULL);
+ 
+-	logprintf(LOG_NOTICE, "%s started", progname);
++	lirc_log(LOG_NOTICE, "%s started", progname);
+ 	loop(socket, lircdfd);
+ 
+ 	closelog();
+-- 
+1.8.4
+
