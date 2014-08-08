@@ -37,3 +37,16 @@ it can use the client library log functions
 -rework initialisation to cope with user log file option
 -improve debug option wording
 
+# client_.use.'output'.option.of.lircrc.shebang.diff [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
+-enhanced 'lirc_setsocketname()' replaces 'lirc_getsocketname()'
+-add trivial lircrc shebang parse for optional 'output' arg to
+ensure no mismatch of lircrc socket names in use
+-pull in error checking and logging from (adjacent) calling code to
+standardise use with a 0 success, 1 errors return mechanism
+
+-with this change, an 'output' option in the lircrc #! line will be
+parsed and used to correctly connect a client to either an existing
+lircrcd socket, or, a new socket. previously, all socket testing
+was done against a default socket name, making all use of lircrd's
+'output' option erroneous
+

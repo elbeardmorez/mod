@@ -1,0 +1,194 @@
+From e2af53659091fa32c525e24ff672d9fdbd5acc21 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Fri, 8 Aug 2014 21:05:32 +0100
+Subject: client: use 'output' option of lircrc shebang
+
+-enhanced 'lirc_setsocketname()' replaces 'lirc_getsocketname()'
+-add trivial lircrc shebang parse for optional 'output' arg to
+ensure no mismatch of lircrc socket names in use
+-pull in error checking and logging from (adjacent) calling code to
+standardise use with a 0 success, 1 errors return mechanism
+
+-with this change, an 'output' option in the lircrc #! line will be
+parsed and used to correctly connect a client to either an existing
+lircrcd socket, or, a new socket. previously, all socket testing
+was done against a default socket name, making all use of lircrd's
+'output' option erroneous
+---
+ lib/lirc_client.c | 83 +++++++++++++++++++++++++++++++++++++++++++++++++------
+ lib/lirc_client.h | 15 +++++++++-
+ tools/lircrcd.c   | 11 ++------
+ 3 files changed, 91 insertions(+), 18 deletions(-)
+
+diff --git a/lib/lirc_client.c b/lib/lirc_client.c
+index 2d65097..1514e0e 100644
+--- a/lib/lirc_client.c
++++ b/lib/lirc_client.c
+@@ -687,13 +687,13 @@ int lirc_readconfig(char *file, struct lirc_config **config, int (check) (char *
+ 	/* connect to lircrcd */
+ 
+ 	addr.sun_family = AF_UNIX;
+-	if (lirc_getsocketname(filename, addr.sun_path, sizeof(addr.sun_path)) > sizeof(addr.sun_path)) {
+-		lirc_log(LOG_WARNING, "file name too long");
++	if (lirc_setsocketname(addr.sun_path, sizeof(addr.sun_path), NULL, sha_bang, filename)) {
++		// error
+ 		goto lirc_readconfig_compat;
+ 	}
+ 	sockfd = socket(AF_UNIX, SOCK_STREAM, 0);
+ 	if (sockfd == -1) {
+-		lirc_log(LOG_ERR, "could not open socket");
++		lirc_log(LOG_ERR, "could not create lircrcd socket");
+ 		lirc_log_err(LOG_ERR, NULL);
+ 		goto lirc_readconfig_compat;
+ 	}
+@@ -1475,15 +1475,82 @@ int lirc_nextcode(char **code)
+ 	return (0);
+ }
+ 
+-size_t lirc_getsocketname(const char *filename, char *buf, size_t size)
+-{
+-	if (strlen(filename) + 2 <= size) {
+-		strcpy(buf, filename);
+-		strcat(buf, "d");
++size_t lirc_getsocketname(const char *filename, char *buf, size_t size) {
++	static int warning = 1;
++	int ret;
++
++	if (warning) {
++		lirc_log(LOG_WARNING, "lirc_getsocketname() is obsolete");
++		warning = 0;
+ 	}
++	lirc_setsocketname(buf, size, NULL, NULL, filename);
+ 	return strlen(filename) + 2;
+ }
+ 
++int lirc_setsocketname(char *buf, size_t size, const char *socketname,
++                       const char *cmdline, const char *configname)
++{
++	int len;
++	int set = 0;
++
++	if (socketname) {
++		/* check size limit */
++		if (strlen(socketname) + 1 > size) {
++			lirc_log(LOG_WARNING,
++			         "socket name for lircrcd '%s' too long",
++			         socketname);
++		} else {
++			strcpy(buf, socketname);
++			set = 1;
++		}
++	}
++	if (!set && cmdline) {
++		/* check for an 'output' arg */
++		char* opt = NULL;
++		if (opt = strstr(cmdline, "-o "))
++			opt += 3;
++		else if(opt = strstr(cmdline, "--output="))
++			opt += 9;
++		if (opt) {
++			/* elementary 'parse' support only
++			 * no support for file names containing;
++			 * quote chars, escaped whitespace etc.*/
++			len = (strstr(opt, " ") ? strstr(opt, " ") - opt : strlen(opt));
++			/* check size limit */
++			if (len + 1 > size) {
++				char buf2[len+1];
++				strncpy(buf2, opt, len);
++				buf2[len] = '\0';
++				lirc_log(LOG_WARNING,
++				         "socket name for lircrcd from 'option' arg '%s' too long",
++				         buf2);
++			} else {
++				strncpy(buf, opt, len);
++				buf[len] = '\0';
++				set = 1;
++			}
++		}
++	}
++	if (!set && configname) {
++		/* default fallback, config file name with a 'd' suffix */
++		if (strlen(configname) + 2 > size) {
++			lirc_log(LOG_WARNING,
++			         "socket name for lircrcd based on config '%s' too long",
++			         configname);
++		} else {
++			strcpy(buf, configname);
++			strcat(buf, "d");
++			set = 1;
++		}
++	}
++	if (set) {
++		lirc_log(LOG_DEBUG, "socket name for lircrcd set to '%s'", buf);
++		return 0;
++	}
++
++  return 1;
++}
++
+ const char *lirc_getmode(struct lirc_config *config)
+ {
+ 	if (config->sockfd != -1) {
+diff --git a/lib/lirc_client.h b/lib/lirc_client.h
+index 6657f88..74a1119 100644
+--- a/lib/lirc_client.h
++++ b/lib/lirc_client.h
+@@ -84,6 +84,8 @@ extern "C" {
+ 	char *lirc_nextir(void);
+ /* obsolete */
+ 	char *lirc_ir2char(struct lirc_config *config, char *code);
++/* obsolete */
++	size_t lirc_getsocketname(const char *filename, char *buf, size_t size);
+ 
+ 	int lirc_nextcode(char **code);
+ 	int lirc_code2char(struct lirc_config *config, char *code, char **string);
+@@ -91,10 +93,21 @@ extern "C" {
+ /* new interface for client daemon */
+ 	int lirc_readconfig_only(char *file, struct lirc_config **config, int (check) (char *s));
+ 	int lirc_code2charprog(struct lirc_config *config, char *code, char **string, char **prog);
+-	size_t lirc_getsocketname(const char *filename, char *buf, size_t size);
+ 	const char *lirc_getmode(struct lirc_config *config);
+ 	const char *lirc_setmode(struct lirc_config *config, const char *mode);
+ 
++/* lirc_setsocketname
++ * @description        set valid socket name given size contraint
++ * @param buf          target char buffer for valid socket name
++ * @param size         max buffer size / socket name length
++ * @param socketname   a proposed socket name (or NULL)
++ * @param cmdline      command line to search for 'output' arg (or NULL)
++ * @param configname   config file name to contruct a default fallback (or NULL)
++ * @return             integer, 0 success, 1 errors
++ */
++	int lirc_setsocketname(char *buf, size_t size, const char *socketname,
++	                       const char *cmdline, const char *configname);
++
+ /* lirc_option.h wrappers */
+ 	void lirc_opt_set(char* key, char* value);
+ 	char* lirc_opt_getstring(char* key);
+diff --git a/tools/lircrcd.c b/tools/lircrcd.c
+index 0008011..8d3d0c4 100644
+--- a/tools/lircrcd.c
++++ b/tools/lircrcd.c
+@@ -325,17 +325,10 @@ static int opensocket(const char *configfile, const char *socketname, mode_t per
+ 	int new = 1;
+ 	int ret;
+ 
+-	/* get socket name */
+-	if ((socketname == NULL &&
+-	     lirc_getsocketname(configfile,
+-				addr->sun_path, sizeof(addr->sun_path)) >
+-	     sizeof(addr->sun_path)) || (socketname != NULL && strlen(socketname) >= sizeof(addr->sun_path))) {
+-		fprintf(stderr, "%s: filename too long", progname);
++	/* ensure valid socket name */
++	if (lirc_setsocketname(addr->sun_path, sizeof(addr->sun_path), socketname, NULL, configfile)) {
+ 		return -1;
+ 	}
+-	if (socketname != NULL) {
+-		strcpy(addr->sun_path, socketname);
+-	}
+ 
+ 	/* create socket */
+ 	sockfd = socket(AF_UNIX, SOCK_STREAM, 0);
+-- 
+1.8.4
+
