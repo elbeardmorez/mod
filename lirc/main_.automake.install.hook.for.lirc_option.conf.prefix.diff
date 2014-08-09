@@ -1,0 +1,27 @@
+From 35942c96b8f6a37a4fb6f21a876e5227f3a61b85 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sat, 9 Aug 2014 08:51:57 +0100
+Subject: main: automake install hook for lirc_option.conf prefix
+
+-ensure pluginsdir option is inline with configured prefix
+---
+ Makefile.am | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/Makefile.am b/Makefile.am
+index 563a484..ef1e28c 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -53,6 +53,9 @@ dist_m4_DATA                = m4/ac-path-kernel-source.m4
+ 
+ # ----------------------------------------------------------------------
+ 
++install-data-hook:
++	sed -i 's|/usr|$(prefix)|' $(lirc_confdir)/lirc_options.conf
++
+ dist-hook:
+ 	(cd $(srcdir)/contrib/hal/ && ./gen-hal-fdi.pl)
+ 	for f in contrib remotes lirc.org include; do \
+-- 
+1.8.4
+

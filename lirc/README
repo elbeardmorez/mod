@@ -50,3 +50,6 @@ lircrcd socket, or, a new socket. previously, all socket testing
 was done against a default socket name, making all use of lircrd's
 'output' option erroneous
 
+# main_.automake.install.hook.for.lirc_option.conf.prefix [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
+-ensure pluginsdir option is inline with configured prefix
+
