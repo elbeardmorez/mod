@@ -1,4 +1,4 @@
-From 35942c96b8f6a37a4fb6f21a876e5227f3a61b85 Mon Sep 17 00:00:00 2001
+From ab9d3bccbc6e9975fd6e5b00b4c3d99431408587 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Sat, 9 Aug 2014 08:51:57 +0100
 Subject: main: automake install hook for lirc_option.conf prefix
@@ -9,7 +9,7 @@ Subject: main: automake install hook for lirc_option.conf prefix
  1 file changed, 3 insertions(+)
 
 diff --git a/Makefile.am b/Makefile.am
-index 563a484..ef1e28c 100644
+index 563a484..d070f7e 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -53,6 +53,9 @@ dist_m4_DATA                = m4/ac-path-kernel-source.m4
@@ -17,7 +17,7 @@ index 563a484..ef1e28c 100644
  # ----------------------------------------------------------------------
  
 +install-data-hook:
-+	sed -i 's|/usr|$(prefix)|' $(lirc_confdir)/lirc_options.conf
++	sed -i '/^plugindir/s|/usr|$(prefix)|' $(lirc_confdir)/lirc_options.conf
 +
  dist-hook:
  	(cd $(srcdir)/contrib/hal/ && ./gen-hal-fdi.pl)
