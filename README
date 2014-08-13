@@ -49,12 +49,12 @@ a dumping ground for patches which modify or add functionality
 -make.contact.address.in.context.menu.selectable.diff [git sha:15ce290db754182af9d7c1a82b07c8b676191cd5 | pending]
 
 ### lirc
--lirc_client.lirc_options.integration.diff [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
--lirc_options,.dictionary.and.ciniparser.usability.diff [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
--lirc_client.lirc_log.integration.diff [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
--convert.lirc_client.print.calls.to.new.format.diff [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
--irexec_lircrcd.clients.option.and.log.integration.diff [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
--lircd.option.reading.and.logging.initialisation.diff [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
--client_.use.'output'.option.of.lircrc.shebang.diff [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
--main_.automake.install.hook.for.lirc_option.conf.prefix [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
+-main_.automake.install.hook.for.lirc_option.conf.prefix [git sha:333047d0e73bd97ce0b4faf92dc04761c0589f6e | committed]
+-lirc_client.lirc_options.integration.diff [git sha:3a58afac5991b58ddc0aadeb7c3110c4ebd814cc | pending]
+-lirc_options,.dictionary.and.ciniparser.usability.diff [git sha:3a58afac5991b58ddc0aadeb7c3110c4ebd814cc | pending]
+-lirc_client.lirc_log.integration.diff [git sha:3a58afac5991b58ddc0aadeb7c3110c4ebd814cc | pending]
+-convert.lirc_client.print.calls.to.new.format.diff [git sha:3a58afac5991b58ddc0aadeb7c3110c4ebd814cc | pending]
+-irexec_lircrcd.clients.option.and.log.integration.diff [git sha:3a58afac5991b58ddc0aadeb7c3110c4ebd814cc | pending]
+-lircd.option.reading.and.logging.initialisation.diff [git sha:3a58afac5991b58ddc0aadeb7c3110c4ebd814cc | pending]
+-client_.use.'output'.option.of.lircrc.shebang.diff [git sha:3a58afac5991b58ddc0aadeb7c3110c4ebd814cc | pending]
 

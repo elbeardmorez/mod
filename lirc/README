@@ -1,8 +1,11 @@
 
-# lirc_client.lirc_options.integration.diff [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
+# main_.automake.install.hook.for.lirc_option.conf.prefix [git sha:333047d0e73bd97ce0b4faf92dc04761c0589f6e | committed]
+-ensure pluginsdir option is inline with configured prefix
+
+# lirc_client.lirc_options.integration.diff [git sha:3a58afac5991b58ddc0aadeb7c3110c4ebd814cc | pending]
 -allows for simple client modification of lircd socket
 
-# lirc_options,.dictionary.and.ciniparser.usability.diff [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
+# lirc_options,.dictionary.and.ciniparser.usability.diff [git sha:3a58afac5991b58ddc0aadeb7c3110c4ebd814cc | pending]
 -ensure existing options exist post ciniparser_load
 -meaningful return value for dictionary_del
 -only ever allocate lirc_options dict if NULL
@@ -15,29 +18,28 @@
 alternative lircd socket location creation
 -update a few doc strings
 
-# lirc_client.lirc_log.integration.diff [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
+# lirc_client.lirc_log.integration.diff [git sha:3a58afac5991b58ddc0aadeb7c3110c4ebd814cc | pending]
 -decouple lirc_log from exclusive lircd use
--add new default LOGFILE_CLIENTS file 'lircc'
 -convert variadic logprintf function to wrapper for va_list
 counterpart to fascilate client wrapper lirc_log()
 -hides log creation from client applications
 -use logfile options from client applications
 -add lirc_log_deinit() to clean up (now) dynamic vars
 
-# convert.lirc_client.print.calls.to.new.format.diff [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
+# convert.lirc_client.print.calls.to.new.format.diff [git sha:3a58afac5991b58ddc0aadeb7c3110c4ebd814cc | pending]
 
-# irexec_lircrcd.clients.option.and.log.integration.diff [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
+# irexec_lircrcd.clients.option.and.log.integration.diff [git sha:3a58afac5991b58ddc0aadeb7c3110c4ebd814cc | pending]
 -expose socket, logfile and debug options
 -remove redundant lirc_log.h include from lircrcd. as a client app
 it can use the client library log functions
 -harmonise initialisation code with lircd
 -improve --help information
 
-# lircd.option.reading.and.logging.initialisation.diff [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
+# lircd.option.reading.and.logging.initialisation.diff [git sha:3a58afac5991b58ddc0aadeb7c3110c4ebd814cc | pending]
 -rework initialisation to cope with user log file option
 -improve debug option wording
 
-# client_.use.'output'.option.of.lircrc.shebang.diff [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
+# client_.use.'output'.option.of.lircrc.shebang.diff [git sha:3a58afac5991b58ddc0aadeb7c3110c4ebd814cc | pending]
 -enhanced 'lirc_setsocketname()' replaces 'lirc_getsocketname()'
 -add trivial lircrc shebang parse for optional 'output' arg to
 ensure no mismatch of lircrc socket names in use
@@ -49,7 +51,4 @@ parsed and used to correctly connect a client to either an existing
 lircrcd socket, or, a new socket. previously, all socket testing
 was done against a default socket name, making all use of lircrd's
 'output' option erroneous
-
-# main_.automake.install.hook.for.lirc_option.conf.prefix [git sha:e085225b6a8ca17af69540b8e0229b5242e9320b | pending]
--ensure pluginsdir option is inline with configured prefix
 
