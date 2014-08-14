@@ -1,45 +1,23 @@
-From 8be1804d9067264d13bc7a8d770be9b7aaeb90ac Mon Sep 17 00:00:00 2001
+From 1d4e9d54dff13f3c87c61e96cc1d5c5c1f33686e Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Wed, 6 Aug 2014 19:37:52 +0100
 Subject: lirc_client lirc_log integration
 
 -decouple lirc_log from exclusive lircd use
--add new default LOGFILE_CLIENTS file 'lircc'
 -convert variadic logprintf function to wrapper for va_list
 counterpart to fascilate client wrapper lirc_log()
 -hides log creation from client applications
 -use logfile options from client applications
 -add lirc_log_deinit() to clean up (now) dynamic vars
 ---
- configure.ac      |   2 ++
- lib/lirc_client.c |  37 ++++++++++++--------
- lib/lirc_client.h |   5 +++
- lib/lirc_log.c    | 100 +++++++++++++++++++++++++++++++++++++-----------------
- lib/lirc_log.h    |  16 +++++++--
- 5 files changed, 110 insertions(+), 50 deletions(-)
+ lib/lirc_client.c |  37 ++++++++++--------
+ lib/lirc_client.h |  28 ++++++++++++++
+ lib/lirc_log.c    | 111 ++++++++++++++++++++++++++++++++----------------------
+ lib/lirc_log.h    |  29 ++++++++++++--
+ 4 files changed, 141 insertions(+), 64 deletions(-)
 
-diff --git a/configure.ac b/configure.ac
-index b3872c7..9514456 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -543,6 +543,7 @@ AH_TOP([
- 
- /* log files */
- #define LOG_LIRCD       "lircd"
-+#define LOG_LIRCC       "lircc"
- #define LOG_LIRMAND     "lirmand"
- 
- /* pid file */
-@@ -575,6 +576,7 @@ AH_BOTTOM([
- #define LIRCRC_OLD_ROOT_FILE    SYSCONFDIR "/" CFG_LIRCRC
- 
- #define LOGFILE                 LOCALSTATEDIR "/log/" LOG_LIRCD
-+#define LOGFILE_CLIENTS         LOCALSTATEDIR "/log/" LOG_LIRCC
- #define LIRMAND_LOGFILE         LOCALSTATEDIR "/log/" LOG_LIRMAND
- 
- #define PIDFILE                 VARRUNDIR "/" PACKAGE "/" PID_LIRCD
 diff --git a/lib/lirc_client.c b/lib/lirc_client.c
-index a679cf1..082aa94 100644
+index 6ca912a..8a117a1 100644
 --- a/lib/lirc_client.c
 +++ b/lib/lirc_client.c
 @@ -27,9 +27,11 @@
@@ -86,7 +64,7 @@ index a679cf1..082aa94 100644
  }
  
  int lirc_init(char *prog, int verbose) {
-@@ -163,16 +156,18 @@ int lirc_init_wopt(const char *optprefix)
+@@ -159,16 +152,18 @@ int lirc_init_wopt(const char *optprefix)
  	strcpy(addr.sun_path, options_getstring(options_name(lirc_option, optprefix, "socket")));
  	lirc_lircd = socket(AF_UNIX, SOCK_STREAM, 0);
  	if (lirc_lircd == -1) {
@@ -109,7 +87,7 @@ index a679cf1..082aa94 100644
  		free(lirc_prog);
  		lirc_prog = NULL;
  		return (-1);
-@@ -194,6 +189,7 @@ int lirc_deinit(void)
+@@ -190,6 +185,7 @@ int lirc_deinit(void)
  		free(lirc_option);
  		lirc_option = NULL;
  	}
@@ -117,7 +95,7 @@ index a679cf1..082aa94 100644
  	dictionary_del(lirc_options);
  	return (close(lirc_lircd));
  }
-@@ -1771,3 +1767,14 @@ void lirc_opt_load(int argc, char **argv,
+@@ -1767,3 +1763,14 @@ void lirc_opt_load(int argc, char **argv,
  		void (*parse_options)(int, char**)) {
  	options_load(argc, argv, options_file, parse_options);
  }
@@ -133,15 +111,38 @@ index a679cf1..082aa94 100644
 +	logperror(prio, s);
 +}
 diff --git a/lib/lirc_client.h b/lib/lirc_client.h
-index d57e422..6657f88 100644
+index bba09aa..3faff4e 100644
 --- a/lib/lirc_client.h
 +++ b/lib/lirc_client.h
-@@ -105,6 +105,11 @@ extern "C" {
+@@ -106,6 +106,34 @@ extern "C" {
  	void lirc_opt_load(int argc, char **argv,
  		const char* options_file,
  		void (*options_load)(int, char**));
 +
 +/* lirc_log.h wrappers */
++
++/* syslog levels */
++#define LOG_EMERG 0 /* system is unusable */
++#define LOG_ALERT 1 /* action must be taken immediately */
++#define LOG_CRIT  2 /* critical conditions */
++#define LOG_ERR   3 /* error conditions */
++#define LOG_WARNING 4 /* warning conditions */
++#define LOG_NOTICE  5 /* normal but significant condition */
++#define LOG_INFO  6 /* informational */
++#define LOG_DEBUG 7 /* debug-level messages */
++
++/* additional priority levels */
++#define LIRC_TRACE 8
++#define LIRC_PEEP  9
++#define LIRC_STALK 10
++
++/* 'fail-fast' log and error macros */
++#define LIRC_LOG(level,fmt,args...) \
++	if (level <= debug) lirc_log(level, fmt, ## args)
++#define LIRC_LOG_ERR(level,s) \
++	if (level <= debug) lirc_log_err(level, s)
++
++/* log and error wrappers */
 +	void lirc_log(int prio, const char *format_str, ...);
 +	void lirc_log_err(int prio, const char *s);
 +
@@ -149,48 +150,50 @@ index d57e422..6657f88 100644
  }
  #endif
 diff --git a/lib/lirc_log.c b/lib/lirc_log.c
-index 2279f4a..789deef 100644
+index 9f57723..1a9a08e 100644
 --- a/lib/lirc_log.c
 +++ b/lib/lirc_log.c
-@@ -45,18 +45,16 @@ FILE *lf = NULL;
- #endif
+@@ -43,17 +43,13 @@ char hostname[HOSTNAME_LEN + 1];
+ FILE *lf = NULL;
  
  int debug = 0;
 -
-+static int nodaemon = 0;
-+char* progname = NULL;
- #ifdef USE_SYSLOG
--const char *syslogident = "lircd-" VERSION;
-+//const char *syslogident = "lircd-" VERSION;
-+char *syslogident = NULL;
- #else
--char *logfile = LOGFILE;
-+char *logfile = NULL;
- #endif
- 
--char progname[128] = {'?','\0'};
--static int nodaemon = 0;
--
+ static int use_syslog = 1;
 -
 -static int log_enabled = 1;
+-
+-const char *syslogident = "lircd-" VERSION;
+-char *logfile = LOGFILE;
+-
+-char progname[128] = {'?','\0'};
+ static int nodaemon = 0;
++char* progname = NULL;
++char *syslogident = NULL;
++char *logfile = NULL;
+ 
 +static int log_enabled = 0;
  
  static const char* prio2text(int prio)
  {
-@@ -76,17 +74,25 @@ static const char* prio2text(int prio)
+@@ -80,67 +76,90 @@ int lirc_log_use_syslog()
  void lirc_set_logfile(char* s)
  {
- #	ifndef USE_SYSLOG
--	logfile = s;
-+	logfile = realloc(logfile, strlen(s) + 1);
-+	strcpy(logfile, s);
-+#	endif
-+}
-+char* lirc_get_logfile() {
-+#	ifndef USE_SYSLOG
-+	return logfile;
- #	endif
+ 	if (strcmp(s, "syslog") == 0) {
+-            use_syslog  = 1;
+-        } else {
+-	    logfile = s;
+-            use_syslog = 0;
++		use_syslog = 1;
++	} else {
++		logfile = realloc(logfile, strlen(s) + 1);
++		strcpy(logfile, s);
++		use_syslog = 0;
+ 	}
  }
+ 
++char* lirc_get_logfile() {
++	return logfile;
++}
  
  int lirc_log_open(const char* _progname, int _nodaemon, int _debug)
  {
@@ -199,68 +202,79 @@ index 2279f4a..789deef 100644
 +	sprintf(progname, "%s", _progname);
  	nodaemon = _nodaemon;
  	debug = _debug;
--
- #ifdef USE_SYSLOG
-+	syslogident = malloc(strlen(progname) + 2 + strlen(VERSION) + 1);
-+	sprintf(syslogident, "%s- %s", progname, VERSION);
- #ifdef DAEMONIZE
- 	if (nodaemon) {
- 		openlog(syslogident, LOG_CONS | LOG_PID | LOG_PERROR, LIRC_SYSLOG);
-@@ -97,6 +103,11 @@ int lirc_log_open(const char* _progname, int _nodaemon, int _debug)
- 	openlog(syslogident, LOG_CONS | LOG_PID | LOG_PERROR, LIRC_SYSLOG);
- #endif
- #else
-+	if (logfile == NULL) {
-+		fprintf(stderr, "%s: log file not set\n", progname);
-+		perror(progname);
-+		return 1;
-+	}
- 	lf = fopen(logfile, "a");
- 	if (lf == NULL) {
- 		fprintf(stderr, "%s: could not open logfile\n", progname);
-@@ -105,6 +116,36 @@ int lirc_log_open(const char* _progname, int _nodaemon, int _debug)
+ 
+ 	if (use_syslog) {
++		syslogident = malloc(strlen(progname) + 2 + strlen(VERSION) + 1);
++		sprintf(syslogident, "%s- %s", progname, VERSION);
+ 		if (nodaemon) {
+ 			openlog(syslogident, LOG_CONS | LOG_PID | LOG_PERROR, LOG_LOCAL0);
+ 		} else {
+ 			openlog(syslogident, LOG_CONS | LOG_PID, LOG_LOCAL0);
+ 		}
+ 	} else {
++		if (logfile == NULL) {
++			fprintf(stderr, "%s: log file not set\n", progname);
++			perror(progname);
++			return 1;
++		}
+ 		lf = fopen(logfile, "a");
+ 		if (lf == NULL) {
+-			fprintf(stderr, "%s: could not open logfile\n", progname);
++			fprintf(stderr, "%s: could not open logfile %s\n", progname, logfile);
+ 			perror(progname);
+ 			return 1;
+ 		}
+ 		gethostname(hostname, HOSTNAME_LEN);
  	}
- 	gethostname(hostname, HOSTNAME_LEN);
- #endif
 +	log_enable(1);
-+	return 0;
-+}
-+
+ 	return 0;
+ }
+ 
 +int lirc_log_deinit()
 +{
 +	lirc_log_close();
-+#ifdef USE_SYSLOG
 +	free(syslogident);
 +	syslogident = NULL;
-+#else
 +	free(logfile);
 +	logfile = NULL;
-+#endif
 +	free(progname);
 +	progname = NULL;
 +	return 0;
 +}
-+
-+int lirc_log_close()
-+{
-+	if (lf) {
+ 
+ int lirc_log_close()
+ {
++	logprintf(LOG_INFO, "closing logfile");
+ 	if (use_syslog){
+-        	closelog();
+-                return(0);
+-	}
+-	else if (lf)
+-		return( fclose(lf));
+-	else
++		closelog();
++		return(0);
++	} else if (lf) {
 +		struct stat s;
 +		if (-1 == fstat(fileno(lf), &s)) {
 +			perror("Invalid logfile!");
 +			return -1;
 +		}
-+		logprintf(LOG_INFO, "closing logfile");
-+		fclose(lf);
-+	}
- 	return 0;
++		return(fclose(lf));
++	} else
+ 		return(0);
  }
  
-@@ -113,14 +154,10 @@ int lirc_log_reopen(void)
- #ifdef USE_SYSLOG
- 	/* we don't need to do anyting as this is syslogd's task */
- #else
+-
+-
+ int lirc_log_reopen(void)
+ {
 -	struct stat s;
 -
+ 	if (use_syslog)
+ 		/* Don't need to do anything; this is syslogd's task */
+ 		return(0);
+ 
 -	logprintf(LOG_INFO, "closing logfile");
 -	if (-1 == fstat(fileno(lf), &s)) {
 -		perror("Invalid logfile!");
@@ -273,8 +287,8 @@ index 2279f4a..789deef 100644
  	lf = fopen(logfile, "a");
  	if (lf == NULL) {
  		/* can't print any error messagees */
-@@ -160,24 +197,26 @@ void log_enable(int enabled)
- 
+@@ -185,37 +204,39 @@ void log_enable(int enabled)
+  */
  void logprintf(int prio, const char *format_str, ...)
  {
 -	int save_errno = errno;
@@ -290,6 +304,9 @@ index 2279f4a..789deef 100644
  	if (!log_enabled)
  		return;
  
++	if (use_syslog && prio > LOG_DEBUG)
++		prio = LOG_DEBUG;
++
  	if (nodaemon && prio <= debug) {
 -		fprintf(stderr, "%s: %s", progname, prio2text(prio));
 -		va_start(ap, format_str);
@@ -299,20 +316,22 @@ index 2279f4a..789deef 100644
  		fputc('\n', stderr);
  		fflush(stderr);
  	}
- #ifdef USE_SYSLOG
--	va_start(ap, format_str);
- 	vsyslog(prio, format_str, ap);
--	va_end(ap);
- #else
- 	if (lf && prio <= debug) {
+-	if (use_syslog) {
+-		va_start(ap, format_str);
++	if (use_syslog)
+ 		vsyslog(prio, format_str, ap);
+-		va_end(ap);
+-	} else if (lf && prio <= debug) {
++	else if (lf && prio <= debug) {
  		time_t current;
-@@ -186,12 +225,9 @@ void logprintf(int prio, const char *format_str, ...)
+ 		char *currents;
+ 
  		current = time(&current);
  		currents = ctime(&current);
  
 -		fprintf(lf, "%15.15s %s %s: ",
 -			currents + 4, hostname, progname);
--		fprintf(lf, prio2text(prio));
+-		fprintf(lf, "%s: ", prio2text(prio));
 -		va_start(ap, format_str);
 +		fprintf(lf, "%15.15s %s %s: %s | ",
 +			currents + 4, hostname, progname, prio2text(prio));
@@ -321,25 +340,40 @@ index 2279f4a..789deef 100644
  		fputc('\n', lf);
  		fflush(lf);
  	}
-@@ -210,10 +246,10 @@ void logperror(int prio, const char *s)
- 	else
- 		syslog(prio, "%m\n");
- #else
--	if (s != NULL) {
--		logprintf(prio, "%s: %s", s, strerror(errno));
--	} else {
-+	if (s == NULL || strcmp(s, "") == 0) {
- 		logprintf(prio, "%s", strerror(errno));
-+	} else {
-+		logprintf(prio, "%s: %s", s, strerror(errno));
+@@ -238,10 +259,10 @@ void logperror(int prio, const char *s)
+ 		else
+ 			syslog(prio, "%m\n");
+ 	} else {
+-		if (s != NULL) {
+-			logprintf(prio, "%s: %s", s, strerror(errno));
+-		} else {
++		if (s == NULL || strcmp(s, "") == 0) {
+ 			logprintf(prio, "%s", strerror(errno));
++		} else {
++			logprintf(prio, "%s: %s", s, strerror(errno));
+ 		}
  	}
- #endif
  }
 diff --git a/lib/lirc_log.h b/lib/lirc_log.h
-index c439e57..d4fd5f4 100644
+index f86da53..86eaf58 100644
 --- a/lib/lirc_log.h
 +++ b/lib/lirc_log.h
-@@ -22,8 +22,8 @@ extern int debug;
+@@ -22,12 +22,23 @@ extern "C" {
+  */
+ extern int debug;
+ 
++/* syslog levels */
++#define LOG_EMERG 0 /* system is unusable */
++#define LOG_ALERT 1 /* action must be taken immediately */
++#define LOG_CRIT  2 /* critical conditions */
++#define LOG_ERR   3 /* error conditions */
++#define LOG_WARNING 4 /* warning conditions */
++#define LOG_NOTICE  5 /* normal but significant condition */
++#define LOG_INFO  6 /* informational */
++#define LOG_DEBUG 7 /* debug-level messages */
++
++/* additional priority levels */
+ #define LIRC_TRACE 8
  #define LIRC_PEEP  9
  #define LIRC_STALK 10
  
@@ -350,7 +384,7 @@ index c439e57..d4fd5f4 100644
  
  #define DEFAULT_LOGLEVEL  3
  
-@@ -36,12 +36,15 @@ extern char progname[128];
+@@ -40,12 +51,15 @@ extern char progname[128];
  #define LOGPRINTF(level,fmt,args...) \
  	if (level + 7 <= debug ) logprintf(logmax(level + 7), fmt, ## args )
  
@@ -367,8 +401,8 @@ index c439e57..d4fd5f4 100644
   * defaulting to DEFAULT_LOGLEVEL. Returns 0 if ok, 1 on errors.
   */
  int lirc_log_setlevel(const char* level);
-@@ -52,11 +55,18 @@ int lirc_log_setlevel(const char* level);
- #define lirc_log_is_enabled_for(level) (level <= debug)
+@@ -59,10 +73,11 @@ int lirc_log_setlevel(const char* level);
+ int lirc_log_use_syslog();
  
  void logprintf(int prio, const char *format_str, ...);
 +void logprintfva(int prio, const char *format_str, va_list ap);
@@ -376,16 +410,23 @@ index c439e57..d4fd5f4 100644
 +int lirc_log_close();
  int lirc_log_reopen(void);
  int lirc_log_open(const char* progname, int _nodaemon, int _debug);
+-int lirc_log_close();
  void log_enable(int enabled);
+ 
+ /*
+@@ -70,6 +85,12 @@ void log_enable(int enabled);
+  * does indeed use syslog(1) instead.
+  * */
  void lirc_set_logfile(char* s);
 +char* lirc_get_logfile();
- 
++
 +/*
 + * Close log file if applicable and clean up local variables.
 + */
 +int lirc_log_deinit();
+ void hexdump(char *prefix, unsigned char* buf, int len);
  
- #endif /* _LIRC_LOG_H */
+ #ifdef __cplusplus
 -- 
 1.8.4
 
