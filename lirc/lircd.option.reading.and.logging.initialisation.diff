@@ -1,4 +1,4 @@
-From 65e940055090d94e177b64c766389da3be7b511b Mon Sep 17 00:00:00 2001
+From a473f81ab5a9518c664c641e527578f42b366a63 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Thu, 7 Aug 2014 15:21:38 +0100
 Subject: lircd option reading and logging initialisation
@@ -6,33 +6,42 @@ Subject: lircd option reading and logging initialisation
 -rework initialisation to cope with user log file option
 -improve debug option wording
 ---
- daemons/lircd.c | 50 ++++++++++++++++++++++++++++++++------------------
- 1 file changed, 32 insertions(+), 18 deletions(-)
+ daemons/lircd.c | 47 ++++++++++++++++++++++++++---------------------
+ 1 file changed, 26 insertions(+), 21 deletions(-)
 
 diff --git a/daemons/lircd.c b/daemons/lircd.c
-index f81b3e6..5a93c35 100644
+index b64ace4..682405d 100644
 --- a/daemons/lircd.c
 +++ b/daemons/lircd.c
-@@ -2105,7 +2105,7 @@ static void lircd_help(void)
- 	printf("\t -L --logfile=file\t\tdaemon log file\n");
- #       endif
- #       ifdef DEBUG
+@@ -378,7 +378,7 @@ void dosigterm(int sig)
+ 
+ 	signal(SIGALRM, SIG_IGN);
+ 	logprintf(LOG_NOTICE, "caught signal");
+-
++	lirc_log_close();
+ 	if (free_remotes != NULL) {
+ 		free_config(free_remotes);
+ 	}
+@@ -2158,8 +2158,8 @@ static void lircd_help(void)
+ 	printf("\t -c --connect=host[:port]\tconnect to remote lircd server\n");
+ 	printf("\t -o --output=socket\t\toutput socket filename\n");
+ 	printf("\t -P --pidfile=file\t\tdaemon pid file\n");
+-	printf("\t -L --logfile=file\t\tLog file path or 'syslog'\n");
 -	printf("\t -D[debug_level] --debug[=debug_level]\n");
++	printf("\t -L --logfile=file\t\tlog file path or 'syslog'\n");
 +	printf("\t -D[X] --debug[=X]\t\tenable log, optional verbosity level 1..10\n");
- #       endif
  	printf("\t -r --release[=suffix]\t\tauto-generate release events\n");
  	printf("\t -a --allow-simulate\t\taccept SIMULATE command\n");
-@@ -2143,7 +2143,7 @@ static void lircd_add_defaults(void)
+ #       if defined(__linux__)
+@@ -2196,19 +2196,16 @@ static void lircd_add_defaults(void)
  
  static void lircd_parse_options(int argc, char** argv)
  {
 -	int c;
 +	strncpy(progname, "lircd", sizeof(progname));
- 	const char* optstring =  "O:hvnp:H:d:o:U:P:l::c:r::aR:"
+ 	const char* optstring =  "O:hvnp:H:d:o:U:P:l::L:c:r::aR:D::"
  #       if defined(__linux__)
  		"u"
-@@ -2155,13 +2155,10 @@ static void lircd_parse_options(int argc, char** argv)
- 		"D::"
  #       endif
  	;
 -
@@ -47,36 +56,15 @@ index f81b3e6..5a93c35 100644
  		switch (c) {
  		case 'h':
  			lircd_help();
-@@ -2187,11 +2184,11 @@ static void lircd_parse_options(int argc, char** argv)
- 		case 'P':
- 			options_set_opt("lircd:pidfile", optarg);
+@@ -2249,7 +2246,6 @@ static void lircd_parse_options(int argc, char** argv)
  			break;
--#               ifndef USE_SYSLOG
-+# ifndef USE_SYSLOG
- 		case 'L':
- 			options_set_opt("lircd:logfile", optarg);
- 			break;
--#               endif
-+# endif
- 		case 'o':
- 			options_set_opt("lircd:output", optarg);
- 			break;
-@@ -2202,12 +2199,11 @@ static void lircd_parse_options(int argc, char** argv)
- 		case 'c':
- 			options_set_opt("lircd:connect", optarg);
- 			break;
--#               ifdef DEBUG
-+# ifdef DEBUG
  		case 'D':
  			options_set_opt("lircd:debug", optarg ? optarg : "1");
--			debug = 1;
+-			debug_opt = 1;
  			break;
--#               endif
-+# endif
  		case 'a':
  			options_set_opt("lircd:allow-simulate", "True");
- 			break;
-@@ -2232,10 +2228,10 @@ static void lircd_parse_options(int argc, char** argv)
+@@ -2275,10 +2271,10 @@ static void lircd_parse_options(int argc, char** argv)
  			exit(EXIT_FAILURE);
  		}
  	}
@@ -91,34 +79,33 @@ index f81b3e6..5a93c35 100644
  		exit(EXIT_FAILURE);
  	}
  }
-@@ -2251,11 +2247,29 @@ int main(int argc, char **argv)
- 	char* opt;
- 	int debug = 0;
+@@ -2294,14 +2290,23 @@ int main(int argc, char **argv)
  
--	lirc_log_open("lircd", 0, LOG_INFO);
  	address.s_addr = htonl(INADDR_ANY);
  	hw_choose_driver(NULL);
 -	options_load(argc, argv, NULL, lircd_parse_options);
+-#       ifndef USE_SYSLOG
+-        opt = options_getstring("lircd:logfile");
+-        if (opt != NULL)
+-                lirc_set_logfile(opt);
+-#       endif
+-        lirc_log_open("lircd", 0, LOG_INFO);
  
 +	/* set default options */
 +	lircd_add_defaults();
 +	/* set up default logging */
-+# ifndef USE_SYSLOG
 +	/* catch 'pre-log' messages in LOGFILE*/
 +	lirc_set_logfile(options_getstring("lircd:logfile"));
-+# endif
 +	lirc_log_open("lircd", 0, LOG_INFO);
 +	/* set command line and file options */
 +	options_load(argc, argv, NULL, lircd_parse_options);
-+# ifndef USE_SYSLOG
 +	if (strcmp(lirc_get_logfile(), options_getstring("lircd:logfile")) != 0) {
 +		/* update log file location */
 +		lirc_log_close();
 +		lirc_set_logfile(options_getstring("lircd:logfile"));
 +		lirc_log_open("lircd", 0, LOG_INFO);
 +	}
-+# endif
-+		/* update log level */
++	/* update log level */
 +	lirc_log_setlevel(options_getstring("lircd:debug"));
  	nodaemon = options_getboolean("lircd:nodaemon");
  	opt = options_getstring("lircd:permission");
