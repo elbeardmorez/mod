@@ -1,20 +1,20 @@
-From 107994f2d1d8196df1357f2f5ae4ca06c0219c60 Mon Sep 17 00:00:00 2001
+From d8d2ef9fd74cbbc3b04d4738ab11fa2bb01b61ce Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Mon, 4 Aug 2014 17:10:44 +0100
 Subject: lirc_client lirc_options integration
 
 -allows for simple client modification of lircd socket
 ---
- lib/Makefile.am    |  6 +++-
+ lib/Makefile.am    |  6 ++++-
  lib/ciniparser.c   |  2 +-
- lib/lirc_client.c  | 81 ++++++++++++++++++++++++++++++++++++++++++++++--------
+ lib/lirc_client.c  | 77 +++++++++++++++++++++++++++++++++++++++++++++---------
  lib/lirc_client.h  | 11 ++++++++
- lib/lirc_options.c |  9 ++++++
+ lib/lirc_options.c |  9 +++++++
  lib/lirc_options.h | 10 +++++++
- 6 files changed, 105 insertions(+), 14 deletions(-)
+ 6 files changed, 101 insertions(+), 14 deletions(-)
 
 diff --git a/lib/Makefile.am b/lib/Makefile.am
-index 96403cf..23222d0 100644
+index 92940f2..b2de98d 100644
 --- a/lib/Makefile.am
 +++ b/lib/Makefile.am
 @@ -22,7 +22,11 @@ liblirc_la_SOURCES          = config_file.c \
@@ -44,7 +44,7 @@ index 5129d7d..8547075 100644
  #define ASCIILINESZ      (1024)
  #define INI_INVALID_KEY  ((char*) NULL)
 diff --git a/lib/lirc_client.c b/lib/lirc_client.c
-index d924ef8..a679cf1 100644
+index d924ef8..6ca912a 100644
 --- a/lib/lirc_client.c
 +++ b/lib/lirc_client.c
 @@ -29,6 +29,7 @@
@@ -63,7 +63,7 @@ index d924ef8..a679cf1 100644
  
  static void lirc_printf(char *format_str, ...)
  {
-@@ -117,23 +119,48 @@ static void lirc_perror(const char *s)
+@@ -117,23 +119,44 @@ static void lirc_perror(const char *s)
  	perror(s);
  }
  
@@ -102,9 +102,7 @@ index d924ef8..a679cf1 100644
 +		options_name(lirc_option, optprefix, "name"), optprefix,
 +		options_name(lirc_option, optprefix, "debug"), 0,
 +		options_name(lirc_option, optprefix, "socket"), LIRCD,
-+#ifndef USE_SYSLOG
-+		options_name(lirc_option, optprefix, "logfile"), LOGFILE_CLIENTS,
-+#endif
++		options_name(lirc_option, optprefix, "logfile"), LOGFILE,
 +		(const char*)NULL, (const char*)NULL
 +	};
 +	lirc_opt_add_defaults(defaults);
@@ -112,9 +110,7 @@ index d924ef8..a679cf1 100644
 +	lirc_prog =
 +		strdup(options_getstring(options_name(lirc_option, optprefix, "name")));
 +	/* ensure logging */
-+#ifndef USE_SYSLOG
 +	lirc_set_logfile(options_getstring(options_name(lirc_option, optprefix, "logfile")));
-+#endif
 +	lirc_log_open(options_getstring(options_name(lirc_option, optprefix, "name")), 0,
 +	              options_getint(options_name(lirc_option, optprefix, "debug")));
 +	/* connect to lircd */
@@ -124,7 +120,7 @@ index d924ef8..a679cf1 100644
  	lirc_lircd = socket(AF_UNIX, SOCK_STREAM, 0);
  	if (lirc_lircd == -1) {
  		lirc_printf("%s: could not open socket\n", lirc_prog);
-@@ -163,6 +190,11 @@ int lirc_deinit(void)
+@@ -163,6 +186,11 @@ int lirc_deinit(void)
  		free(lirc_buffer);
  		lirc_buffer = NULL;
  	}
@@ -136,7 +132,7 @@ index d924ef8..a679cf1 100644
  	return (close(lirc_lircd));
  }
  
-@@ -1714,3 +1746,28 @@ int lirc_identify(int sockfd)
+@@ -1714,3 +1742,28 @@ int lirc_identify(int sockfd)
  	(void)lirc_send_command(sockfd, command, NULL, NULL, &success);
  	return success;
  }
@@ -166,10 +162,10 @@ index d924ef8..a679cf1 100644
 +	options_load(argc, argv, options_file, parse_options);
 +}
 diff --git a/lib/lirc_client.h b/lib/lirc_client.h
-index 2713df3..d57e422 100644
+index 6be0720..bba09aa 100644
 --- a/lib/lirc_client.h
 +++ b/lib/lirc_client.h
-@@ -74,6 +74,7 @@ extern "C" {
+@@ -75,6 +75,7 @@ extern "C" {
  	};
  
  	int lirc_init(char *prog, int verbose);
@@ -177,7 +173,7 @@ index 2713df3..d57e422 100644
  	int lirc_deinit(void);
  
  	int lirc_readconfig(char *file, struct lirc_config **config, int (check) (char *s));
-@@ -94,6 +95,16 @@ extern "C" {
+@@ -95,6 +96,16 @@ extern "C" {
  	const char *lirc_getmode(struct lirc_config *config);
  	const char *lirc_setmode(struct lirc_config *config, const char *mode);
  
@@ -195,10 +191,10 @@ index 2713df3..d57e422 100644
  }
  #endif
 diff --git a/lib/lirc_options.c b/lib/lirc_options.c
-index 7da5911..56da7c3 100644
+index 4337be9..1014ff7 100644
 --- a/lib/lirc_options.c
 +++ b/lib/lirc_options.c
-@@ -100,6 +100,8 @@ void options_add_defaults(const char* const defaults[])
+@@ -98,6 +98,8 @@ void options_add_defaults(const char* const defaults[])
  	const char* key;
  	const char* value;
  
@@ -207,7 +203,7 @@ index 7da5911..56da7c3 100644
  	for(i = 0; defaults[i] != NULL; i += 2){
  		key = defaults[i];
  		value = defaults[i + 1];
-@@ -107,3 +109,10 @@ void options_add_defaults(const char* const defaults[])
+@@ -105,3 +107,10 @@ void options_add_defaults(const char* const defaults[])
  			options_set_opt((char*)key, (char*)value);
  	}
  }
