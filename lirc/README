@@ -61,3 +61,6 @@ both defaulting to syslog on configure's vsyslog  discovery
 -rebrand 'logfile' as 'logtarget' in light of syslog non-fd target
 -remove ancient/unused LIRMAND defines
 
+# lircd_.utilise.lirc_log_reopen.diff [git sha:3a58afac5991b58ddc0aadeb7c3110c4ebd814cc | pending]
+-remove code duplication
+
