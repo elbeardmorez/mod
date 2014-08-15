@@ -52,3 +52,12 @@ lircrcd socket, or, a new socket. previously, all socket testing
 was done against a default socket name, making all use of lircrd's
 'output' option erroneous
 
+# logging_.add.default.log.target.build.options.diff [git sha:3a58afac5991b58ddc0aadeb7c3110c4ebd814cc | pending]
+-add '--with-daemon-logging' and '--with-client-logging' build options
+both defaulting to syslog on configure's vsyslog  discovery
+-facilitates non-syslog logging by default if required
+-facilitates natural split of daemon and client logging if required
+
+-rebrand 'logfile' as 'logtarget' in light of syslog non-fd target
+-remove ancient/unused LIRMAND defines
+

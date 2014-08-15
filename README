@@ -57,4 +57,5 @@ a dumping ground for patches which modify or add functionality
 -irexec_lircrcd.clients.option.and.log.integration.diff [git sha:3a58afac5991b58ddc0aadeb7c3110c4ebd814cc | pending]
 -lircd.option.reading.and.logging.initialisation.diff [git sha:3a58afac5991b58ddc0aadeb7c3110c4ebd814cc | pending]
 -client_.use.'output'.option.of.lircrc.shebang.diff [git sha:3a58afac5991b58ddc0aadeb7c3110c4ebd814cc | pending]
+-logging_.add.default.log.target.build.options.diff [git sha:3a58afac5991b58ddc0aadeb7c3110c4ebd814cc | pending]
 
