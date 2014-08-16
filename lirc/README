@@ -64,3 +64,6 @@ both defaulting to syslog on configure's vsyslog  discovery
 # lircd_.utilise.lirc_log_reopen.diff [git sha:3a58afac5991b58ddc0aadeb7c3110c4ebd814cc | pending]
 -remove code duplication
 
+# main_.automake.install.hook.for.lirc_option.conf.plugindir.diff [git sha:9406e45e13d5a483b3758cf40f3aa94580a4dff3 | pending]
+-replace based on libdir to support lib dir suffixes
+

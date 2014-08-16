@@ -1,0 +1,26 @@
+From 0da796b9cc08b5da3a927d22fd39eb9e2e9137f4 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sat, 16 Aug 2014 21:27:14 +0100
+Subject: [PATCH] main: automake install hook for lirc_option.conf plugindir
+
+-replace based on libdir to support lib dir suffixes
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 0577ced..4e1fedc 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -29,7 +29,7 @@ m4dir                   = m4
+ dist_m4_DATA            = m4/ac-path-kernel-source.m4
+ 
+ install-data-hook:
+-	sed -i '/^plugindir/s|/usr|$(prefix)|' \
++	sed -i '/^plugindir/s|/usr/lib|$(libdir)|' \
+ 	    $(DESTDIR)$(lirc_confdir)/lirc_options.conf
+ 	for f in contrib remotes lirc.org include configs; do \
+ 	    cp -pr $(srcdir)/$$f $(DESTDIR)$(pkgdatadir); \
+-- 
+1.8.4
+
