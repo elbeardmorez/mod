@@ -1,30 +1,42 @@
-From e2af53659091fa32c525e24ff672d9fdbd5acc21 Mon Sep 17 00:00:00 2001
+From b10e683853a5b2ccfcc04331f0a83a9ab574dc89 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Fri, 8 Aug 2014 21:05:32 +0100
-Subject: client: use 'output' option of lircrc shebang
+Subject: [PATCH] client: use 'output' option of lircrc shebang
 
 -enhanced 'lirc_setsocketname()' replaces 'lirc_getsocketname()'
 -add trivial lircrc shebang parse for optional 'output' arg to
 ensure no mismatch of lircrc socket names in use
 -pull in error checking and logging from (adjacent) calling code to
 standardise use with a 0 success, 1 errors return mechanism
+-only build lircrcd command when required
+-fix lirc_readconfig mem leak
 
 -with this change, an 'output' option in the lircrc #! line will be
 parsed and used to correctly connect a client to either an existing
 lircrcd socket, or, a new socket. previously, all socket testing
-was done against a default socket name, making all use of lircrd's
+was done against a default socket name, making all use of lircrcd's
 'output' option erroneous
 ---
- lib/lirc_client.c | 83 +++++++++++++++++++++++++++++++++++++++++++++++++------
- lib/lirc_client.h | 15 +++++++++-
- tools/lircrcd.c   | 11 ++------
- 3 files changed, 91 insertions(+), 18 deletions(-)
+ lib/lirc_client.c | 121 ++++++++++++++++++++++++++++++++++++++++++++++--------
+ lib/lirc_client.h |  15 ++++++-
+ tools/lircrcd.c   |  11 +----
+ 3 files changed, 119 insertions(+), 28 deletions(-)
 
 diff --git a/lib/lirc_client.c b/lib/lirc_client.c
-index 2d65097..1514e0e 100644
+index 132e70b..27aeeeb 100644
 --- a/lib/lirc_client.c
 +++ b/lib/lirc_client.c
-@@ -687,13 +687,13 @@ int lirc_readconfig(char *file, struct lirc_config **config, int (check) (char *
+@@ -666,8 +666,7 @@ int lirc_readconfig(char *file, struct lirc_config **config, int (check) (char *
+ {
+ 	struct sockaddr_un addr;
+ 	int sockfd = -1;
+-	char *sha_bang, *sha_bang2, *filename;
+-	char *command;
++	char *sha_bang, *filename, *command;
+ 	int ret;
+ 
+ 	filename = NULL;
+@@ -683,13 +682,13 @@ int lirc_readconfig(char *file, struct lirc_config **config, int (check) (char *
  	/* connect to lircrcd */
  
  	addr.sun_family = AF_UNIX;
@@ -41,7 +53,52 @@ index 2d65097..1514e0e 100644
  		lirc_log_err(LOG_ERR, NULL);
  		goto lirc_readconfig_compat;
  	}
-@@ -1475,15 +1475,82 @@ int lirc_nextcode(char **code)
+@@ -712,17 +711,36 @@ int lirc_readconfig(char *file, struct lirc_config **config, int (check) (char *
+ 	sockfd = -1;
+ 
+ 	/* launch lircrcd */
+-	sha_bang2 = sha_bang != NULL ? sha_bang : "lircrcd";
+-
+-	command = malloc(strlen(sha_bang2) + 1 + strlen(filename) + 1);
+-	if (command == NULL) {
+-		goto lirc_readconfig_compat;
++	int wsp = 0;
++	int wss;
++	if (!sha_bang) {
++		strcpy(sha_bang, "lircrcd");
++		wss = strlen(sha_bang) - 1;
++	} else {
++		/* trim to determine if options passed */
++		wss = strlen(sha_bang) - 1;
++		if (isspace(sha_bang[wsp]) || isspace(sha_bang[wss])) {
++			char *sha_bang2;
++			while (isspace(sha_bang[wsp]))
++				wsp++;
++			while ((wss >= wsp) && isspace(sha_bang[wss]))
++				wss--;
++			sha_bang2 = malloc(wss - wsp + 1 + 1);
++			strncpy(sha_bang2, sha_bang + wsp, wss - wsp + 1);
++			sha_bang2[wss - wsp + 1] = '\0';
++			strcpy(sha_bang, sha_bang2);
++			free(sha_bang2);
++		}
+ 	}
+-	strcpy(command, sha_bang2);
+-	strcat(command, " ");
+-	strcat(command, filename);
++	if (strcmp(sha_bang, "lircrcd") == 0) {
++		command = malloc(strlen(sha_bang) + 1 + strlen(filename) + 1);
++		sprintf(command, "%s %s", sha_bang, filename);
++	} else
++		command = strdup(sha_bang);
+ 
++	lirc_log(LOG_DEBUG, "starting lircrc daemon with #! '%s'", command);
+ 	ret = system(command);
++	free(command);
+ 
+ 	if (ret == -1 || WEXITSTATUS(ret) != EXIT_SUCCESS) {
+ 		goto lirc_readconfig_compat;
+@@ -1471,15 +1489,82 @@ int lirc_nextcode(char **code)
  	return (0);
  }
  
@@ -130,10 +187,10 @@ index 2d65097..1514e0e 100644
  {
  	if (config->sockfd != -1) {
 diff --git a/lib/lirc_client.h b/lib/lirc_client.h
-index 6657f88..74a1119 100644
+index 3faff4e..6547ed0 100644
 --- a/lib/lirc_client.h
 +++ b/lib/lirc_client.h
-@@ -84,6 +84,8 @@ extern "C" {
+@@ -85,6 +85,8 @@ extern "C" {
  	char *lirc_nextir(void);
  /* obsolete */
  	char *lirc_ir2char(struct lirc_config *config, char *code);
@@ -142,7 +199,7 @@ index 6657f88..74a1119 100644
  
  	int lirc_nextcode(char **code);
  	int lirc_code2char(struct lirc_config *config, char *code, char **string);
-@@ -91,10 +93,21 @@ extern "C" {
+@@ -92,10 +94,21 @@ extern "C" {
  /* new interface for client daemon */
  	int lirc_readconfig_only(char *file, struct lirc_config **config, int (check) (char *s));
  	int lirc_code2charprog(struct lirc_config *config, char *code, char **string, char **prog);
@@ -166,10 +223,10 @@ index 6657f88..74a1119 100644
  	void lirc_opt_set(char* key, char* value);
  	char* lirc_opt_getstring(char* key);
 diff --git a/tools/lircrcd.c b/tools/lircrcd.c
-index 0008011..8d3d0c4 100644
+index 2f712e7..a66817e 100644
 --- a/tools/lircrcd.c
 +++ b/tools/lircrcd.c
-@@ -325,17 +325,10 @@ static int opensocket(const char *configfile, const char *socketname, mode_t per
+@@ -323,17 +323,10 @@ static int opensocket(const char *configfile, const char *socketname, mode_t per
  	int new = 1;
  	int ret;
  
