@@ -1,4 +1,4 @@
-From 1d4e9d54dff13f3c87c61e96cc1d5c5c1f33686e Mon Sep 17 00:00:00 2001
+From c15bccd60bffdc1ff31f79546e4dc3402ddd451e Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Wed, 6 Aug 2014 19:37:52 +0100
 Subject: lirc_client lirc_log integration
@@ -10,14 +10,14 @@ counterpart to fascilate client wrapper lirc_log()
 -use logfile options from client applications
 -add lirc_log_deinit() to clean up (now) dynamic vars
 ---
- lib/lirc_client.c |  37 ++++++++++--------
+ lib/lirc_client.c |  43 ++++++++++++---------
  lib/lirc_client.h |  28 ++++++++++++++
  lib/lirc_log.c    | 111 ++++++++++++++++++++++++++++++++----------------------
  lib/lirc_log.h    |  29 ++++++++++++--
- 4 files changed, 141 insertions(+), 64 deletions(-)
+ 4 files changed, 145 insertions(+), 66 deletions(-)
 
 diff --git a/lib/lirc_client.c b/lib/lirc_client.c
-index 6ca912a..8a117a1 100644
+index 6ca912a..162301d 100644
 --- a/lib/lirc_client.c
 +++ b/lib/lirc_client.c
 @@ -27,9 +27,11 @@
@@ -40,7 +40,7 @@ index 6ca912a..8a117a1 100644
  static char *lirc_prog = NULL;
  static char *lirc_buffer = NULL;
  char *lirc_option = NULL;
-@@ -102,21 +103,13 @@ char *lirc_option = NULL;
+@@ -102,29 +103,23 @@ char *lirc_option = NULL;
  static void lirc_printf(char *format_str, ...)
  {
  	va_list ap;
@@ -64,7 +64,27 @@ index 6ca912a..8a117a1 100644
  }
  
  int lirc_init(char *prog, int verbose) {
-@@ -159,16 +152,18 @@ int lirc_init_wopt(const char *optprefix)
+ 	if (lirc_options == NULL)
+ 		lirc_options = dictionary_new(0);
++	char d[2];
++	sprintf(d, "%d", (verbose < 0 ? 0 : verbose) > LIRC_STALK ? LIRC_STALK : verbose);
+ 	const char* const defaults[] = {
+ 		options_name(lirc_option, prog, "name"), prog,
+-		options_name(lirc_option, prog, "debug"), verbose ? "True" : "False",
++		options_name(lirc_option, prog, "debug"), d,
+ 		(const char*)NULL, (const char*)NULL
+ 	};
+ 	options_add_defaults(defaults);
+@@ -141,7 +136,7 @@ int lirc_init_wopt(const char *optprefix)
+ 	struct sockaddr_un addr;
+ 	const char* const defaults[] = {
+ 		options_name(lirc_option, optprefix, "name"), optprefix,
+-		options_name(lirc_option, optprefix, "debug"), 0,
++		options_name(lirc_option, optprefix, "debug"), "0",
+ 		options_name(lirc_option, optprefix, "socket"), LIRCD,
+ 		options_name(lirc_option, optprefix, "logfile"), LOGFILE,
+ 		(const char*)NULL, (const char*)NULL
+@@ -159,16 +154,18 @@ int lirc_init_wopt(const char *optprefix)
  	strcpy(addr.sun_path, options_getstring(options_name(lirc_option, optprefix, "socket")));
  	lirc_lircd = socket(AF_UNIX, SOCK_STREAM, 0);
  	if (lirc_lircd == -1) {
@@ -87,7 +107,7 @@ index 6ca912a..8a117a1 100644
  		free(lirc_prog);
  		lirc_prog = NULL;
  		return (-1);
-@@ -190,6 +185,7 @@ int lirc_deinit(void)
+@@ -190,6 +187,7 @@ int lirc_deinit(void)
  		free(lirc_option);
  		lirc_option = NULL;
  	}
@@ -95,7 +115,7 @@ index 6ca912a..8a117a1 100644
  	dictionary_del(lirc_options);
  	return (close(lirc_lircd));
  }
-@@ -1767,3 +1763,14 @@ void lirc_opt_load(int argc, char **argv,
+@@ -1767,3 +1765,14 @@ void lirc_opt_load(int argc, char **argv,
  		void (*parse_options)(int, char**)) {
  	options_load(argc, argv, options_file, parse_options);
  }
