@@ -1,4 +1,4 @@
-From f833733ac925ccf4e4f7e145f11f3405e899ee4e Mon Sep 17 00:00:00 2001
+From ef5c4fa7b36e4232bec1700569ee29e6d3ab1e34 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Thu, 7 Aug 2014 15:14:08 +0100
 Subject: irexec/lircrcd clients option and log integration
@@ -14,7 +14,7 @@ it can use the client library log functions
  2 files changed, 156 insertions(+), 104 deletions(-)
 
 diff --git a/tools/irexec.c b/tools/irexec.c
-index f14d808..5642d72 100644
+index f14d808..beebd60 100644
 --- a/tools/irexec.c
 +++ b/tools/irexec.c
 @@ -21,70 +21,98 @@
@@ -55,7 +55,7 @@ index f14d808..5642d72 100644
 +		"irexec:name", 		progname,
 +		"irexec:socket", 	LIRCD,
 +		"irexec:logfile", 	LOGFILE,
-+		"irexec:debug", 	"False",
++		"irexec:debug", 	"0",
 +		(const char*)NULL, 	(const char*)NULL
 +	};
 +	lirc_opt_add_defaults(defaults);
@@ -160,7 +160,7 @@ index f14d808..5642d72 100644
  			}
  			free(code);
 diff --git a/tools/lircrcd.c b/tools/lircrcd.c
-index bafe4b6..2f712e7 100644
+index bafe4b6..e99a777 100644
 --- a/tools/lircrcd.c
 +++ b/tools/lircrcd.c
 @@ -29,10 +29,7 @@
@@ -442,7 +442,7 @@ index bafe4b6..2f712e7 100644
 +		"lircrcd:name", 		progname,
 +		"lircrcd:socket", 	LIRCD,
 +		"lircrcd:logfile", 	LOGFILE,
-+		"lircrcd:debug", 	"False",
++		"lircrcd:debug", 	"0",
 +		(const char*)NULL, 	(const char*)NULL
 +	};
 +	lirc_opt_add_defaults(defaults);
