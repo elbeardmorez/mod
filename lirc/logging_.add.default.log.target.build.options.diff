@@ -1,4 +1,4 @@
-From b19eab442a739d920bf11599f429e32a2b34ac42 Mon Sep 17 00:00:00 2001
+From 8264223c793f28596ae15c88b318d99436559f2c Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Fri, 15 Aug 2014 19:21:19 +0100
 Subject: logging: add default log target build options
@@ -21,11 +21,11 @@ both defaulting to syslog on configure's vsyslog  discovery
  lib/lirc_log.h     |  6 +++---
  lirc_options.conf  |  2 +-
  tools/irexec.c     | 10 +++++-----
- tools/lircrcd.c    | 10 +++++-----
- 11 files changed, 82 insertions(+), 58 deletions(-)
+ tools/lircrcd.c    |  9 ++++-----
+ 11 files changed, 81 insertions(+), 58 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index f8728ab..e260f5f 100644
+index f8728ab..faaa075 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -118,6 +118,14 @@ case "${host_os}" in
@@ -100,7 +100,7 @@ index f8728ab..e260f5f 100644
  AC_DEFINE_UNQUOTED(VERSION, "$VERSION")
  AC_DEFINE_UNQUOTED(PLUGINDIR, "$libdir/lirc/plugins",[
 diff --git a/daemons/lircd.c b/daemons/lircd.c
-index 682405d..97cc70b 100644
+index fa9f8e1..2428ece 100644
 --- a/daemons/lircd.c
 +++ b/daemons/lircd.c
 @@ -169,7 +169,6 @@ static __u32 repeat_max = REPEAT_MAX_DEFAULT;
@@ -148,7 +148,7 @@ index 682405d..97cc70b 100644
  		"lircd:pidfile", 	PIDFILE,
 -		"lircd:logfile", 	LOGFILE,
 +		"lircd:logtarget", 	LOGGING_DAEMON,
- 		"lircd:debug", 		"False",
+ 		"lircd:debug", 		"0",
  		"lircd:release", 	NULL,
  		"lircd:allow-simulate", "False",
 @@ -2232,7 +2233,7 @@ static void lircd_parse_options(int argc, char** argv)
@@ -193,19 +193,19 @@ index 682405d..97cc70b 100644
  		listen_tcpip = 1;
  		opt = options_getstring("lircd:listen_hostport");
 diff --git a/lib/lirc_client.c b/lib/lirc_client.c
-index 5e2c9c4..6125928 100644
+index ffc41f3..1ae1abf 100644
 --- a/lib/lirc_client.c
 +++ b/lib/lirc_client.c
-@@ -122,7 +122,7 @@ int lirc_init_wopt(const char *optprefix)
+@@ -124,7 +124,7 @@ int lirc_init_wopt(const char *optprefix)
  		options_name(lirc_option, optprefix, "name"), optprefix,
- 		options_name(lirc_option, optprefix, "debug"), 0,
+ 		options_name(lirc_option, optprefix, "debug"), "0",
  		options_name(lirc_option, optprefix, "socket"), LIRCD,
 -		options_name(lirc_option, optprefix, "logfile"), LOGFILE,
 +		options_name(lirc_option, optprefix, "logtarget"), LOGGING_CLIENT,
  		(const char*)NULL, (const char*)NULL
  	};
  	lirc_opt_add_defaults(defaults);
-@@ -130,7 +130,7 @@ int lirc_init_wopt(const char *optprefix)
+@@ -132,7 +132,7 @@ int lirc_init_wopt(const char *optprefix)
  	lirc_prog =
  		strdup(options_getstring(options_name(lirc_option, optprefix, "name")));
  	/* ensure logging */
@@ -391,7 +391,7 @@ index d8ddedd..2791f22 100644
  [lircmd]
  uinput          = False
 diff --git a/tools/irexec.c b/tools/irexec.c
-index 5642d72..013e110 100644
+index beebd60..4f8fa62 100644
 --- a/tools/irexec.c
 +++ b/tools/irexec.c
 @@ -36,7 +36,7 @@ int main(int argc, char *argv[])
@@ -400,7 +400,7 @@ index 5642d72..013e110 100644
  		"irexec:socket", 	LIRCD,
 -		"irexec:logfile", 	LOGFILE,
 +		"irexec:logtarget", 	LOGGING_CLIENT,
- 		"irexec:debug", 	"False",
+ 		"irexec:debug", 	"0",
  		(const char*)NULL, 	(const char*)NULL
  	};
 @@ -48,7 +48,7 @@ int main(int argc, char *argv[])
@@ -433,19 +433,18 @@ index 5642d72..013e110 100644
  		case 'D':
  			lirc_opt_set("irexec:debug", optarg ? optarg : "1");
 diff --git a/tools/lircrcd.c b/tools/lircrcd.c
-index a66817e..3cb3ea0 100644
+index baa3b28..a8da9cc 100644
 --- a/tools/lircrcd.c
 +++ b/tools/lircrcd.c
-@@ -799,7 +799,7 @@ int main(int argc, char **argv)
+@@ -799,7 +799,6 @@ int main(int argc, char **argv)
  	const char* const defaults[] = {
  		"lircrcd:name", 		progname,
  		"lircrcd:socket", 	LIRCD,
 -		"lircrcd:logfile", 	LOGFILE,
-+		"lircrcd:logtarget", 	LOGGING_CLIENT,
- 		"lircrcd:debug", 	"False",
+ 		"lircrcd:debug", 	"0",
  		(const char*)NULL, 	(const char*)NULL
  	};
-@@ -811,7 +811,7 @@ int main(int argc, char **argv)
+@@ -811,7 +810,7 @@ int main(int argc, char **argv)
  		{"permission", required_argument, NULL, 'p'},
  		{"output", required_argument, NULL, 'o'},
  		{"socket", required_argument, NULL, 's'},
@@ -454,7 +453,7 @@ index a66817e..3cb3ea0 100644
  		{"debug", optional_argument, NULL, 'D'},
  		{0, 0, 0, 0}
  	};
-@@ -831,8 +831,8 @@ int main(int argc, char **argv)
+@@ -831,8 +830,8 @@ int main(int argc, char **argv)
  			       "[default: %s/%sd]\n", getenv("HOME"), LIRCRC_USER_FILE);
  			printf("\t -s --socket=SOCKET\tlircd socket filename "
  			       "[default: %s]\n", LIRCD);
@@ -465,7 +464,7 @@ index a66817e..3cb3ea0 100644
  			printf("\t -D[X] --debug[=X]\tenable log, optional verbosity level 1..10 "
  			       "[default: 1]\n");
  			return (EXIT_SUCCESS);
-@@ -853,7 +853,7 @@ int main(int argc, char **argv)
+@@ -853,7 +852,7 @@ int main(int argc, char **argv)
  			lirc_opt_set("lircrcd:socket", optarg);
  			break;
  		case 'L':
