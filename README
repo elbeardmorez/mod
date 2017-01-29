@@ -61,3 +61,5 @@ a dumping ground for patches which modify or add functionality
 -lircd_.utilise.lirc_log_reopen.diff [git sha:3a58afac5991b58ddc0aadeb7c3110c4ebd814cc | pending]
 -main_.automake.install.hook.for.lirc_option.conf.plugindir.diff [git sha:9406e45e13d5a483b3758cf40f3aa94580a4dff3 | pending]
 
+### guitarix
+-add-ui-configurable-constant-state-toggle-behaviour.diff [git sha:c3c157351161449d20ec13bef550ba7d3d226571 | committed]

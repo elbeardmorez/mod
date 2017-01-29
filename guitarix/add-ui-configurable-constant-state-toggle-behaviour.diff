@@ -1,0 +1,486 @@
+From c3c157351161449d20ec13bef550ba7d3d226571 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Thu, 26 Jan 2017 00:30:09 +0000
+Subject: [PATCH] add ui-configurable 'constant state' toggle behaviour
+
+---
+ trunk/src/gx_head/builder/midi.glade       | 84 +++++++++++++++++++++++++++++-
+ trunk/src/gx_head/engine/gx_paramtable.cpp | 44 +++++++++++++---
+ trunk/src/gx_head/engine/jsonrpc.cpp       |  2 +-
+ trunk/src/gx_head/gui/gx_main_midi.cpp     | 35 +++++++++++--
+ trunk/src/gx_head/gui/machine.cpp          |  8 +--
+ trunk/src/headers/gx_main_midi.h           |  8 +++
+ trunk/src/headers/gx_parameter.h           | 10 ++--
+ trunk/src/headers/machine.h                |  6 +--
+ 8 files changed, 176 insertions(+), 21 deletions(-)
+
+diff --git a/trunk/src/gx_head/builder/midi.glade b/trunk/src/gx_head/builder/midi.glade
+index a1ed9be..c31f78f 100644
+--- a/trunk/src/gx_head/builder/midi.glade
++++ b/trunk/src/gx_head/builder/midi.glade
+@@ -257,15 +257,87 @@
+                   </packing>
+                 </child>
+                 <child>
++                  <object class="GtkTable" id="table4">
++                    <property name="visible">True</property>
++                    <property name="can_focus">False</property>
++                    <property name="n_rows">2</property>
++                    <child>
++                      <object class="GtkTable" id="table2">
++                        <property name="visible">True</property>
++                        <property name="can_focus">False</property>
++                        <property name="n_columns">2</property>
++                        <child>
++                          <object class="GtkLabel" id="label5">
++                            <property name="width_request">100</property>
++                            <property name="visible">True</property>
++                            <property name="can_focus">False</property>
++                            <property name="xalign">1</property>
++                            <property name="label" translatable="yes">toggle parameter</property>
++                            <property name="justify">right</property>
++                          </object>
++                          <packing>
++                            <property name="x_options">GTK_SHRINK | GTK_FILL</property>
++                            <property name="y_options">GTK_EXPAND | GTK_SHRINK | GTK_FILL</property>
++                            <property name="x_padding">4</property>
++                          </packing>
++                        </child>
++                        <child>
+                   <object class="GtkCheckButton" id="use_toggle">
+-                    <property name="label" translatable="yes">toggle parameter (off -&gt; on transition toggles)</property>
+                     <property name="visible">True</property>
+                     <property name="can_focus">True</property>
+                     <property name="receives_default">False</property>
+                     <property name="use_action_appearance">False</property>
++                            <property name="relief">none</property>
++                            <property name="image_position">right</property>
+                     <property name="draw_indicator">True</property>
+                   </object>
+                   <packing>
++                            <property name="left_attach">1</property>
++                            <property name="right_attach">2</property>
++                            <property name="x_options">GTK_SHRINK | GTK_FILL</property>
++                            <property name="y_options">GTK_SHRINK | GTK_FILL</property>
++                          </packing>
++                        </child>
++                      </object>
++                    </child>
++                    <child>
++                      <object class="GtkTable" id="table3">
++                        <property name="visible">True</property>
++                        <property name="can_focus">False</property>
++                        <property name="n_columns">2</property>
++                        <child>
++                          <object class="GtkLabel" id="label6">
++                            <property name="width_request">100</property>
++                            <property name="visible">True</property>
++                            <property name="can_focus">False</property>
++                            <property name="xalign">1</property>
++                            <property name="label" translatable="yes">type</property>
++                            <property name="justify">right</property>
++                          </object>
++                          <packing>
++                            <property name="x_options">GTK_SHRINK | GTK_FILL</property>
++                            <property name="y_options">GTK_EXPAND | GTK_SHRINK | GTK_FILL</property>
++                            <property name="x_padding">4</property>
++                          </packing>
++                        </child>
++                        <child>
++                          <object class="GtkComboBox" id="toggle_behaviours">
++                            <property name="visible">True</property>
++                            <property name="can_focus">False</property>
++                          </object>
++                          <packing>
++                            <property name="left_attach">1</property>
++                            <property name="right_attach">2</property>
++                          </packing>
++                        </child>
++                      </object>
++                      <packing>
++                        <property name="top_attach">1</property>
++                        <property name="bottom_attach">2</property>
++                      </packing>
++                    </child>
++                  </object>
++                  <packing>
+                     <property name="expand">True</property>
+                     <property name="fill">True</property>
+                     <property name="position">2</property>
+@@ -297,7 +369,7 @@
+                   <packing>
+                     <property name="expand">False</property>
+                     <property name="fill">False</property>
+-                    <property name="position">4</property>
++                    <property name="position">3</property>
+                   </packing>
+                 </child>
+               </object>
+@@ -567,4 +639,12 @@
+       <column type="gchararray"/>
+     </columns>
+   </object>
++  <object class="GtkListStore" id="liststore2">
++    <columns>
++      <!-- column-name gint -->
++      <column type="gint"/>
++      <!-- column-name gchararray -->
++      <column type="gchararray"/>
++    </columns>
++  </object>
+ </interface>
+diff --git a/trunk/src/gx_head/engine/gx_paramtable.cpp b/trunk/src/gx_head/engine/gx_paramtable.cpp
+index e90b99d..bc55d25 100644
+--- a/trunk/src/gx_head/engine/gx_paramtable.cpp
++++ b/trunk/src/gx_head/engine/gx_paramtable.cpp
+@@ -180,6 +180,7 @@ void MidiController::writeJSON(gx_system::JsonWriter& jw) const {
+     } else {
+         assert(param->getControlType() == Parameter::Switch);
+ 	jw.write(toggle);
++        jw.write(_toggle_behaviour);
+     }
+     jw.end_array();
+ }
+@@ -197,6 +198,7 @@ MidiController *MidiController::readJSON(gx_system::JsonParser& jp, ParamMap& pm
+     Parameter& pm = pmap[id];
+     float lower = 0, upper = 0;
+     bool toggle = false;
++    int toggle_behaviour = 0;
+     bool bad = false;
+     bool chg = false;
+     if (pm.getControlType() == Parameter::Continuous ||
+@@ -241,11 +243,18 @@ MidiController *MidiController::readJSON(gx_system::JsonParser& jp, ParamMap& pm
+     } else if (pm.getControlType() == Parameter::Switch) {
+ 	if (jp.peek() == gx_system::JsonParser::value_number) {
+ 	    jp.next(gx_system::JsonParser::value_number);
++            int _toggle = jp.current_value_int();
+ 	    if (jp.peek() == gx_system::JsonParser::value_number) {
++                jp.next(gx_system::JsonParser::value_number);
++                if (jp.current_value_int() < Parameter::toggle_type::_Count) {
++                   toggle = _toggle;
++                   toggle_behaviour = jp.current_value_int();
++                } else {
+ 		// two numbers -> range
+ 		bad = true;
++                }
+ 	    } else {
+-		toggle = jp.current_value_int();
++                toggle = _toggle;
+ 	    }
+ 	}
+     } else {
+@@ -265,13 +274,15 @@ MidiController *MidiController::readJSON(gx_system::JsonParser& jp, ParamMap& pm
+             _("recall MIDI state"),
+             _("Parameter range outside bounds, changed: ") + id);
+     }
+-    return new MidiController(pm, lower, upper, toggle);
++    return new MidiController(pm, lower, upper, toggle, toggle_behaviour);
+ }
+ 
+ bool MidiController::set_midi(int n, int last_value) {
+     bool ret = false;
+     if (param->get_midi_blocked()) return ret;
+     if (toggle) {
++        switch (_toggle_behaviour) {
++            case Parameter::toggle_type::OnOff: {
+ 	bool s_o = (2*last_value > 127);
+ 	bool s_n = (2*n > 127);
+ 	if (!s_o && s_n) {
+@@ -281,11 +292,23 @@ bool MidiController::set_midi(int n, int last_value) {
+ 		ret = param->midi_set(127, 127, _lower, _upper);
+ 	    }
+ 	}
++                break;
++            }
++            case Parameter::toggle_type::Constant: {
++                if (n == last_value || last_value == -1) {
++                    if (param->on_off_value()) {
++                        ret = param->midi_set(0, n, _lower, _upper);
++                    } else {
++                        ret = param->midi_set(127, n, _lower, _upper);
++                    }
++                }
++                break;
++            }
++        }
+     } else {
+         //fprintf(stderr,"continues %s \n",param->id().c_str());
+         //fprintf(stderr,"%f \n",(127.*log10f(double(n+1.)))/2.1072);
+         //fprintf(stderr,"%f \n",double(n * double(double(n+1.)/128)));
+-        
+ 	ret = param->midi_set(n, 127, _lower, _upper);
+     }
+     param->trigger_changed();
+@@ -482,6 +505,10 @@ bool MidiControllerList::check_midi_values() {
+ 	    if (!get_config_mode()) {
+ 		midi_controller_list& ctr_list = map[n];
+ 		for (midi_controller_list::iterator i = ctr_list.begin(); i != ctr_list.end(); ++i) {
++                    if (i->is_toggle()
++                        && i->toggle_behaviour() == Parameter::toggle_type::Constant) {
++                        midi_value_changed(n, i->getParameter().on_off_value() * 127);
++                    }
+ 		    i->trigger_changed();
+ 		}
+ 	    }
+@@ -554,7 +581,7 @@ void MidiControllerList::deleteParameter(Parameter& p) {
+ }
+ 
+ void MidiControllerList::modifyCurrent(Parameter &param,
+-                                       float lower, float upper, bool toggle) {
++                                       float lower, float upper, bool toggle, int toggle_behaviour) {
+     if (!get_config_mode()) {
+ 	assert(false);
+ 	return;	// keep rt thread away from table
+@@ -564,7 +591,7 @@ void MidiControllerList::modifyCurrent(Parameter &param,
+     if (last_midi_control < 0)
+         return;
+     // add zone to controller
+-    map[last_midi_control].push_front(MidiController(param, lower, upper, toggle));
++    map[last_midi_control].push_front(MidiController(param, lower, upper, toggle, toggle_behaviour));
+     update_from_controller(last_midi_control);
+     changed();
+ }
+@@ -572,7 +599,12 @@ void MidiControllerList::modifyCurrent(Parameter &param,
+ void MidiControllerList::request_midi_value_update() {
+     for (unsigned int n = 0; n < ControllerArray::array_size; ++n) {
+ 	int v = last_midi_control_value[n];
+-	if (v >= 0) {
++        midi_controller_list& ctr_list = map[n];
++        for (midi_controller_list::iterator i = ctr_list.begin(); i != ctr_list.end(); ++i) {
++            if (i->is_toggle()
++                && i->toggle_behaviour() == Parameter::toggle_type::Constant) {
++                v = i->getParameter().on_off_value() * 127;
++            }
+ 	    midi_value_changed(n, v);
+ 	}
+     }
+diff --git a/trunk/src/gx_head/engine/jsonrpc.cpp b/trunk/src/gx_head/engine/jsonrpc.cpp
+index bb4028f..a713818 100644
+--- a/trunk/src/gx_head/engine/jsonrpc.cpp
++++ b/trunk/src/gx_head/engine/jsonrpc.cpp
+@@ -970,7 +970,7 @@ void CmdConnection::notify(gx_system::JsonStringWriter& jw, const methodnames *m
+     PROCEDURE(midi_modifyCurrent) {
+ 	serv.jack.get_engine().controller_map.modifyCurrent(
+ 	    serv.settings.get_param()[params[0]->getString()], params[1]->getFloat(),
+-	    params[2]->getFloat(), params[3]->getInt());
++	    params[2]->getFloat(), params[3]->getInt(), params[4]->getInt());
+     }
+ 
+     PROCEDURE(set) {
+diff --git a/trunk/src/gx_head/gui/gx_main_midi.cpp b/trunk/src/gx_head/gui/gx_main_midi.cpp
+index 19e959f..7aa5aaf 100644
+--- a/trunk/src/gx_head/gui/gx_main_midi.cpp
++++ b/trunk/src/gx_head/gui/gx_main_midi.cpp
+@@ -212,10 +212,11 @@ void MidiConnect::midi_response_cb(GtkWidget *widget, gint response_id, gpointer
+             assert(m->adj_upper);
+             float lower = gtk_adjustment_get_value(m->adj_lower);
+             float upper = gtk_adjustment_get_value(m->adj_upper);
+-            m->machine.midi_modifyCurrent(m->param, lower, upper, false);
++            m->machine.midi_modifyCurrent(m->param, lower, upper, false, gx_engine::Parameter::toggle_type::OnOff);
+         } else {
+ 	    bool toggle = gtk_toggle_button_get_active(m->use_toggle);
+-            m->machine.midi_modifyCurrent(m->param, 0, 0, toggle);
++            int toggle_behaviour = gtk_combo_box_get_active(GTK_COMBO_BOX(m->toggle_behaviours));
++            m->machine.midi_modifyCurrent(m->param, 0, 0, toggle, toggle_behaviour);
+         }
+         break;
+     case RESPONSE_DELETE:
+@@ -261,6 +262,12 @@ void MidiConnect::midi_destroy_cb(GtkWidget *widget, gpointer data) {
+     m->machine.midi_set_config_mode(false);
+ }
+ 
++void MidiConnect::toggle_behaviours_visibility(GtkWidget *widget, gpointer data) {
++    MidiConnect *m = reinterpret_cast<MidiConnect*>(data);
++    int b = gtk_toggle_button_get_active(m->use_toggle);
++    gtk_widget_set_sensitive(gtk_widget_get_parent(m->toggle_behaviours), b);
++}
++
+ const char* MidiConnect::ctl_to_str(int n) {
+     static char buf[12];
+     if (n < 0)
+@@ -336,6 +343,7 @@ MidiConnect::MidiConnect(GdkEventButton *event, gx_engine::Parameter &param_, gx
+     GtkBuilder * builder = gtk_builder_new();
+     dialog = gx_gui::load_toplevel(builder, "midi.glade", "MidiConnect");
+     use_toggle = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder, "use_toggle"));
++    toggle_behaviours = GTK_WIDGET(gtk_builder_get_object(builder, "toggle_behaviours"));
+     GtkWidget *zn = GTK_WIDGET(gtk_builder_get_object(builder, "zone_name"));
+     GtkStyle *style = gtk_widget_get_style(zn);
+     pango_font_description_set_size(style->font_desc, 12*PANGO_SCALE);
+@@ -370,19 +378,40 @@ MidiConnect::MidiConnect(GdkEventButton *event, gx_engine::Parameter &param_, gx
+             gtk_adjustment_set_value(adj_lower, pctrl->lower());
+             gtk_adjustment_set_value(adj_upper, pctrl->upper());
+         }
+-        gtk_widget_hide(GTK_WIDGET(use_toggle));
++        gtk_widget_hide(gtk_widget_get_parent(gtk_widget_get_parent(GTK_WIDGET(use_toggle))));
+     } else {
+         gtk_widget_hide(GTK_WIDGET(gtk_builder_get_object(builder, "range_label")));
+         gtk_widget_hide(GTK_WIDGET(gtk_builder_get_object(builder, "range_box")));
++
++        store = GTK_LIST_STORE(gtk_builder_get_object(builder, "liststore2"));
++        GtkTreeIter iter;
++        gtk_list_store_clear(store);
++        for (std::map<gx_engine::Parameter::toggle_type, const char*>::iterator it = toggle_behaviour_descriptions.begin();
++               it!=toggle_behaviour_descriptions.end(); ++it) {
++                gtk_list_store_append(store, &iter);
++                gtk_list_store_set(store, &iter, 0, it->first, 1, it->second, -1);
++        }
++        gtk_combo_box_set_model(GTK_COMBO_BOX(toggle_behaviours), GTK_TREE_MODEL(store));
++        g_object_unref(store);
++        GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
++        gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(toggle_behaviours), renderer, TRUE);
++        gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(toggle_behaviours), renderer,
++                                       "cell-background", 0, "text", 1, NULL);
++        gtk_combo_box_set_active(GTK_COMBO_BOX(toggle_behaviours), gx_engine::Parameter::toggle_type::OnOff);
+         if (nctl != -1) {
+ 	    gtk_toggle_button_set_active(use_toggle, pctrl->is_toggle());
++            gtk_combo_box_set_active(GTK_COMBO_BOX(toggle_behaviours), pctrl->toggle_behaviour());
+ 	}
++        int b = gtk_toggle_button_get_active(use_toggle);
++        gtk_widget_set_sensitive(gtk_widget_get_parent(toggle_behaviours), b);
+     }
+     entry_new = GTK_WIDGET(gtk_builder_get_object(builder, "new"));
+     label_desc = GTK_WIDGET(gtk_builder_get_object(builder, "new_desc"));
++
+     g_signal_connect(dialog, "response", G_CALLBACK(midi_response_cb), this);
+     g_signal_connect(dialog, "destroy", G_CALLBACK(midi_destroy_cb), this);
+     g_signal_connect(entry_new, "changed", G_CALLBACK(changed_text_handler), this);
++    g_signal_connect(use_toggle, "toggled", G_CALLBACK(toggle_behaviours_visibility), this);
+     if (nctl == -1) {
+         gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog), RESPONSE_DELETE, FALSE);
+         gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog), GTK_RESPONSE_OK, FALSE);
+diff --git a/trunk/src/gx_head/gui/machine.cpp b/trunk/src/gx_head/gui/machine.cpp
+index 8a9f90d..fb8ea8d 100644
+--- a/trunk/src/gx_head/gui/machine.cpp
++++ b/trunk/src/gx_head/gui/machine.cpp
+@@ -784,8 +784,9 @@ void GxMachine::midi_set_current_control(int v) {
+     engine.controller_map.set_current_control(v);
+ }
+ 
+-void GxMachine::midi_modifyCurrent(Parameter& param, float lower, float upper, bool toggle) {
+-    engine.controller_map.modifyCurrent(param, lower, upper, toggle);
++void GxMachine::midi_modifyCurrent(Parameter& param, float lower, float upper,
++                                   bool toggle, int toggle_behaviour) {
++    engine.controller_map.modifyCurrent(param, lower, upper, toggle, toggle_behaviour);
+ }
+ 
+ int GxMachine::midi_param2controller(Parameter& param, const MidiController** p) {
+@@ -2502,12 +2503,13 @@ void GxMachineRemote::midi_set_current_control(int v) {
+     SEND();
+ }
+ 
+-void GxMachineRemote::midi_modifyCurrent(Parameter& param, float lower, float upper, bool toggle) {
++void GxMachineRemote::midi_modifyCurrent(Parameter& param, float lower, float upper, bool toggle, int toggle_behaviour) {
+     START_NOTIFY(midi_modifyCurrent);
+     jw->write(param.id());
+     jw->write(lower);
+     jw->write(upper);
+     jw->write(toggle);
++    jw->write(toggle_behaviour);
+     SEND();
+ }
+ 
+diff --git a/trunk/src/headers/gx_main_midi.h b/trunk/src/headers/gx_main_midi.h
+index f7d7e88..9c0ebc4 100644
+--- a/trunk/src/headers/gx_main_midi.h
++++ b/trunk/src/headers/gx_main_midi.h
+@@ -75,6 +75,12 @@ class MidiControllerTable: public sigc::trackable {
+ class MidiConnect {
+  private:
+     enum { RESPONSE_DELETE = 1 };
++    std::map<gx_engine::Parameter::toggle_type, const char*> toggle_behaviour_descriptions {
++        { gx_engine::Parameter::toggle_type::OnOff, "off /on states transition toggle" },
++        { gx_engine::Parameter::toggle_type::Constant, "constant state toggle" }
++    };
++    GtkTreeSelection* selection;
++    GtkListStore* store;
+     gx_engine::Parameter &param;
+     gx_engine::GxMachineBase& machine;
+     int current_control;
+@@ -85,12 +91,14 @@ class MidiConnect {
+     GtkWidget* dialog;
+     GtkWidget* entry_new;
+     GtkWidget* label_desc;
++    GtkWidget* toggle_behaviours;
+     static string ctr_desc(int ctr);
+     static const char *ctl_to_str(int n);
+  public:
+     MidiConnect(GdkEventButton *event, gx_engine::Parameter& param, gx_engine::GxMachineBase& machine);
+     static void midi_response_cb(GtkWidget *widget, gint response_id, gpointer data);
+     static void midi_destroy_cb(GtkWidget *widget, gpointer data);
++    static void toggle_behaviours_visibility(GtkWidget *widget, gpointer data);
+     static gboolean check_midi_cb(gpointer);
+     static void changed_text_handler(GtkEditable *entry, gpointer data);
+ };
+diff --git a/trunk/src/headers/gx_parameter.h b/trunk/src/headers/gx_parameter.h
+index 2614b90..8d14fd8 100644
+--- a/trunk/src/headers/gx_parameter.h
++++ b/trunk/src/headers/gx_parameter.h
+@@ -105,6 +105,7 @@ class FileParameter;
+ class Parameter: boost::noncopyable {
+ public:
+     enum ctrl_type { None, Continuous, Switch, Enum };
++    enum toggle_type { OnOff = 0, Constant = 1, _Count = 2 };
+ private:
+     virtual bool midi_set(float n, float high, float llimit, float ulimit); //RT
+     virtual bool midi_set_bpm(float n, float high, float llimit, float ulimit); //RT
+@@ -672,12 +673,15 @@ class MidiController {
+     Parameter *param; //RT
+     float _lower, _upper; //RT
+     bool toggle; //RT
++    int _toggle_behaviour;
++
+  public:
+-    MidiController(Parameter& p, float l, float u, bool t=false):
+-        param(&p), _lower(l), _upper(u), toggle(t) {}
++    MidiController(Parameter& p, float l, float u, bool t=false, int tt=0):
++        param(&p), _lower(l), _upper(u), toggle(t), _toggle_behaviour(tt) {}
+     float lower() const { return _lower; }
+     float upper() const { return _upper; }
+     bool is_toggle() const { return toggle; }
++    int toggle_behaviour() const { return _toggle_behaviour; }
+     bool hasParameter(const Parameter& p) const { return *param == p; }
+     Parameter& getParameter() const { return *param; }
+     static MidiController *readJSON(gx_system::JsonParser& jp, ParamMap& param);
+@@ -764,7 +768,7 @@ public:
+     void set_ctr_val(int ctr, int val); //RT
+     void set_bpm_val(unsigned int val); //RT
+     void deleteParameter(Parameter& param);
+-    void modifyCurrent(Parameter& param, float lower, float upper, bool toggle);
++    void modifyCurrent(Parameter& param, float lower, float upper, bool toggle, int toggle_behaviour);
+     int param2controller(Parameter& param, const MidiController** p) {
+ 	return map.param2controller(param, p); }
+     void writeJSON(gx_system::JsonWriter& jw) const { map.writeJSON(jw); }
+diff --git a/trunk/src/headers/machine.h b/trunk/src/headers/machine.h
+index 38082d4..e5ffa55 100644
+--- a/trunk/src/headers/machine.h
++++ b/trunk/src/headers/machine.h
+@@ -175,7 +175,7 @@ public:
+     virtual midi_controller_list& midi_get(int n) = 0;
+     virtual void midi_deleteParameter(Parameter& param) = 0;
+     virtual void midi_set_current_control(int v) = 0;
+-    virtual void midi_modifyCurrent(Parameter& param, float lower, float upper, bool toggle) = 0;
++    virtual void midi_modifyCurrent(Parameter& param, float lower, float upper, bool toggle, int toggle_behaviour) = 0;
+     virtual int midi_param2controller(Parameter& param, const MidiController** p) = 0;
+     // Convolver
+     virtual void reload_impresp_list(const std::string& path) = 0;
+@@ -356,7 +356,7 @@ public:
+     virtual midi_controller_list& midi_get(int n);
+     virtual void midi_deleteParameter(Parameter& param);
+     virtual void midi_set_current_control(int v);
+-    virtual void midi_modifyCurrent(Parameter& param, float lower, float upper, bool toggle);
++    virtual void midi_modifyCurrent(Parameter& param, float lower, float upper, bool toggle, int toggle_behaviour);
+     virtual int midi_param2controller(Parameter& param, const MidiController** p);
+     // Convolver
+     virtual void reload_impresp_list(const std::string& path);
+@@ -535,7 +535,7 @@ public:
+     virtual midi_controller_list& midi_get(int n);
+     virtual void midi_deleteParameter(Parameter& param);
+     virtual void midi_set_current_control(int v);
+-    virtual void midi_modifyCurrent(Parameter& param, float lower, float upper, bool toggle);
++    virtual void midi_modifyCurrent(Parameter& param, float lower, float upper, bool toggle, int toggle_behaviour);
+     virtual int midi_param2controller(Parameter& param, const MidiController** p);
+     // Convolver
+     virtual void reload_impresp_list(const std::string& path);
+-- 
+1.8.4
+
