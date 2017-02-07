@@ -1,0 +1,194 @@
+From 63975c026b34986739e9dd0c8bd8bea47113216c Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sun, 5 Feb 2017 13:53:47 +0000
+Subject: refactor default values
+
+---
+ utils/vpiano/keyboard.h      | 33 +++++++++++++++++++++++++++++++++
+ utils/vpiano/keyboardmap.h   | 32 --------------------------------
+ utils/vpiano/pianoscene.cpp  |  2 +-
+ utils/vpiano/pianoscene.h    |  2 +-
+ utils/vpiano/preferences.cpp | 11 ++++++-----
+ utils/vpiano/vpiano.cpp      | 11 ++++++-----
+ utils/vpiano/vpiano.pro      |  2 +-
+ 7 files changed, 48 insertions(+), 45 deletions(-)
+ create mode 100644 utils/vpiano/keyboard.h
+ delete mode 100644 utils/vpiano/keyboardmap.h
+
+diff --git a/utils/vpiano/keyboard.h b/utils/vpiano/keyboard.h
+new file mode 100644
+index 0000000..afc42fd
+--- /dev/null
++++ b/utils/vpiano/keyboard.h
+@@ -0,0 +1,33 @@
++/*
++    Virtual Piano Widget for Qt5
++    Copyright (C) 2008-2016, Pedro Lopez-Cabanillas <plcl@users.sf.net>
++
++    This program is free software; you can redistribute it and/or modify
++    it under the terms of the GNU General Public License as published by
++    the Free Software Foundation; either version 2 of the License, or
++    (at your option) any later version.
++
++    This program is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++    GNU General Public License for more details.
++
++    You should have received a copy of the GNU General Public License along
++    with this program; If not, see <http://www.gnu.org/licenses/>.
++*/
++
++#ifndef KEYBOARD_H
++#define KEYBOARD_H
++
++typedef QHash<int, int> KeyboardMap;
++
++const int DEFAULTVELOCITY = 100;
++const int DEFAULTSTARTINGKEY = 9;
++const int DEFAULTBASEOCTAVE = 1;
++const int DEFAULTNUMBEROFKEYS = 88;
++const int KEYLABELFONTSIZE = 7;
++const int DEFAULTKEYWIDTH = 18;
++const int DEFAULTKEYHEIGHT = 72;
++const qreal DEFAULTKEYSIZESCALE = 1.0;
++
++#endif // KEYBOARD_H
+diff --git a/utils/vpiano/keyboardmap.h b/utils/vpiano/keyboardmap.h
+deleted file mode 100644
+index 30363d7..0000000
+--- a/utils/vpiano/keyboardmap.h
++++ /dev/null
+@@ -1,32 +0,0 @@
+-/*
+-    Virtual Piano Widget for Qt5
+-    Copyright (C) 2008-2016, Pedro Lopez-Cabanillas <plcl@users.sf.net>
+-
+-    This program is free software; you can redistribute it and/or modify
+-    it under the terms of the GNU General Public License as published by
+-    the Free Software Foundation; either version 2 of the License, or
+-    (at your option) any later version.
+-
+-    This program is distributed in the hope that it will be useful,
+-    but WITHOUT ANY WARRANTY; without even the implied warranty of
+-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-    GNU General Public License for more details.
+-
+-    You should have received a copy of the GNU General Public License along
+-    with this program; If not, see <http://www.gnu.org/licenses/>.
+-*/
+-
+-#ifndef KEYBOARDMAP_H
+-#define KEYBOARDMAP_H
+-
+-typedef QHash<int, int> KeyboardMap;
+-
+-const int DEFAULTSTARTINGKEY = 9;
+-const int DEFAULTBASEOCTAVE = 1;
+-const int DEFAULTNUMBEROFKEYS = 88;
+-const int KEYLABELFONTSIZE = 7;
+-const int DEFAULTKEYWIDTH = 18;
+-const int DEFAULTKEYHEIGHT = 72;
+-const qreal DEFAULTKEYSIZESCALE = 1.0;
+-
+-#endif // KEYBOARDMAP_H
+diff --git a/utils/vpiano/pianoscene.cpp b/utils/vpiano/pianoscene.cpp
+index 2248e1f..2ec9d6b 100644
+--- a/utils/vpiano/pianoscene.cpp
++++ b/utils/vpiano/pianoscene.cpp
+@@ -54,7 +54,7 @@ PianoScene::PianoScene ( const int baseOctave,
+     m_touchEnabled( true ),
+     m_keyPressedColor( keyPressedColor ),
+     m_mousePressed( false ),
+-    m_velocity( 100 ),
++    m_velocity( DEFAULTVELOCITY ),
+     m_channel( 0 ),
+     m_velocityTint( true ),
+     m_handler( 0 )
+diff --git a/utils/vpiano/pianoscene.h b/utils/vpiano/pianoscene.h
+index 700d084..7cc84dc 100644
+--- a/utils/vpiano/pianoscene.h
++++ b/utils/vpiano/pianoscene.h
+@@ -21,7 +21,7 @@
+ 
+ #include "pianokey.h"
+ #include "keylabel.h"
+-#include "keyboardmap.h"
++#include "keyboard.h"
+ #if defined(PALETTE_SUPPORT)
+ #include "pianopalette.h"
+ #endif
+diff --git a/utils/vpiano/preferences.cpp b/utils/vpiano/preferences.cpp
+index 3e0d214..65038c7 100644
+--- a/utils/vpiano/preferences.cpp
++++ b/utils/vpiano/preferences.cpp
+@@ -18,6 +18,7 @@
+ */
+ 
+ #include "preferences.h"
++#include "keyboard.h"
+ #include <QPushButton>
+ #include <QShowEvent>
+ 
+@@ -25,11 +26,11 @@ Preferences::Preferences(QWidget *parent)
+     : QDialog(parent),
+     m_inChannel(0),
+     m_outChannel(0),
+-    m_velocity(100),
+-    m_baseOctave(1),
+-    m_numKeys(88),
+-    m_startingKey(9),
+-    m_keySizeScale(1.0)
++    m_velocity(DEFAULTVELOCITY),
++    m_baseOctave(DEFAULTBASEOCTAVE),
++    m_numKeys(DEFAULTNUMBEROFKEYS),
++    m_startingKey(DEFAULTSTARTINGKEY),
++    m_keySizeScale(DEFAULTKEYSIZESCALE)
+ {
+     ui.setupUi( this );
+     connect(ui.buttonBox, SIGNAL(clicked(QAbstractButton*)), SLOT(slotButtonClicked(QAbstractButton*)));
+diff --git a/utils/vpiano/vpiano.cpp b/utils/vpiano/vpiano.cpp
+index c5d1f1b..9ce8ad8 100644
+--- a/utils/vpiano/vpiano.cpp
++++ b/utils/vpiano/vpiano.cpp
+@@ -20,6 +20,7 @@
+ #include <QDebug>
+ #include "vpiano.h"
+ #include "backendmanager.h"
++#include "keyboard.h"
+ 
+ VPiano::VPiano( QWidget * parent, Qt::WindowFlags flags )
+     : QMainWindow(parent, flags),
+@@ -243,11 +244,11 @@ void VPiano::readSettings()
+     settings.beginGroup("Preferences");
+     dlgPreferences.setInChannel(settings.value("inputChannel", 0).toInt());
+     dlgPreferences.setOutChannel(settings.value("outputChannel", 0).toInt());
+-    dlgPreferences.setVelocity(settings.value("velocity", 100).toInt());
+-    dlgPreferences.setBaseOctave(settings.value("baseOctave", 1).toInt());
+-    dlgPreferences.setNumKeys(settings.value("numKeys", 88).toInt());
+-    dlgPreferences.setStartingKey(settings.value("startingKey", 9).toInt());
+-    dlgPreferences.setKeySizeScale(settings.value("keySizeScale", 1.0).toDouble());
++    dlgPreferences.setVelocity(settings.value("velocity", DEFAULTVELOCITY).toInt());
++    dlgPreferences.setBaseOctave(settings.value("baseOctave", DEFAULTBASEOCTAVE).toInt());
++    dlgPreferences.setNumKeys(settings.value("numKeys", DEFAULTNUMBEROFKEYS).toInt());
++    dlgPreferences.setStartingKey(settings.value("startingKey", DEFAULTSTARTINGKEY).toInt());
++    dlgPreferences.setKeySizeScale(settings.value("keySizeScale", DEFAULTKEYSIZESCALE).toDouble());
+     ui.pianokeybd->setBaseOctave(dlgPreferences.getBaseOctave());
+     ui.pianokeybd->resetScene(dlgPreferences.getNumKeys(),
+                               dlgPreferences.getStartingKey(),
+diff --git a/utils/vpiano/vpiano.pro b/utils/vpiano/vpiano.pro
+index 7d35eb2..b7e5326 100644
+--- a/utils/vpiano/vpiano.pro
++++ b/utils/vpiano/vpiano.pro
+@@ -11,7 +11,7 @@ FORMS += vpiano.ui connections.ui vpianoabout.ui preferences.ui fluidsettingsdia
+     sonivoxsettingsdialog.ui \
+     macsynthsettingsdialog.ui
+ HEADERS += pianokey.h pianokeybd.h pianoscene.h vpiano.h \
+-           keyboardmap.h keylabel.h pianodefs.h \
++           keyboard.h keylabel.h pianodefs.h \
+            connections.h vpianoabout.h preferences.h \
+            fluidsettingsdialog.h networksettingsdialog.h \
+     macsynthsettingsdialog.h \
+-- 
+1.8.4
+
