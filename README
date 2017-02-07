@@ -63,3 +63,7 @@ a dumping ground for patches which modify or add functionality
 
 ### guitarix
 -add-ui-configurable-constant-state-toggle-behaviour.diff [git sha:c3c157351161449d20ec13bef550ba7d3d226571 | committed]
+
+### drumstick
+-add.key.size.scaling.diff [git sha:ad367539b76b089651ccf702b0510b3eb77ed72d | pending]
+
