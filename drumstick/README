@@ -6,3 +6,6 @@
 
 # add.show.key.labels.toggle.diff [git sha:c8ce939c66b988613469e21e248b4e6318feb54c | pending]
 
+# perform.scene.update.on.preferences.'apply'.diff [git sha:6b4bfc68a2797de6ef37b41ec9c776081284ef2c | pending]
+-see the effects of the scaling changes without having to re-open the dialog
+

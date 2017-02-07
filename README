@@ -68,4 +68,5 @@ a dumping ground for patches which modify or add functionality
 -add.key.size.scaling.diff [git sha:ad367539b76b089651ccf702b0510b3eb77ed72d | pending]
 -refactor.default.values.diff [git sha:63975c026b34986739e9dd0c8bd8bea47113216c | pending]
 -add.show.key.labels.toggle.diff [git sha:c8ce939c66b988613469e21e248b4e6318feb54c | pending]
+-perform.scene.update.on.preferences.'apply'.diff [git sha:6b4bfc68a2797de6ef37b41ec9c776081284ef2c | pending]
 

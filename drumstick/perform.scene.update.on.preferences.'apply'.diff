@@ -1,0 +1,108 @@
+From 6b4bfc68a2797de6ef37b41ec9c776081284ef2c Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Mon, 6 Feb 2017 00:11:51 +0000
+Subject: perform scene update on preferences 'apply'
+
+---
+ utils/vpiano/preferences.cpp |  2 ++
+ utils/vpiano/preferences.h   |  3 +++
+ utils/vpiano/vpiano.cpp      | 36 ++++++++++++++++++++----------------
+ utils/vpiano/vpiano.h        |  1 +
+ 4 files changed, 26 insertions(+), 16 deletions(-)
+
+diff --git a/utils/vpiano/preferences.cpp b/utils/vpiano/preferences.cpp
+index bd5e394..0970e65 100644
+--- a/utils/vpiano/preferences.cpp
++++ b/utils/vpiano/preferences.cpp
+@@ -68,6 +68,8 @@ void Preferences::apply()
+     m_startingKey = ui.comboNotes->currentIndex();
+     m_keySizeScale = ui.spinKeySizeScale->value();
+     m_showLabels = ui.checkBoxShowLabels->isChecked();
++
++    emit signalApply();
+ }
+ 
+ void Preferences::accept()
+diff --git a/utils/vpiano/preferences.h b/utils/vpiano/preferences.h
+index 3ec98d8..0096e74 100644
+--- a/utils/vpiano/preferences.h
++++ b/utils/vpiano/preferences.h
+@@ -54,6 +54,9 @@ public slots:
+     void slotButtonClicked(QAbstractButton *button);
+     void accept();
+ 
++signals:
++    void signalApply();
++
+ protected:
+     void showEvent ( QShowEvent *event ); 
+ 
+diff --git a/utils/vpiano/vpiano.cpp b/utils/vpiano/vpiano.cpp
+index 4c0c164..bfe475b 100644
+--- a/utils/vpiano/vpiano.cpp
++++ b/utils/vpiano/vpiano.cpp
+@@ -69,6 +69,7 @@ VPiano::VPiano( QWidget * parent, Qt::WindowFlags flags )
+     connect(ui.actionAbout_Qt, SIGNAL(triggered()), SLOT(slotAboutQt()));
+     connect(ui.actionConnections, SIGNAL(triggered()), SLOT(slotConnections()));
+     connect(ui.actionPreferences, SIGNAL(triggered()), SLOT(slotPreferences()));
++    connect(&dlgPreferences, SIGNAL(signalApply()), SLOT(slotPreferencesApply()));
+     connect(ui.pianokeybd, SIGNAL(noteOn(int,int)), SLOT(slotNoteOn(int,int)));
+     connect(ui.pianokeybd, SIGNAL(noteOff(int,int)), SLOT(slotNoteOff(int,int)));
+ 
+@@ -169,22 +170,25 @@ void VPiano::slotConnections()
+ 
+ void VPiano::slotPreferences()
+ {
+-    if (dlgPreferences.exec() == QDialog::Accepted) {
+-        if (ui.pianokeybd->baseOctave() != dlgPreferences.getBaseOctave()) {
+-            ui.pianokeybd->setBaseOctave(dlgPreferences.getBaseOctave());
+-        }
+-        if (ui.pianokeybd->numKeys() != dlgPreferences.getNumKeys()) {
+-            ui.pianokeybd->setNumKeys(dlgPreferences.getNumKeys());
+-        }
+-        if (ui.pianokeybd->startKey() != dlgPreferences.getStartingKey()) {
+-            ui.pianokeybd->setNumKeys(dlgPreferences.getNumKeys(), dlgPreferences.getStartingKey());
+-        }
+-        if (ui.pianokeybd->keySizeScale() != dlgPreferences.getKeySizeScale()) {
+-            ui.pianokeybd->setKeySizeScale(dlgPreferences.getKeySizeScale());
+-        }
+-        if (ui.pianokeybd->showLabels() != dlgPreferences.getShowLabels()) {
+-            ui.pianokeybd->setShowLabels(dlgPreferences.getShowLabels());
+-        }
++    dlgPreferences.exec();
++}
++
++void VPiano::slotPreferencesApply()
++{
++    if (ui.pianokeybd->baseOctave() != dlgPreferences.getBaseOctave()) {
++        ui.pianokeybd->setBaseOctave(dlgPreferences.getBaseOctave());
++    }
++    if (ui.pianokeybd->numKeys() != dlgPreferences.getNumKeys()) {
++        ui.pianokeybd->setNumKeys(dlgPreferences.getNumKeys());
++    }
++    if (ui.pianokeybd->startKey() != dlgPreferences.getStartingKey()) {
++        ui.pianokeybd->setNumKeys(dlgPreferences.getNumKeys(), dlgPreferences.getStartingKey());
++    }
++    if (ui.pianokeybd->keySizeScale() != dlgPreferences.getKeySizeScale()) {
++        ui.pianokeybd->setKeySizeScale(dlgPreferences.getKeySizeScale());
++    }
++    if (ui.pianokeybd->showLabels() != dlgPreferences.getShowLabels()) {
++        ui.pianokeybd->setShowLabels(dlgPreferences.getShowLabels());
+     }
+ }
+ 
+diff --git a/utils/vpiano/vpiano.h b/utils/vpiano/vpiano.h
+index 9bac376..0de499b 100644
+--- a/utils/vpiano/vpiano.h
++++ b/utils/vpiano/vpiano.h
+@@ -51,6 +51,7 @@ public slots:
+     void slotAboutQt();
+     void slotConnections();
+     void slotPreferences();
++    void slotPreferencesApply();
+ 
+     void slotNoteOn(const int midiNote, const int vel);
+     void slotNoteOn(const int chan, const int note, const int vel);
+-- 
+1.8.4
+
