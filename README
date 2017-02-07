@@ -69,4 +69,5 @@ a dumping ground for patches which modify or add functionality
 -refactor.default.values.diff [git sha:63975c026b34986739e9dd0c8bd8bea47113216c | pending]
 -add.show.key.labels.toggle.diff [git sha:c8ce939c66b988613469e21e248b4e6318feb54c | pending]
 -perform.scene.update.on.preferences.'apply'.diff [git sha:6b4bfc68a2797de6ef37b41ec9c776081284ef2c | pending]
+-add.key.up_down.channel.out.control,.shift.mod.channel.in.diff [git sha:927d088a7a668b27872ed171cbf2b42a5bcb9ac7 | pending]
 
