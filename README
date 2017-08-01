@@ -74,4 +74,5 @@ a dumping ground for patches which modify or add functionality
 ### quodlibet
 -allow.configurable.custom.files.names.for.downloaded.art.diff [git sha:c130f934c09a4525e93b3cf8e3b482a0dcf53ae5 | pending]
 -move.album.art.when.renaming.[#237].diff [git sha:a721fbb38fcee0a46cf9e4fa56bc13296b659b8b | pending]
+-add.option.to.remove.empty.directories.post.rename.diff [git sha:30d6d17419ebe80e4012e0d1a50737b617961857 | pending]
 
