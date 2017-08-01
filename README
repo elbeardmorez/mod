@@ -71,3 +71,6 @@ a dumping ground for patches which modify or add functionality
 -perform.scene.update.on.preferences.'apply'.diff [git sha:6b4bfc68a2797de6ef37b41ec9c776081284ef2c | pending]
 -add.key.up_down.channel.out.control,.shift.mod.channel.in.diff [git sha:927d088a7a668b27872ed171cbf2b42a5bcb9ac7 | pending]
 
+### quodlibet
+-allow.configurable.custom.files.names.for.downloaded.art.diff [git sha:c130f934c09a4525e93b3cf8e3b482a0dcf53ae5 | pending]
+

@@ -1,0 +1,102 @@
+From c130f934c09a4525e93b3cf8e3b482a0dcf53ae5 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Mon, 31 Jul 2017 19:37:00 +0100
+Subject: allow configurable custom files names for downloaded art
+
+---
+ quodlibet/quodlibet/ext/songsmenu/albumart.py | 25 +++++++++++++++----------
+ quodlibet/quodlibet/plugins/__init__.py       |  6 ++++++
+ 2 files changed, 21 insertions(+), 10 deletions(-)
+
+diff --git a/quodlibet/quodlibet/ext/songsmenu/albumart.py b/quodlibet/quodlibet/ext/songsmenu/albumart.py
+index b8d0170..41372f0 100644
+--- a/quodlibet/quodlibet/ext/songsmenu/albumart.py
++++ b/quodlibet/quodlibet/ext/songsmenu/albumart.py
+@@ -331,6 +331,8 @@ class CoverArea(Gtk.VBox, PluginConfigMixin):
+         self.window_fit.connect('toggled', self.__scale_pixbuf)
+ 
+         self.name_combo = Gtk.ComboBoxText()
++        self.name_combo.set_tooltip_text(
++             _("See '[plugins] cover_filenames' config entry for filename strings."))
+ 
+         self.cmd = qltk.entry.ValidatingEntry(iscommand)
+ 
+@@ -349,30 +351,32 @@ class CoverArea(Gtk.VBox, PluginConfigMixin):
+ 
+         self.cmd.set_text(self.config_get('edit_cmd', 'gimp'))
+ 
+-        # Create the filename combo box
+-        fn_list = ['cover.jpg', 'folder.jpg', '.folder.jpg']
+-
++        # populate the filename combo box
++        fn_list = self.config_get_stringlist('filenames', ["cover.jpg", "folder.jpg", ".folder.jpg"])
+         # Issue 374 - add dynamic file names
++        fn_dynlist = []
+         artist = song("artist")
+         alartist = song("albumartist")
+         album = song("album")
+         labelid = song("labelid")
+         if album:
+-            fn_list.append("<album>.jpg")
++            fn_dynlist.append("<album>.jpg")
+             if alartist:
+-                fn_list.append("<albumartist> - <album>.jpg")
++                fn_dynlist.append("<albumartist> - <album>.jpg")
+             else:
+-                fn_list.append("<artist> - <album>.jpg")
++                fn_dynlist.append("<artist> - <album>.jpg")
+         else:
+             print_w(u"No album for \"%s\". Could be difficult "
+                     u"finding art…" % song("~filename"))
+             title = song("title")
+             if title and artist:
+-                fn_list.append("<artist> - <title>.jpg")
++                fn_dynlist.append("<artist> - <title>.jpg")
+         if labelid:
+-            fn_list.append("<labelid>.jpg")
++            fn_dynlist.append("<labelid>.jpg")
++        # merge unique
++        fn_list.extend(s for s in fn_dynlist if s not in fn_list)
+ 
+-        set_fn = self.config_get('fn', fn_list[0])
++        set_fn = self.config_get('filename', fn_list[0])
+ 
+         for i, fn in enumerate(fn_list):
+                 self.name_combo.append_text(fn)
+@@ -381,6 +385,7 @@ class CoverArea(Gtk.VBox, PluginConfigMixin):
+ 
+         if self.name_combo.get_active() < 0:
+             self.name_combo.set_active(0)
++        self.config_set('filename', self.name_combo.get_active_text())
+ 
+         table = Gtk.Table(n_rows=2, n_columns=2, homogeneous=False)
+         table.props.expand = False
+@@ -469,7 +474,7 @@ class CoverArea(Gtk.VBox, PluginConfigMixin):
+ 
+     def __save_config(self, widget):
+         self.config_set('edit_cmd', self.cmd.get_text())
+-        self.config_set('fn', self.name_combo.get_active_text())
++        self.config_set('filename', self.name_combo.get_active_text())
+ 
+     def __update(self, loader, *data):
+         """Update the picture while it's loading"""
+diff --git a/quodlibet/quodlibet/plugins/__init__.py b/quodlibet/quodlibet/plugins/__init__.py
+index 04190ef..bd6bb38 100644
+--- a/quodlibet/quodlibet/plugins/__init__.py
++++ b/quodlibet/quodlibet/plugins/__init__.py
+@@ -492,6 +492,12 @@ class PluginConfigMixin(object):
+         return config.getboolean(PM.CONFIG_SECTION, cls._config_key(name),
+                                  default)
+ 
++    @classmethod
++    def config_get_stringlist(cls, name, default=False):
++        """Gets a config string list for this plugin"""
++        return config.getstringlist(PM.CONFIG_SECTION, cls._config_key(name),
++                                 default)
++
+     def config_entry_changed(self, entry, key):
+         """React to a change in an gtk.Entry (by saving it to config)"""
+         if entry.get_property('sensitive'):
+-- 
+1.8.4
+
