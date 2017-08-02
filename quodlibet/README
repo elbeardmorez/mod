@@ -9,3 +9,11 @@
 the algorithm for construction of a final 'query to send'  based on user
 input is imperfect. allow users to override this if the results are off
 (e.g. missing words) whilst giving them insight into what's usually best.
+
+# expose.album.art.downloader.query.results.limit.diff [git sha:3715223ca4d23231570870104ddd8e3d207e7fd7 | pending]
+-the current engine defaults of 5 and 3 for Amazon and Discogs respectively
+ occassionally aren't enough to see the actual cover you want. this
+ change allows for more results
+-new overriding results limit takes the lower of current defaults - 3
+-REQUEST_LIMIT_MAX is hardcoded as 15 so users can't do anything too crazy
+-breaking change as it causes all engines to use the same user defined  limit
