@@ -1,0 +1,25 @@
+From 954cf9340fd636217c440a54aa70cb3777bacf83 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Wed, 2 Aug 2017 10:45:37 +0100
+Subject: fix use of complete file paths for relative renames
+
+---
+ quodlibet/quodlibet/qltk/renamefiles.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/quodlibet/quodlibet/qltk/renamefiles.py b/quodlibet/quodlibet/qltk/renamefiles.py
+index 489d79a..32dbd5f 100644
+--- a/quodlibet/quodlibet/qltk/renamefiles.py
++++ b/quodlibet/quodlibet/qltk/renamefiles.py
+@@ -316,7 +316,7 @@ class RenameFiles(Gtk.VBox):
+                     break
+ 
+             if moveart:
+-                self.__moveart(moveart_sets, old_pathfile, new_name, song)
++                self.__moveart(moveart_sets, old_pathfile, new_pathfile, song)
+ 
+             if removeemptydirs:
+                 path_old = os.path.dirname(old_pathfile)
+-- 
+1.8.4
+
