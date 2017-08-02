@@ -1,0 +1,106 @@
+From d683bcd1c634ee30320e378dcb6bdb54046e6c32 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Wed, 2 Aug 2017 11:07:31 +0100
+Subject: fix quality/style issues
+
+---
+ quodlibet/quodlibet/ext/songsmenu/albumart.py |  9 +++++++--
+ quodlibet/quodlibet/qltk/renamefiles.py       | 14 ++++++++------
+ 2 files changed, 15 insertions(+), 8 deletions(-)
+
+diff --git a/quodlibet/quodlibet/ext/songsmenu/albumart.py b/quodlibet/quodlibet/ext/songsmenu/albumart.py
+index 681c283..7dbc241 100644
+--- a/quodlibet/quodlibet/ext/songsmenu/albumart.py
++++ b/quodlibet/quodlibet/ext/songsmenu/albumart.py
+@@ -54,6 +54,7 @@ SEARCH_PATTERN = Pattern(
+ 
+ REQUEST_LIMIT_MAX = 15
+ 
++
+ def get_encoding_from_socket(socket):
+     content_type = socket.headers.get("Content-Type", "")
+     p = map(str.strip, map(str.lower, content_type.split(";")))
+@@ -333,7 +334,8 @@ class CoverArea(Gtk.VBox, PluginConfigMixin):
+ 
+         self.name_combo = Gtk.ComboBoxText()
+         self.name_combo.set_tooltip_text(
+-             _("See '[plugins] cover_filenames' config entry for filename strings."))
++             _("See '[plugins] cover_filenames' config entry " +
++               "for image filename strings"))
+ 
+         self.cmd = qltk.entry.ValidatingEntry(iscommand)
+ 
+@@ -353,7 +355,8 @@ class CoverArea(Gtk.VBox, PluginConfigMixin):
+         self.cmd.set_text(self.config_get('edit_cmd', 'gimp'))
+ 
+         # populate the filename combo box
+-        fn_list = self.config_get_stringlist('filenames', ["cover.jpg", "folder.jpg", ".folder.jpg"])
++        fn_list = self.config_get_stringlist('filenames',
++                      ["cover.jpg", "folder.jpg", ".folder.jpg"])
+         # Issue 374 - add dynamic file names
+         fn_dynlist = []
+         artist = song("artist")
+@@ -943,6 +946,7 @@ class CoverSearch(object):
+         progress = float(self.finished) / len(self.engine_list)
+         GLib.idle_add(self.callback, result, progress)
+ 
++
+ def cleanup_query(query, replace):
+     """split up at '-', remove some chars, only keep the longest words..
+     more false positives but much better results"""
+@@ -968,6 +972,7 @@ def cleanup_query(query, replace):
+ 
+     return new_query.rstrip()
+ 
++
+ def get_size_of_url(url):
+     request = Request(url)
+     request.add_header('Accept-Encoding', 'gzip')
+diff --git a/quodlibet/quodlibet/qltk/renamefiles.py b/quodlibet/quodlibet/qltk/renamefiles.py
+index 32dbd5f..cc2a5f5 100644
+--- a/quodlibet/quodlibet/qltk/renamefiles.py
++++ b/quodlibet/quodlibet/qltk/renamefiles.py
+@@ -177,7 +177,8 @@ class RenameFiles(Gtk.VBox):
+              _('_Move album art'),
+              "rename", "moveart", populate=True)
+         self.moveart.set_tooltip_text(
+-             _("See '[albumart] filenames' config entry for image search strings."))
++             _("See '[albumart] filenames' config entry " +
++               "for image search strings"))
+         self.moveart.show()
+         moveart_box.pack_start(self.moveart, False, True, 0)
+         self.moveart_overwrite = ConfigCheckButton(
+@@ -356,9 +357,9 @@ class RenameFiles(Gtk.VBox):
+         if len(images) > 0:
+             # set not empty yet, (re)process
+             filenames = config.getstringlist("albumart", "filenames")
+-            moves = [];
++            moves = []
+             for fn in filenames:
+-                fn = os.path.join(path_old, fn);
++                fn = os.path.join(path_old, fn)
+                 if "<" in fn:
+                     # resolve path
+                     fnres = ArbitraryExtensionFileFromPattern(fn).format(song)
+@@ -386,14 +387,15 @@ class RenameFiles(Gtk.VBox):
+                                 suffix = 1
+                                 while os.path.exists(fnmoveto_orig +
+                                                      "." + str(suffix)):
+-                                    suffix+=1
++                                    suffix += 1
+                                 fnmoveto_orig = (fnmoveto_orig +
+                                                  "." + str(suffix))
+                                 os.rename(fnmoveto, fnmoveto_orig)
+-                        print_d("Renaming image %r to %r" % (fnmove, fnmoveto), self)
++                        print_d("Renaming image %r to %r" %
++                                   (fnmove, fnmoveto), self)
+                         shutil.move(fnmove, fnmoveto)
+                         if overwrite and fnmoveto_orig:
+-                            os.remove(fnmoveto_orig);
++                            os.remove(fnmoveto_orig)
+                         images.remove(fnmove)
+                     except Exception:
+                         util.print_exc()
+-- 
+1.8.4
+

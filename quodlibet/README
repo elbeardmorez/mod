@@ -19,3 +19,5 @@ input is imperfect. allow users to override this if the results are off
 -breaking change as it causes all engines to use the same user defined  limit
 
 # fix.use.of.complete.file.paths.for.relative.renames.diff [git sha:954cf9340fd636217c440a54aa70cb3777bacf83 | pending]
+
+# fix.quality_style.issues.diff [git sha:d683bcd1c634ee30320e378dcb6bdb54046e6c32 | pending]
