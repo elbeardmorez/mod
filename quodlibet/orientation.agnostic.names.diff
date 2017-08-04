@@ -1,0 +1,74 @@
+From 7ff7d478997f3d6ee60539476475386a9b5d8e67 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Fri, 4 Aug 2017 07:53:58 +0100
+Subject: orientation agnostic names
+
+---
+ quodlibet/quodlibet/browsers/paned/main.py  | 4 ++--
+ quodlibet/quodlibet/browsers/paned/prefs.py | 2 +-
+ quodlibet/quodlibet/qltk/paned.py           | 2 +-
+ quodlibet/tests/test_qltk_paned.py          | 4 ++--
+ 4 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/quodlibet/quodlibet/browsers/paned/main.py b/quodlibet/quodlibet/browsers/paned/main.py
+index cf37cb5..d816e44 100644
+--- a/quodlibet/quodlibet/browsers/paned/main.py
++++ b/quodlibet/quodlibet/browsers/paned/main.py
+@@ -233,8 +233,8 @@ class PanedBrowser(Browser, util.InstanceTracker):
+         self.activate()
+         self._panes[-1].uninhibit()
+ 
+-    def make_pane_widths_equal(self):
+-        self.multi_paned.make_pane_widths_equal()
++    def make_pane_sizes_equal(self):
++        self.multi_paned.make_pane_sizes_equal()
+ 
+     def __get_filter_pane(self, key):
+         """Get the best pane for filtering etc."""
+diff --git a/quodlibet/quodlibet/browsers/paned/prefs.py b/quodlibet/quodlibet/browsers/paned/prefs.py
+index ca9341d..4be9343 100644
+--- a/quodlibet/quodlibet/browsers/paned/prefs.py
++++ b/quodlibet/quodlibet/browsers/paned/prefs.py
+@@ -236,7 +236,7 @@ class Preferences(qltk.UniqueWindow):
+             browser.set_all_panes()
+ 
+         if equal_width.get_active():
+-            browser.make_pane_widths_equal()
++            browser.make_pane_sizes_equal()
+ 
+         if close:
+             self.destroy()
+diff --git a/quodlibet/quodlibet/qltk/paned.py b/quodlibet/quodlibet/qltk/paned.py
+index adf6f47..35b3273 100644
+--- a/quodlibet/quodlibet/qltk/paned.py
++++ b/quodlibet/quodlibet/qltk/paned.py
+@@ -182,7 +182,7 @@ class MultiRPaned(object):
+ 
+         return self._root_paned
+ 
+-    def make_pane_widths_equal(self):
++    def make_pane_sizes_equal(self):
+         paneds = self._get_paneds()
+ 
+         # the relative paned widths must be equal to the reciprocal (1/i) of
+diff --git a/quodlibet/tests/test_qltk_paned.py b/quodlibet/tests/test_qltk_paned.py
+index 1d4076a..70e9db5 100644
+--- a/quodlibet/tests/test_qltk_paned.py
++++ b/quodlibet/tests/test_qltk_paned.py
+@@ -130,11 +130,11 @@ class TMultiRPaned(object):
+         self.assertIs(sws[1], sub_paned.get_child1())
+         self.assertIs(sws[2], sub_paned.get_child2())
+ 
+-    def test_make_pane_widths_equal(self):
++    def test_make_pane_sizes_equal(self):
+         p = self.Kind()
+         sws = [Gtk.ScrolledWindow() for _ in range(4)]
+         p.set_widgets(sws)
+-        p.make_pane_widths_equal()
++        p.make_pane_sizes_equal()
+ 
+         paneds = p._get_paneds()
+         self.failUnlessAlmostEqual(paneds[0].get_relative(), 1.0 / 4.0)
+-- 
+1.8.4
+
