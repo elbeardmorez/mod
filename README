@@ -81,4 +81,5 @@ a dumping ground for patches which modify or add functionality
 -fix.quality_style.issues.diff [git sha:d683bcd1c634ee30320e378dcb6bdb54046e6c32 | pending]
 -escape.special.glob.characters.diff [git sha:35da2605ca89984366c7eb0373a643acd51d33cb | pending]
 -orientation.agnostic.names.diff [git sha:7ff7d478997f3d6ee60539476475386a9b5d8e67 | pending]
+-exposed.multipaned.paned.set.diff [git sha:601d663d032be7d87a57988c4c99274fe4d6c393 | pending]
 

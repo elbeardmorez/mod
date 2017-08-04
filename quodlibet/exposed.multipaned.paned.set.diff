@@ -1,0 +1,107 @@
+From 601d663d032be7d87a57988c4c99274fe4d6c393 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Fri, 4 Aug 2017 08:13:51 +0100
+Subject: exposed multipaned paned set
+
+---
+ quodlibet/quodlibet/qltk/paned.py      | 12 ++++++------
+ quodlibet/tests/test_browsers_paned.py |  2 +-
+ quodlibet/tests/test_qltk_paned.py     |  4 ++--
+ 3 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/quodlibet/quodlibet/qltk/paned.py b/quodlibet/quodlibet/qltk/paned.py
+index 35b3273..0e1a9c5 100644
+--- a/quodlibet/quodlibet/qltk/paned.py
++++ b/quodlibet/quodlibet/qltk/paned.py
+@@ -183,7 +183,7 @@ class MultiRPaned(object):
+         return self._root_paned
+ 
+     def make_pane_sizes_equal(self):
+-        paneds = self._get_paneds()
++        paneds = self.get_paneds()
+ 
+         # the relative paned widths must be equal to the reciprocal (1/i) of
+         # their respective indices (i) in reverse order (from right to left)
+@@ -200,7 +200,7 @@ class MultiRPaned(object):
+         hor = Gtk.Orientation.HORIZONTAL
+         ver = Gtk.Orientation.VERTICAL
+ 
+-        for paned in self._get_paneds():
++        for paned in self.get_paneds():
+             paned.props.orientation = hor if horizontal else ver
+ 
+     def destroy(self):
+@@ -210,7 +210,7 @@ class MultiRPaned(object):
+     def show_all(self):
+         self._root_paned.show_all()
+ 
+-    def _get_paneds(self):
++    def get_paneds(self):
+         """Get all internal paneds in a flat, ordered list."""
+ 
+         paneds = [self._root_paned]
+@@ -245,7 +245,7 @@ class ConfigMultiRPaned(MultiRPaned):
+ 
+     def set_widgets(self, widgets):
+         super(ConfigMultiRPaned, self).set_widgets(widgets)
+-        paneds = self._get_paneds()
++        paneds = self.get_paneds()
+ 
+         # Connect all paneds
+         for paned in paneds:
+@@ -256,7 +256,7 @@ class ConfigMultiRPaned(MultiRPaned):
+     def save_widths(self):
+         """Save all current paned widths."""
+ 
+-        paneds = self._get_paneds()
++        paneds = self.get_paneds()
+         if len(paneds) == 1 and not paneds[0].get_child1():
+             # If there's only one pane (i.e. the only paned has just one
+             # child), do not save the paned width, as this will cause
+@@ -272,7 +272,7 @@ class ConfigMultiRPaned(MultiRPaned):
+         """Restore pane widths from the config."""
+ 
+         widths = config.getstringlist(self.section, self.option, [])
+-        paneds = self._get_paneds()
++        paneds = self.get_paneds()
+ 
+         if not widths:
+             # If no widths are saved, save the current widths
+diff --git a/quodlibet/tests/test_browsers_paned.py b/quodlibet/tests/test_browsers_paned.py
+index 7b3f452..30e545c 100644
+--- a/quodlibet/tests/test_browsers_paned.py
++++ b/quodlibet/tests/test_browsers_paned.py
+@@ -164,7 +164,7 @@ class TPanedBrowser(TestCase):
+         config.set("browsers", "panes", "artist\talbum\t~year\t~#track")
+         self.bar.set_all_panes()
+         self.bar.make_pane_widths_equal()
+-        paneds = self.bar.multi_paned._get_paneds()
++        paneds = self.bar.multi_paned.get_paneds()
+ 
+         self.failUnlessAlmostEqual(paneds[0].get_relative(), 1.0 / 4.0)
+         self.failUnlessAlmostEqual(paneds[1].get_relative(), 1.0 / 3.0)
+diff --git a/quodlibet/tests/test_qltk_paned.py b/quodlibet/tests/test_qltk_paned.py
+index 70e9db5..3cd29a1 100644
+--- a/quodlibet/tests/test_qltk_paned.py
++++ b/quodlibet/tests/test_qltk_paned.py
+@@ -152,7 +152,7 @@ class TMultiRPaned(object):
+             horizontal_opposite = False
+ 
+         p.change_orientation(horizontal=horizontal_opposite)
+-        for paned in p._get_paneds():
++        for paned in p.get_paneds():
+             self.assertIs(paned.props.orientation, opposite)
+ 
+     def test_destroy(self):
+@@ -182,7 +182,7 @@ class TConfigMultiRPaned(object):
+         sws = [Gtk.ScrolledWindow() for _ in range(3)]
+         p.set_widgets(sws)
+ 
+-        paneds = p._get_paneds()
++        paneds = p.get_paneds()
+         paneds[0].set_relative(0.4)
+         paneds[1].set_relative(0.6)
+         p.save_widths()
+-- 
+1.8.4
+
