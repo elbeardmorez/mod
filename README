@@ -83,4 +83,5 @@ a dumping ground for patches which modify or add functionality
 -orientation.agnostic.names.diff [git sha:7ff7d478997f3d6ee60539476475386a9b5d8e67 | pending]
 -exposed.multipaned.paned.set.diff [git sha:601d663d032be7d87a57988c4c99274fe4d6c393 | pending]
 -make.multirpaned.more.generic.diff [git sha:c52cfaf9c454d51ddcb8774ee9e04e6f79218dba | pending]
+-allow.custom.widget.packing.in.multipaned.diff [git sha:b0a1f923e17e9c678251f83831d7bad306a57480 | pending]
 

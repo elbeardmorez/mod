@@ -32,3 +32,5 @@ input is imperfect. allow users to override this if the results are off
 -add code path for absolute based sizing in 'make_pane_sizes_equal'
 -update relevant test
 -rename class to MultiPaned
+
+# allow.custom.widget.packing.in.multipaned.diff [git sha:b0a1f923e17e9c678251f83831d7bad306a57480 | pending]
