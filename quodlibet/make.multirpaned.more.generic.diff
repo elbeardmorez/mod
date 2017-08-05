@@ -1,0 +1,186 @@
+From c52cfaf9c454d51ddcb8774ee9e04e6f79218dba Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sat, 5 Aug 2017 07:52:12 +0100
+Subject: make MultiRPaned more generic
+
+-add code path for absolute based sizing in 'make_pane_sizes_equal'
+-update relevant test
+-rename class to MultiPaned
+---
+ quodlibet/quodlibet/qltk/paned.py  | 32 +++++++++++++++++++++-----------
+ quodlibet/tests/helper.py          |  5 +++++
+ quodlibet/tests/test_qltk_paned.py | 33 ++++++++++++++++++++++++---------
+ 3 files changed, 50 insertions(+), 20 deletions(-)
+
+diff --git a/quodlibet/quodlibet/qltk/paned.py b/quodlibet/quodlibet/qltk/paned.py
+index 0e1a9c5..af3e615 100644
+--- a/quodlibet/quodlibet/qltk/paned.py
++++ b/quodlibet/quodlibet/qltk/paned.py
+@@ -138,7 +138,7 @@ class ConfigRVPaned(ConfigRPaned):
+     ORIENTATION = Gtk.Orientation.VERTICAL
+ 
+ 
+-class MultiRPaned(object):
++class MultiPaned(object):
+     """A Paned that supports an unlimited number of panes."""
+ 
+     # The Paned type (horizontal or vertical)
+@@ -149,7 +149,7 @@ class MultiRPaned(object):
+ 
+         if self.PANED is None:
+             explanation = ("PANED is None. Do not directly"
+-                           "instantiate MultiRPaned, use"
++                           "instantiate MultiPaned, use"
+                            "one of its subclasses.")
+             raise AttributeError(explanation)
+ 
+@@ -191,8 +191,18 @@ class MultiRPaned(object):
+         # from zero- to one-indexed, and +1 for compensating that the last
+         # paned contains two panes
+         for i, paned in enumerate(reversed(paneds)):
+-            width = min(1.0 / (i + 2), 0.5)
+-            paned.set_relative(width)
++            proportion = min(1.0 / (i + 2), 0.5)
++            if isinstance(paned, RPaned):
++                # relative
++                paned.set_relative(proportion)
++            else:
++                # absolute
++                if paned.ORIENTATION == Gtk.Orientation.HORIZONTAL:
++                    paned.set_position(
++                        paned.get_allocation().width * proportion)
++                else:
++                    paned.set_position(
++                        paned.get_allocation().height * proportion)
+ 
+     def change_orientation(self, horizontal):
+         """Change the orientation of the paned."""
+@@ -228,23 +238,23 @@ class MultiRPaned(object):
+         return paneds
+ 
+ 
+-class MultiRHPaned(MultiRPaned):
++class MultiRHPaned(MultiPaned):
+     PANED = RHPaned
+ 
+ 
+-class MultiRVPaned(MultiRPaned):
++class MultiRVPaned(MultiPaned):
+     PANED = RVPaned
+ 
+ 
+-class ConfigMultiRPaned(MultiRPaned):
++class ConfigMultiPaned(MultiPaned):
+ 
+     def __init__(self, section, option):
+-        super(ConfigMultiRPaned, self).__init__()
++        super(ConfigMultiPaned, self).__init__()
+         self.section = section
+         self.option = option
+ 
+     def set_widgets(self, widgets):
+-        super(ConfigMultiRPaned, self).set_widgets(widgets)
++        super(ConfigMultiPaned, self).set_widgets(widgets)
+         paneds = self.get_paneds()
+ 
+         # Connect all paneds
+@@ -296,9 +306,9 @@ class ConfigMultiRPaned(MultiRPaned):
+         self.save_widths()
+ 
+ 
+-class ConfigMultiRHPaned(ConfigMultiRPaned):
++class ConfigMultiRHPaned(ConfigMultiPaned):
+     PANED = RHPaned
+ 
+ 
+-class ConfigMultiRVPaned(ConfigMultiRPaned):
++class ConfigMultiRVPaned(ConfigMultiPaned):
+     PANED = RVPaned
+diff --git a/quodlibet/tests/helper.py b/quodlibet/tests/helper.py
+index df061a4..37c1636 100644
+--- a/quodlibet/tests/helper.py
++++ b/quodlibet/tests/helper.py
+@@ -279,6 +279,11 @@ def temp_filename(*args, **kwargs):
+             raise
+ 
+ 
++def relatively_close(x, y, tolerance=0.01):
++    """Returns True if x is within tolerance of y, else returns False"""
++    return abs(x - y) <= tolerance * max(abs(x), abs(y))
++
++
+ def get_temp_copy(path):
+     """Returns a copy of the file with the same extension"""
+ 
+diff --git a/quodlibet/tests/test_qltk_paned.py b/quodlibet/tests/test_qltk_paned.py
+index 3cd29a1..11133a0 100644
+--- a/quodlibet/tests/test_qltk_paned.py
++++ b/quodlibet/tests/test_qltk_paned.py
+@@ -10,7 +10,7 @@ from quodlibet.qltk.paned import RVPaned, RHPaned, ConfigRVPaned, \
+ from quodlibet import config
+ 
+ from . import TestCase
+-from .helper import visible
++from .helper import visible, relatively_close
+ 
+ 
+ class TRPaned(object):
+@@ -91,7 +91,7 @@ class TConfigRPaned(TestCase):
+         self.failUnlessAlmostEqual(config_value, 0.10, 2)
+ 
+ 
+-class TMultiRPaned(object):
++class TMultiPaned(object):
+     Kind = None
+ 
+     def test_set_widgets(self):
+@@ -134,12 +134,27 @@ class TMultiRPaned(object):
+         p = self.Kind()
+         sws = [Gtk.ScrolledWindow() for _ in range(4)]
+         p.set_widgets(sws)
+-        p.make_pane_sizes_equal()
+ 
+-        paneds = p._get_paneds()
+-        self.failUnlessAlmostEqual(paneds[0].get_relative(), 1.0 / 4.0)
+-        self.failUnlessAlmostEqual(paneds[1].get_relative(), 1.0 / 3.0)
+-        self.failUnlessAlmostEqual(paneds[2].get_relative(), 1.0 / 2.0)
++        size = 500
++        with visible(p.get_paned(), size, size):
++            p.make_pane_sizes_equal()
++
++            paneds = p.get_paneds()
++
++            if isinstance(p.PANED(), RPaned):
++                self.failUnlessAlmostEqual(
++                    paneds[0].get_relative(), 1.0 / 4.0, 2)
++                self.failUnlessAlmostEqual(
++                    paneds[1].get_relative(), 1.0 / 3.0, 2)
++                self.failUnlessAlmostEqual(
++                    paneds[2].get_relative(), 1.0 / 2.0, 2)
++            else:
++                self.failUnless(
++                    relatively_close(paneds[0].get_position(), size / 4))
++                self.failUnless(
++                    relatively_close(paneds[1].get_position(), size / 4))
++                self.failUnless(
++                    relatively_close(paneds[2].get_position(), size / 4))
+ 
+     def test_change_orientation(self):
+         p = self.Kind()
+@@ -159,11 +174,11 @@ class TMultiRPaned(object):
+         self.Kind().destroy()
+ 
+ 
+-class TMultiRHPaned(TestCase, TMultiRPaned):
++class TMultiRHPaned(TestCase, TMultiPaned):
+     Kind = MultiRHPaned
+ 
+ 
+-class TMultiRVPaned(TestCase, TMultiRPaned):
++class TMultiRVPaned(TestCase, TMultiPaned):
+     Kind = MultiRVPaned
+ 
+ 
+-- 
+1.8.4
+
