@@ -85,4 +85,5 @@ a dumping ground for patches which modify or add functionality
 -make.multirpaned.more.generic.diff [git sha:c52cfaf9c454d51ddcb8774ee9e04e6f79218dba | pending]
 -allow.custom.widget.packing.in.multipaned.diff [git sha:b0a1f923e17e9c678251f83831d7bad306a57480 | pending]
 -add.'expander-aware'.x-paned.flavours.diff [git sha:11d45592218c27cead4e3c99c1f8a265a0536c17 | pending]
+-update.paned.definitions.diff [git sha:2c0ea887f325b938c04bcb5ab3c75c0f54ac5bcf | pending]
 

@@ -52,3 +52,5 @@ workaround employed uses do_allocate_size to remove locks and button
 releases to restore them. the unwanted result of this is that a resize
 MUST start by making the pane at least 1px BIGGER, before making it
 bigger OR smaller. in practice, this is not really noticable
+
+# update.paned.definitions.diff [git sha:2c0ea887f325b938c04bcb5ab3c75c0f54ac5bcf | pending]
