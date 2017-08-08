@@ -34,3 +34,21 @@ input is imperfect. allow users to override this if the results are off
 -rename class to MultiPaned
 
 # allow.custom.widget.packing.in.multipaned.diff [git sha:b0a1f923e17e9c678251f83831d7bad306a57480 | pending]
+
+# add.'expander-aware'.x-paned.flavours.diff [git sha:11d45592218c27cead4e3c99c1f8a265a0536c17 | pending]
+-adds XPaned base with H/V subclasses
+-adds Multi XPaned H/V subclasses of MultiPaned
+-implementation based on a single pane of 'x'-pane being set as
+expandable. work is then done to ensure that pane takes any space given
+by collapsed expanders, or resized panes
+-PaneLock objects are embedded into widgets who want to lock their own
+size during (necessarily) chaotic resizing operations
+-fixing sizes manually AND allowing for manual resizing is difficult.
+setting size requests locks the minimum pane sizes, which makes for
+sensible resizing 'of the pane you'd expect to be resized', but doing so means
+the panes cannot be made smaller. given the pane handle is unhookable in
+any useful way (right down to the Gtk core), the 'nearly perfect'
+workaround employed uses do_allocate_size to remove locks and button
+releases to restore them. the unwanted result of this is that a resize
+MUST start by making the pane at least 1px BIGGER, before making it
+bigger OR smaller. in practice, this is not really noticable
