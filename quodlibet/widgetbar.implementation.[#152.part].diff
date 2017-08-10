@@ -1,0 +1,632 @@
+From 27a964270934662fa73fac1b9e50d2d2145ee2a7 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Thu, 10 Aug 2017 10:56:01 +0100
+Subject: WidgetBar implementation [#152 part]
+
+-tied in as a UserInterfacePlugin
+---
+ quodlibet/po/POTFILES.in                    |   1 +
+ quodlibet/quodlibet/config.py               |   3 +
+ quodlibet/quodlibet/plugins/__init__.py     |  18 +++
+ quodlibet/quodlibet/plugins/gui.py          |  52 ++++++---
+ quodlibet/quodlibet/qltk/icons.py           |   1 +
+ quodlibet/quodlibet/qltk/quodlibetwindow.py | 173 +++++++++++++++++++++++++---
+ quodlibet/quodlibet/qltk/widgetbar.py       | 150 ++++++++++++++++++++++++
+ quodlibet/quodlibet/util/config.py          |   3 +-
+ 8 files changed, 370 insertions(+), 31 deletions(-)
+ create mode 100644 quodlibet/quodlibet/qltk/widgetbar.py
+
+diff --git a/quodlibet/po/POTFILES.in b/quodlibet/po/POTFILES.in
+index ad3afbd..ea37df4 100644
+--- a/quodlibet/po/POTFILES.in
++++ b/quodlibet/po/POTFILES.in
+@@ -195,6 +195,7 @@ quodlibet/qltk/tracker.py
+ quodlibet/qltk/tracknumbers.py
+ quodlibet/qltk/unity.py
+ quodlibet/qltk/views.py
++quodlibet/qltk/widgetbar.py
+ quodlibet/qltk/wlw.py
+ quodlibet/qltk/x.py
+ quodlibet/update.py
+diff --git a/quodlibet/quodlibet/config.py b/quodlibet/quodlibet/config.py
+index bf15288..164917c 100644
+--- a/quodlibet/quodlibet/config.py
++++ b/quodlibet/quodlibet/config.py
+@@ -96,6 +96,9 @@ INITIAL = {
+         "column_widths": "",
+ 
+         "column_expands": "",
++
++        # pane order
++        "pane_order": "playbar,main",
+     },
+ 
+     "browsers": {
+diff --git a/quodlibet/quodlibet/plugins/__init__.py b/quodlibet/quodlibet/plugins/__init__.py
+index 04190ef..101ba54 100644
+--- a/quodlibet/quodlibet/plugins/__init__.py
++++ b/quodlibet/quodlibet/plugins/__init__.py
+@@ -492,6 +492,15 @@ class PluginConfigMixin(object):
+         return config.getboolean(PM.CONFIG_SECTION, cls._config_key(name),
+                                  default)
+ 
++    @classmethod
++    def config_get_stringlist(cls, name, default=False):
++        """Gets a config string list for this plugin"""
++        return config.getstringlist(PM.CONFIG_SECTION, cls._config_key(name),
++                                 default)
++
++    def __get__(self, *args, **kwargs):
++        return self._conf.getfloat(self._name)
++
+     def config_entry_changed(self, entry, key):
+         """React to a change in an gtk.Entry (by saving it to config)"""
+         if entry.get_property('sensitive'):
+@@ -544,6 +553,15 @@ class FloatConfProp(ConfProp):
+         return self._conf.getfloat(self._name)
+ 
+ 
++class StringListConfProp(ConfProp):
++
++    def __get__(self, *args, **kwargs):
++        return self._conf.getstringlist(self._name)
++
++    def __set__(self, obj, value):
++        self._conf.setstringlist(self._name, value)
++
++
+ def str_to_color_tuple(s):
+     """Raises ValueError"""
+ 
+diff --git a/quodlibet/quodlibet/plugins/gui.py b/quodlibet/quodlibet/plugins/gui.py
+index 0217a56..23e261c 100644
+--- a/quodlibet/quodlibet/plugins/gui.py
++++ b/quodlibet/quodlibet/plugins/gui.py
+@@ -1,6 +1,7 @@
+ # -*- coding: utf-8 -*-
+-# Copyright 2014, 2016 Nick Boultbee
++# Copyright 2014, 2016-2017 Nick Boultbee
+ #                 2015 Christoph Reiter
++#                 2017 Pete Beardmore
+ #
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License version 2 as
+@@ -15,7 +16,8 @@ from gi.repository import Gtk
+ 
+ class UserInterfacePlugin(object):
+     """Plugins that provide a (Gtk+ Widget)
+-    to display as a side bar (currently) in the main Quod Libet Window.
++    to display as a either side bar or widget bar (currently) in the
++    main Quod Libet Window.
+ 
+     These can be combined well with an EventPlugin to listen for
+     current song or selection changes.
+@@ -29,31 +31,55 @@ class UserInterfacePlugin(object):
+         """If defined, returns a Gtk.Box to populate the sidebar"""
+         pass
+ 
++    def create_widgetbar(self):
++        """If defined, returns a Gtk.Box to populate the widgetbar"""
++        pass
++
+ 
+ class UserInterfacePluginHandler(PluginHandler):
+     def __init__(self):
+ 
+         self.__plugins = {}
+         self.__sidebars = {}
++        self.__widgetbars = {}
+ 
+     def plugin_handle(self, plugin):
+         return issubclass(plugin.cls, UserInterfacePlugin)
+ 
+     def plugin_enable(self, plugin):
+         self.__plugins[plugin.cls] = pl_obj = plugin.get_instance()
+-        sidebar = pl_obj.create_sidebar()
+-        app.window.hide_side_book()
+-        if sidebar:
+-            print_d("Enabling sidebar for %s" % plugin.cls)
+-            self.__sidebars[plugin] = app.window.add_sidebar(
+-                sidebar, name=plugin.name)
+-            sidebar.show_all()
++
++        # sidebars
++        if hasattr(pl_obj, 'create_sidebar'):
++            sidebar = pl_obj.create_sidebar()
++            app.window.hide_side_book()
++            if sidebar:
++                print_d("Enabling sidebar for %s" % plugin.cls)
++                self.__sidebars[plugin] = app.window.add_sidebar(
++                    sidebar, name=plugin.name)
++                sidebar.show_all()
++
++        # widgetbars
++        if hasattr(pl_obj, 'create_widgetbar'):
++            widgetbar = pl_obj.create_widgetbar()
++            if widgetbar:
++                print_d("Enabling widgetbar for %s" % plugin.cls)
++                self.__widgetbars[plugin] = widgetbar
++                app.window.add_widgetbar(widgetbar)
++                widgetbar.show_all()
+ 
+     def plugin_disable(self, plugin):
+-        widget = self.__sidebars.get(plugin)
+-        if widget:
+-            print_d("Removing sidebar %s" % widget)
+-            app.window.remove_sidebar(widget)
++
++        if plugin in self.__sidebars:
++            sidebar = self.__sidebars.get(plugin)
++            if sidebar:
++                print_d("Removing sidebar %s" % sidebar)
++                app.window.remove_sidebar(sidebar)
++        elif plugin in self.__widgetbars:
++            widgetbar = self.__widgetbars.get(plugin)
++            if widgetbar:
++                print_d("Removing widgetbar %s" % widgetbar)
++                app.window.remove_widgetbar(plugin.id)
+         self.__plugins.pop(plugin.cls)
+ 
+ 
+diff --git a/quodlibet/quodlibet/qltk/icons.py b/quodlibet/quodlibet/qltk/icons.py
+index 5da4a99..6810b43 100644
+--- a/quodlibet/quodlibet/qltk/icons.py
++++ b/quodlibet/quodlibet/qltk/icons.py
+@@ -98,6 +98,7 @@ class Icons(str):
+     PREFERENCES_SYSTEM = "preferences-system"  # "_Preferences"
+     PREFERENCES_DESKTOP_SCREENSAVER = "preferences-desktop-screensaver"
+     PREFERENCES_DESKTOP_THEME = "preferences-desktop-theme"
++    PREFERENCES_PLUGIN = "preferences-plugin"
+     PROCESS_STOP = "process-stop"  # "_Stop"
+     SYSTEM_RUN = "system-run"  # "_Execute"
+     SYSTEM_SEARCH = "system-search"
+diff --git a/quodlibet/quodlibet/qltk/quodlibetwindow.py b/quodlibet/quodlibet/qltk/quodlibetwindow.py
+index dd702e4..936344b 100644
+--- a/quodlibet/quodlibet/qltk/quodlibetwindow.py
++++ b/quodlibet/quodlibet/qltk/quodlibetwindow.py
+@@ -10,6 +10,7 @@
+ 
+ import os
+ 
++from itertools import groupby
+ from gi.repository import Gtk, Gdk, GLib, Gio, GObject
+ from senf import uri2fsn, fsnative, path2fsn
+ 
+@@ -44,12 +45,14 @@ from quodlibet.qltk.notif import StatusBar, TaskController
+ from quodlibet.qltk.playorder import PlayOrderWidget, RepeatSongForever, \
+     RepeatListForever
+ from quodlibet.qltk.pluginwin import PluginWindow
++from quodlibet.plugins import PluginManager
+ from quodlibet.qltk.properties import SongProperties
+ from quodlibet.qltk.prefs import PreferencesWindow
+ from quodlibet.qltk.queue import QueueExpander
+ from quodlibet.qltk.songlist import SongList, get_columns, set_columns
+ from quodlibet.qltk.songmodel import PlaylistMux
+-from quodlibet.qltk.x import RVPaned, Align, ScrolledWindow, Action
++from quodlibet.qltk.x import RVPaned, MultiXVPaned, PaneLock,\
++                             Align, ScrolledWindow, Action
+ from quodlibet.qltk.x import ToggleAction, RadioAction, HighlightToggleButton
+ from quodlibet.qltk.x import SeparatorMenuItem, MenuItem, CellRendererPixbuf
+ from quodlibet.qltk import Icons
+@@ -298,9 +301,14 @@ class MainSongList(SongList):
+ 
+ 
+ class TopBar(Gtk.Toolbar):
+-    def __init__(self, parent, player, library):
++    def __init__(self, id, parent, player, library):
+         super(TopBar, self).__init__()
+ 
++        self.id = id
++        self.panelock = PaneLock(self.id, Gtk.Orientation.VERTICAL, 0)
++        self.panelock.size = config.getint("memory", self.id + "_size", 0)
++        self.set_size_request(-1, self.panelock.size)
++
+         # play controls
+         control_item = Gtk.ToolItem()
+         self.insert(control_item, 0)
+@@ -356,6 +364,13 @@ class TopBar(Gtk.Toolbar):
+         context = self.get_style_context()
+         context.add_class("primary-toolbar")
+ 
++        self.connect('size_allocate', self.__size_allocate)
++        self.connect("destroy", self.__destroy)
++
++    def __size_allocate(self, widget, allocation):
++        if self.get_realized():
++            self.panelock.size_allocate(allocation)
++
+     def set_seekbar_widget(self, widget):
+         children = self._pattern_box.get_children()
+         if len(children) > 1:
+@@ -373,6 +388,12 @@ class TopBar(Gtk.Toolbar):
+     def __song_art_changed(self, player, songs, library):
+         self.image.refresh()
+ 
++    def __destroy(self, *args):
++        self.__save()
++
++    def __save(self):
++        config.set("memory", self.id + "_size", self.panelock.size)
++
+ 
+ class QueueButton(HighlightToggleButton):
+ 
+@@ -744,16 +765,26 @@ class QuodLibetWindow(Window, PersistentWindowMixin, AppWindow):
+         self.playlist = PlaylistMux(
+             player, self.qexpander.model, self.songlist.model)
+ 
+-        top_bar = TopBar(self, player, library)
+-        main_box.pack_start(top_bar, False, True, 0)
++        # ui elements set
++        self.uielements = {}
++
++        top_bar = TopBar('playbar', self, player, library)
+         self.top_bar = top_bar
++        self.uielements['playbar'] = top_bar
+ 
+-        self.__browserbox = Align(bottom=3)
+-        self.__paned = paned = ConfigRHPaned("memory", "sidebar_pos", 0.25)
+-        paned.pack1(self.__browserbox, resize=True)
+-        # We'll pack2 when necessary (when the first sidebar plugin is set up)
++        # nested paneds supporting config read/write and expander widget bars
++        self.__multipaned = MultiXVPaned()
+ 
+-        main_box.pack_start(paned, True, True, 0)
++        # box for 'dynamic' paneds
++        self.__dynelements_box = Align()
++        main_box.pack_start(self.__dynelements_box, True, True, 4)
++
++        # browser / sidebar
++        self.__browserbox = Gtk.VBox()
++        self.__browserpaned = ConfigRHPaned("memory", "sidebar_pos", 0.25)
++        self.__browserpaned.pack1(self.__browserbox, resize=True)
++        # pack2 when the first sidebar plugin is set up
++        self.uielements['main'] = self.__browserpaned
+ 
+         play_order = PlayOrderWidget(self.songlist.model, player)
+         statusbox = StatusBarBox(play_order, self.qexpander)
+@@ -761,11 +792,9 @@ class QuodLibetWindow(Window, PersistentWindowMixin, AppWindow):
+         self.statusbar = statusbox.statusbar
+ 
+         main_box.pack_start(
+-            Align(statusbox, border=3, top=-3),
+-            False, True, 0)
++            Align(statusbox, border=6), False, False, 0)
+ 
+         self.songpane = SongListPaned(self.song_scroller, self.qexpander)
+-        self.songpane.show_all()
+ 
+         try:
+             orders = []
+@@ -779,8 +808,6 @@ class QuodLibetWindow(Window, PersistentWindowMixin, AppWindow):
+         self.browser = None
+         self.ui = ui
+ 
+-        main_box.show_all()
+-
+         self._playback_error_dialog = None
+         connect_destroy(player, 'song-started', self.__song_started)
+         connect_destroy(player, 'paused', self.__update_paused, True)
+@@ -834,6 +861,98 @@ class QuodLibetWindow(Window, PersistentWindowMixin, AppWindow):
+ 
+         self.enable_window_tracking("quodlibet")
+ 
++        self.update_ui()
++
++    def update_ui(self):
++
++        uielements = self.get_uielements()
++
++        # unparent all ui elements
++        if self.__dynelements_box.get_children():
++            for w in uielements:
++                parent = w.get_parent()
++                if parent:
++                    parent.remove(w)
++            self.__dynelements_box.remove(
++                self.__dynelements_box.get_children()[0])
++
++        # add ui elements to multipane
++        print_d("adding %d widgets to multipane" % len(uielements))
++        self.__multipaned.set_widgets(uielements, [(False, False)])
++
++        # ensure initial panelocks
++        for w in uielements:
++            if hasattr(w, 'panelock') and not (isinstance(w, Gtk.Expander)
++                                               and not w.get_expanded()):
++                print_d("%r | setting panelock size: %d" %
++                            (w.id, w.panelock.size))
++                if w.panelock.orientation == Gtk.Orientation.VERTICAL:
++                    w.set_size_request(-1, w.panelock.size)
++                else:
++                    w.set_size_request(w.panelock.size, -1)
++                w.get_parent().queue_resize()
++
++        # expand browser only, implicitly meaning any pane in which it nests
++        w = self.uielements['main']
++        while w.get_parent():
++            p = w.get_parent()
++            if isinstance(p, Gtk.Paned):
++                if w == p.get_child1():
++                    p.remove(w)
++                    p.pack1(w, True, False)
++                else:
++                    p.remove(w)
++                    p.pack2(w, True, False)
++            w = p
++
++        self.__dynelements_box.add(self.__multipaned.get_paned())
++
++        self.show_all()
++
++    def get_uielements(self):
++
++        order = config.getstringlist('memory', 'pane_order') # default only
++
++        widgetbars = self.widgetbars_enabled
++        if widgetbars:
++            order = config.getstringlist('plugins', 'widgetbars_pane_order')
++
++        if 'main' not in order:
++            order = ['main'] + order
++
++        # remove dupes, maintain order
++        order = [s for s, _ in groupby(
++                    sorted(order, key=lambda s: order.index(s)))]
++
++        self.uielements_ordered = \
++            [self.uielements[key] for key in order
++                if key in self.uielements.keys()]
++
++        if widgetbars:
++            # keep 'missing'
++            extra = [key for key in self.uielements.keys()
++                    if key not in order]
++            order.extend(extra)
++
++            self.uielements_ordered.extend(
++                [val for key, val in self.uielements.items()
++                    if key in extra])
++
++        print_d("%d ui elements live:" % len(self.uielements_ordered))
++        for w in self.uielements_ordered:
++            print_d("%r" % w)
++
++        return self.uielements_ordered
++
++    @property
++    def widgetbars_enabled(self):
++        pm = PluginManager.instance
++        if not pm:
++            return False
++        widgetbars_plugin =\
++            next((p for p in pm.plugins if p.id == "widgetbars"), None)
++        return widgetbars_plugin and pm.enabled(widgetbars_plugin)
++
+     def hide_side_book(self):
+         self.side_book.hide()
+ 
+@@ -852,18 +971,37 @@ class QuodLibetWindow(Window, PersistentWindowMixin, AppWindow):
+         self.side_book.remove_page(self.side_book.page_num(widget))
+         if self.side_book_empty:
+             print_d("Hiding sidebar")
+-            self.__paned.remove(self.__paned.get_children()[1])
++            self.__browserpaned.remove(self.__browserpaned.get_children()[1])
+ 
+     def add_sidebar_to_layout(self, widget):
+         print_d("Recreating sidebar")
+         align = Align(widget, top=6, bottom=3)
+-        self.__paned.pack2(align, shrink=True)
++        self.__browserpaned.pack2(align, shrink=True)
+         align.show_all()
+ 
+     @property
+     def side_book_empty(self):
+         return not self.side_book.get_children()
+ 
++    def add_widgetbar(self, widgetbar):
++
++        # check pool
++        if widgetbar.id in self.uielements.keys():
++            del self.uielements[widgetbar.id]
++
++        # add new
++        self.uielements[widgetbar.id] = widgetbar
++        self.update_ui()
++
++        return widgetbar
++
++    def remove_widgetbar(self, id):
++        if id in self.uielements.keys():
++            del self.uielements[id]
++            self.update_ui()
++            return True
++        return False
++
+     def set_seekbar_widget(self, widget):
+         """Add an alternative seek bar widget.
+ 
+@@ -1262,8 +1400,9 @@ class QuodLibetWindow(Window, PersistentWindowMixin, AppWindow):
+ 
+         player.replaygain_profiles[1] = self.browser.replaygain_profiles
+         player.reset_replaygain()
+-        self.__browserbox.add(container)
++        self.__browserbox.pack_start(container, True, True, 3)
+         container.show()
++
+         self._filter_menu.set_browser(self.browser)
+         self.__hide_headers()
+ 
+diff --git a/quodlibet/quodlibet/qltk/widgetbar.py b/quodlibet/quodlibet/qltk/widgetbar.py
+new file mode 100644
+index 0000000..7dae977
+--- /dev/null
++++ b/quodlibet/quodlibet/qltk/widgetbar.py
+@@ -0,0 +1,150 @@
++# -*- coding: utf-8 -*-
++# Copyright 2017 Pete Beardmore
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License version 2 as
++# published by the Free Software Foundation
++
++import os
++from quodlibet.qltk.pluginwin import PluginWindow
++from quodlibet.plugins import PluginManager
++
++from quodlibet import config
++from quodlibet.util import print_d
++from quodlibet import _
++
++from quodlibet.qltk import get_top_parent
++from quodlibet.qltk import Icons
++from quodlibet.qltk.menubutton import SmallMenuButton
++from quodlibet.qltk.x import ScrolledWindow, SymbolicIconImage, \
++    SmallImageButton, MenuItem, PaneLock
++
++from gi.repository import Gtk
++
++
++class WidgetBar(Gtk.Expander):
++
++    def __init__(self, id):
++        super(WidgetBar, self).__init__(spacing=1)
++
++        self.id = id
++        self.panelock = PaneLock(self.id, Gtk.Orientation.VERTICAL, 100)
++        self.panelock.size = config.getint("plugins",
++                                 self.id + "_size", self.default_size)
++
++        self.title = Gtk.Label()
++        self.title.set_alignment(0.0, 0.5)
++        self.set_label_widget(self.title)
++        title_height = self.get_label_widget().get_allocation().height
++
++        expanded = config.getboolean("plugins", self.id + "_expanded", True)
++
++        self.set_size_request(-1, self.panelock.size if expanded
++                                                     else title_height + 5)
++
++        self.scroll = ScrolledWindow()
++        self.scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.NEVER)
++        self.scroll.set_shadow_type(Gtk.ShadowType.NONE)
++
++        self.preferences_cb = self.__preferences
++
++        outer = Gtk.HBox()
++        self.box_left = Gtk.HBox()
++        self.box_right = Gtk.HBox()
++        self.box = Gtk.HBox()
++        controls_box = Gtk.VBox()
++
++        outer.pack_start(self.box_left, False, False, 0)
++        self.scroll.add(self.box)
++        outer.pack_start(self.scroll, True, True, 0)
++        outer.pack_start(self.box_right, False, False, 0)
++        outer.pack_end(controls_box, False, False, 0)
++
++        self.menu = Gtk.Menu()
++        menuitem_prefs = MenuItem(_("_Preferences"), Icons.EDIT_CLEAR)
++        self.menu.append(menuitem_prefs)
++        menuitem_prefs.connect("activate", self.preferences)
++
++        button_menu = SmallMenuButton(
++            SymbolicIconImage(Icons.EMBLEM_SYSTEM, Gtk.IconSize.MENU),
++            arrow=True)
++        button_menu.set_relief(Gtk.ReliefStyle.NONE)
++        button_menu.show_all()
++        button_menu.set_no_show_all(True)
++        self.menu.show_all()
++        button_menu.set_menu(self.menu)
++
++        aligntop = Gtk.Alignment()
++        aligntop.set(1.0, 0.5, 0, 0)
++        aligntop.add(button_menu)
++        controls_box.pack_start(aligntop, False, True, 0)
++
++        button_close = SmallImageButton(
++            image=SymbolicIconImage("window-close", Gtk.IconSize.MENU),
++            relief=Gtk.ReliefStyle.NONE)
++        button_close.connect("clicked", lambda *x: self.__disable())
++        controls_box.pack_end(button_close, False, True, 0)
++
++        self.title.set_text(self.id)
++        self.add(outer)
++
++        self.connect('notify::expanded', self.__expand, button_menu)
++        self.connect('size_allocate', self.__size_allocate)
++        self.connect("destroy", self.__destroy)
++
++        self.set_expanded(expanded)
++
++    @property
++    def default_size(self):
++        return self.panelock.default_size
++
++    @default_size.setter
++    def default_size(self, value):
++        self.panelock.default_size = value
++
++    def preferences(self, data):
++        if self.preferences_cb:
++            self.preferences_cb()
++
++    def __preferences(self):
++        plugins_window = PluginWindow(get_top_parent(self))
++        plugins_window.show()
++        if id:
++            plugins_window.move_to(self.id)
++
++    def __expand(self, widget, prop, menu_button):
++        expanded = self.get_expanded()
++        config.set("plugins", self.id + "_expanded", str(expanded))
++
++        if self.get_parent():
++            self.panelock.updating = True
++            self.get_parent().update(self)
++            self.get_parent().check_resize()
++            self.panelock.updating = False
++
++    def __disable(self):
++        pm = PluginManager.instance
++        plugin = next((p for p in pm.plugins if p.id == self.id), None)
++        if plugin:
++            pm.enable(plugin, False)
++            pm.save()
++        self.__save()
++
++    def __destroy(self, *args):
++        # no guarantee that this will be called -> :(
++        self.__save()
++
++    def __save(self):
++        config.set("plugins", self.id + "_size", self.panelock.size)
++
++    def __size_allocate(self, widget, allocation):
++
++        if not self.get_expanded():
++            title_height = self.get_label_widget().get_allocation().height
++            self.set_size_request(-1, title_height + 5)
++        self.get_parent().queue_resize()
++        self.get_parent().check_resize()
++
++        self.panelock.size_allocate(allocation)
++        # persistence overkill as __destroy failing
++        config.set("plugins", self.id + "_size", self.panelock.size)
+diff --git a/quodlibet/quodlibet/util/config.py b/quodlibet/quodlibet/util/config.py
+index 76ff4a9..7ad9c37 100644
+--- a/quodlibet/quodlibet/util/config.py
++++ b/quodlibet/quodlibet/util/config.py
+@@ -476,7 +476,8 @@ class ConfigProxy(object):
+ 
+         # methods starting with a section arg
+         for name in ["get", "set", "getboolean", "getint", "getfloat",
+-                     "reset", "settext", "gettext", "getbytes", "setbytes"]:
++                     "reset", "settext", "gettext", "getbytes", "setbytes",
++                     "getstringlist", "setstringlist"]:
+             setattr(cls, name, get_func(name))
+ 
+ ConfigProxy._init_wrappers()
+-- 
+1.8.4
+
