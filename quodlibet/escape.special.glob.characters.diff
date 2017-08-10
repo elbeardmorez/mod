@@ -1,0 +1,33 @@
+From 35da2605ca89984366c7eb0373a643acd51d33cb Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Thu, 10 Aug 2017 19:38:47 +0100
+Subject: escape special glob characters
+
+---
+ quodlibet/quodlibet/qltk/renamefiles.py | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/quodlibet/quodlibet/qltk/renamefiles.py b/quodlibet/quodlibet/qltk/renamefiles.py
+index cc2a5f5..3a506e7 100644
+--- a/quodlibet/quodlibet/qltk/renamefiles.py
++++ b/quodlibet/quodlibet/qltk/renamefiles.py
+@@ -352,8 +352,15 @@ class RenameFiles(Gtk.VBox):
+         else:
+             art_sets[path_old] = images
+             # generate art set for path
++            def glob_escape(s):
++                for c in [ '[', '*', '?' ]:
++                    s = s.replace(c, '[' + c + ']')
++                return s
++
++            path_old_escaped = glob_escape(path_old)
+             for suffix in self.IMAGE_EXTENSIONS:
+-                images.extend(glob.glob(os.path.join(path_old, "*." + suffix)))
++                images.extend(glob.glob(os.path.join(path_old_escaped,
++                                                     "*." + suffix)))
+         if len(images) > 0:
+             # set not empty yet, (re)process
+             filenames = config.getstringlist("albumart", "filenames")
+-- 
+1.8.4
+

@@ -79,4 +79,5 @@ a dumping ground for patches which modify or add functionality
 -expose.album.art.downloader.query.results.limit.diff [git sha:3715223ca4d23231570870104ddd8e3d207e7fd7 | pending]
 -fix.use.of.complete.file.paths.for.relative.renames.diff [git sha:954cf9340fd636217c440a54aa70cb3777bacf83 | pending]
 -fix.quality_style.issues.diff [git sha:d683bcd1c634ee30320e378dcb6bdb54046e6c32 | pending]
+-escape.special.glob.characters.diff [git sha:35da2605ca89984366c7eb0373a643acd51d33cb | pending]
 
