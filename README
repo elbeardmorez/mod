@@ -87,4 +87,5 @@ a dumping ground for patches which modify or add functionality
 -add.'expander-aware'.x-paned.flavours.diff [git sha:11d45592218c27cead4e3c99c1f8a265a0536c17 | pending]
 -update.paned.definitions.diff [git sha:2c0ea887f325b938c04bcb5ab3c75c0f54ac5bcf | pending]
 -widgetbar.implementation.[#152.part].diff [git sha:27a964270934662fa73fac1b9e50d2d2145ee2a7 | pending]
+-expose.a.plugin.toggled.event.from.pluginmanager.diff [git sha:8cecbcaa27d69b882a2910570486bd0f33a91225 | pending]
 

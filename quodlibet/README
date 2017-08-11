@@ -57,3 +57,5 @@ bigger OR smaller. in practice, this is not really noticable
 
 # widgetbar.implementation.[#152.part].diff [git sha:27a964270934662fa73fac1b9e50d2d2145ee2a7 | pending]
 -tied in as a UserInterfacePlugin
+
+# expose.a.plugin.toggled.event.from.pluginmanager.diff [git sha:8cecbcaa27d69b882a2910570486bd0f33a91225 | pending]
