@@ -59,3 +59,5 @@ bigger OR smaller. in practice, this is not really noticable
 -tied in as a UserInterfacePlugin
 
 # expose.a.plugin.toggled.event.from.pluginmanager.diff [git sha:8cecbcaa27d69b882a2910570486bd0f33a91225 | pending]
+
+# simple.widgetbars.eventplugin.diff [git sha:584cbc75a4b05d781a59c45b3087c0da3b7e7b6e | pending]
