@@ -1,0 +1,30 @@
+From 9d86de6fca4daf900f3cef8dfebfba72cf3df009 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sun, 13 Aug 2017 08:57:52 +0100
+Subject: persistent moveable big images
+
+-identical single-click destroy feature as the 'POPUP' window type,
+ but with extra benefits
+---
+ quodlibet/quodlibet/qltk/cover.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/quodlibet/quodlibet/qltk/cover.py b/quodlibet/quodlibet/qltk/cover.py
+index 5cafd26..8be3c4a 100644
+--- a/quodlibet/quodlibet/qltk/cover.py
++++ b/quodlibet/quodlibet/qltk/cover.py
+@@ -27,8 +27,10 @@ class BigCenteredImage(qltk.Window):
+     This might leak memory, but it could just be Python's GC being dumb."""
+ 
+     def __init__(self, title, fileobj, parent):
+-        super(BigCenteredImage, self).__init__(type=Gtk.WindowType.POPUP)
++        super(BigCenteredImage, self).__init__()
+         self.set_type_hint(Gdk.WindowTypeHint.TOOLTIP)
++        self.set_skip_taskbar_hint(True)
++        self.set_decorated(False)
+ 
+         assert parent
+         parent = qltk.get_top_parent(parent)
+-- 
+1.8.4
+

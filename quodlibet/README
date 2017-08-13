@@ -63,3 +63,7 @@ bigger OR smaller. in practice, this is not really noticable
 # simple.widgetbars.eventplugin.diff [git sha:584cbc75a4b05d781a59c45b3087c0da3b7e7b6e | pending]
 
 # return.default.1x1.for.invalid.image.scaling.diff [git sha:ab552b5efbe790015cf35d43a21fb39d6432a079 | pending]
+
+# persistent.moveable.big.images.diff [git sha:9d86de6fca4daf900f3cef8dfebfba72cf3df009 | pending]
+-identical single-click destroy feature as the 'POPUP' window type,
+ but with extra benefits
