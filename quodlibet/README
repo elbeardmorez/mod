@@ -67,3 +67,7 @@ bigger OR smaller. in practice, this is not really noticable
 # persistent.moveable.big.images.diff [git sha:9d86de6fca4daf900f3cef8dfebfba72cf3df009 | pending]
 -identical single-click destroy feature as the 'POPUP' window type,
  but with extra benefits
+
+# support.multiple.big.images.diff [git sha:9a6b8ed4749bd7dd961cf135f32423fc07d4fb54 | pending]
+-allows multiple big images to remain visible from a single CoverImage
+-toggled via the config 'settings -> multiple_big_images' bool

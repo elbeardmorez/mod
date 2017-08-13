@@ -91,4 +91,5 @@ a dumping ground for patches which modify or add functionality
 -simple.widgetbars.eventplugin.diff [git sha:584cbc75a4b05d781a59c45b3087c0da3b7e7b6e | pending]
 -return.default.1x1.for.invalid.image.scaling.diff [git sha:ab552b5efbe790015cf35d43a21fb39d6432a079 | pending]
 -persistent.moveable.big.images.diff [git sha:9d86de6fca4daf900f3cef8dfebfba72cf3df009 | pending]
+-support.multiple.big.images.diff [git sha:9a6b8ed4749bd7dd961cf135f32423fc07d4fb54 | pending]
 
