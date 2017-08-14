@@ -93,4 +93,5 @@ a dumping ground for patches which modify or add functionality
 -persistent.moveable.big.images.diff [git sha:9d86de6fca4daf900f3cef8dfebfba72cf3df009 | pending]
 -support.multiple.big.images.diff [git sha:9a6b8ed4749bd7dd961cf135f32423fc07d4fb54 | pending]
 -coverswidgetbar.plugin.diff [git sha:52e11ef3d86beb92629c2f01dfe233bd7135fb59 | pending]
+-update.default.widgetbars.tooltip.example.diff [git sha:58f937c9e6c241a72984dbc83660c1b1a0850c89 | pending]
 

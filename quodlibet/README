@@ -73,3 +73,5 @@ bigger OR smaller. in practice, this is not really noticable
 -toggled via the config 'settings -> multiple_big_images' bool
 
 # coverswidgetbar.plugin.diff [git sha:52e11ef3d86beb92629c2f01dfe233bd7135fb59 | pending]
+
+# update.default.widgetbars.tooltip.example.diff [git sha:58f937c9e6c241a72984dbc83660c1b1a0850c89 | pending]
