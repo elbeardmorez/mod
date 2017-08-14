@@ -1,0 +1,26 @@
+From 3a3b15dcca0e8046a3e1af43cfbc698a9ab74e7b Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Mon, 14 Aug 2017 18:05:51 +0100
+Subject: avoid pixmap error
+
+---
+ quodlibet/quodlibet/qltk/cover.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/quodlibet/quodlibet/qltk/cover.py b/quodlibet/quodlibet/qltk/cover.py
+index 2a6f28f..a272258 100644
+--- a/quodlibet/quodlibet/qltk/cover.py
++++ b/quodlibet/quodlibet/qltk/cover.py
+@@ -206,7 +206,8 @@ class ResizeImage(Gtk.Bin):
+                 return
+             pixbuf = scale(
+                 pixbuf, (width - 2 * scale_factor, height - 2 * scale_factor))
+-            pixbuf = add_border_widget(pixbuf, self)
++            if pixbuf:
++                pixbuf = add_border_widget(pixbuf, self)
+         else:
+             pixbuf = scale(pixbuf, (width, height))
+ 
+-- 
+1.8.4
+
