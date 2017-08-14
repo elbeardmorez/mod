@@ -71,3 +71,5 @@ bigger OR smaller. in practice, this is not really noticable
 # support.multiple.big.images.diff [git sha:9a6b8ed4749bd7dd961cf135f32423fc07d4fb54 | pending]
 -allows multiple big images to remain visible from a single CoverImage
 -toggled via the config 'settings -> multiple_big_images' bool
+
+# coverswidgetbar.plugin.diff [git sha:52e11ef3d86beb92629c2f01dfe233bd7135fb59 | pending]
