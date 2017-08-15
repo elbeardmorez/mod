@@ -1,0 +1,32 @@
+From 3ec677e1614c398ba020233ea48b5d57df6030b8 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Tue, 15 Aug 2017 06:51:37 +0100
+Subject: center images on their cairo surface
+
+---
+ quodlibet/quodlibet/qltk/cover.py | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/quodlibet/quodlibet/qltk/cover.py b/quodlibet/quodlibet/qltk/cover.py
+index a272258..a6bc98e 100644
+--- a/quodlibet/quodlibet/qltk/cover.py
++++ b/quodlibet/quodlibet/qltk/cover.py
+@@ -214,7 +214,14 @@ class ResizeImage(Gtk.Bin):
+         style_context = self.get_style_context()
+ 
+         surface = get_surface_for_pixbuf(self, pixbuf)
+-        Gtk.render_icon_surface(style_context, cairo_context, surface, 0, 0)
++        # centre the image on the surface via an offset. required when cover
++        # is set to resize as its container is then necessarily set to expand
++        # and fill which makes attempts at widget alignments futile - the
++        # surface is always the full allocatable size
++        xoffset = int(0.5 * (alloc.width - pixbuf.get_width()))
++        yoffset = int(0.5 * (alloc.height - pixbuf.get_height()))
++        Gtk.render_icon_surface(style_context, cairo_context, surface,
++                                xoffset, yoffset)
+ 
+ 
+ class CoverImage(Gtk.EventBox):
+-- 
+1.8.4
+
