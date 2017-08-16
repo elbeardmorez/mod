@@ -89,4 +89,5 @@ a dumping ground for patches which modify or add functionality
 -widgetbar.implementation.[#152.part].diff [git sha:27a964270934662fa73fac1b9e50d2d2145ee2a7 | pending]
 -expose.a.plugin.toggled.event.from.pluginmanager.diff [git sha:8cecbcaa27d69b882a2910570486bd0f33a91225 | pending]
 -simple.widgetbars.eventplugin.diff [git sha:584cbc75a4b05d781a59c45b3087c0da3b7e7b6e | pending]
+-return.default.1x1.for.invalid.image.scaling.diff [git sha:ab552b5efbe790015cf35d43a21fb39d6432a079 | pending]
 

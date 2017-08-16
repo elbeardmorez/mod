@@ -1,0 +1,41 @@
+From ab552b5efbe790015cf35d43a21fb39d6432a079 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Wed, 16 Aug 2017 07:14:40 +0100
+Subject: return default 1x1 for invalid image scaling
+
+---
+ quodlibet/quodlibet/qltk/image.py  | 2 +-
+ quodlibet/tests/test_qltk_image.py | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/quodlibet/quodlibet/qltk/image.py b/quodlibet/quodlibet/qltk/image.py
+index 566fdb8..6cd823a 100644
+--- a/quodlibet/quodlibet/qltk/image.py
++++ b/quodlibet/quodlibet/qltk/image.py
+@@ -148,7 +148,7 @@ def calc_scale_size(boundary, size, scale_up=True):
+     iwidth, iheight = size
+ 
+     if bwidth <= 0 or bheight <= 0 or iwidth <= 0 or iheight <= 0:
+-        raise ValueError
++        return 1, 1 # don't error - probably a temporary state
+ 
+     scale_w, scale_h = iwidth, iheight
+ 
+diff --git a/quodlibet/tests/test_qltk_image.py b/quodlibet/tests/test_qltk_image.py
+index a72aa95..d8a12f9 100644
+--- a/quodlibet/tests/test_qltk_image.py
++++ b/quodlibet/tests/test_qltk_image.py
+@@ -44,8 +44,8 @@ class TImageUtils(TestCase):
+         s.failUnlessEqual((ns.get_width(), ns.get_height()), (10, 20))
+ 
+     def test_calc_scale_size(self):
+-        self.assertRaises(ValueError,
+-                          calc_scale_size, (1, 1), (1, 0))
++        res = calc_scale_size((1, 1), (1, 0)) # illegal
++        self.assertEquals(res, (1, 1)) # default
+         res = calc_scale_size((100, 100), (500, 100))
+         self.assertEqual(res, (100, 20))
+ 
+-- 
+1.8.4
+
