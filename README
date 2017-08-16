@@ -96,4 +96,5 @@ a dumping ground for patches which modify or add functionality
 -update.default.widgetbars.tooltip.example.diff [git sha:58f937c9e6c241a72984dbc83660c1b1a0850c89 | pending]
 -avoid.pixmap.error.diff [git sha:3a3b15dcca0e8046a3e1af43cfbc698a9ab74e7b | pending]
 -center.images.on.their.cairo.surface.diff [git sha:3ec677e1614c398ba020233ea48b5d57df6030b8 | pending]
+-coverswidgetbar,.follow.front.option.diff [git sha:09ac2099b2feb57755b5d5a7d13656931fa4fedf | pending]
 
