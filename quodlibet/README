@@ -83,3 +83,5 @@ bigger OR smaller. in practice, this is not really noticable
 # coverswidgetbar,.follow.front.option.diff [git sha:09ac2099b2feb57755b5d5a7d13656931fa4fedf | pending]
 
 # coverswidgetbar,.make.cover.label.more.configurable.diff [git sha:a1ac9ebcc529e1bb1673db75a221c323e705d643 | pending]
+
+# coverswidgetbar,.add.cover.size.to.tooltip.option.diff [git sha:6d98d9e4f02fe998c3bebaa4a3beee707b06af88 | pending]

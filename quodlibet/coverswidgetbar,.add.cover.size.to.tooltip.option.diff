@@ -1,0 +1,57 @@
+From 6d98d9e4f02fe998c3bebaa4a3beee707b06af88 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Thu, 17 Aug 2017 06:23:53 +0100
+Subject: coverswidgetbar, add cover size to tooltip option
+
+---
+ quodlibet/quodlibet/ext/covers/covers_widgetbar.py | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/quodlibet/quodlibet/ext/covers/covers_widgetbar.py b/quodlibet/quodlibet/ext/covers/covers_widgetbar.py
+index 21613f7..e3d0dad 100644
+--- a/quodlibet/quodlibet/ext/covers/covers_widgetbar.py
++++ b/quodlibet/quodlibet/ext/covers/covers_widgetbar.py
+@@ -48,6 +48,7 @@ class Config(object):
+     follow_front = BoolConfProp(_config, "follow_front", True)
+     name_in_label = BoolConfProp(_config, "name_in_label", True)
+     size_in_label = BoolConfProp(_config, "size_in_label", False)
++    size_in_tooltip = BoolConfProp(_config, "size_in_tooltip", True)
+     songs_history = []
+ 
+ 
+@@ -136,6 +137,9 @@ class CoversBox(Gtk.HBox):
+ 
+             coverimage_box.pack_start(coverimage, True, True, 0)
+ 
++            if CONFIG.size_in_tooltip:
++                coverimage.set_tooltip_markup(size)
++
+             desc = str.format("%s%s%s") % (
+                 title,
+                 " [" + name + "]" if CONFIG.name_in_label else "",
+@@ -288,6 +292,13 @@ class CoversBox(Gtk.HBox):
+                 " [" + box.image_size + "]" if CONFIG.size_in_label else ""))
+             box.label.set_use_markup(True)
+ 
++    def update_tooltips(self):
++        for box in self.get_children():
++            if CONFIG.size_in_tooltip:
++                box.image.set_tooltip_markup(box.image_size)
++            else:
++                box.image.set_tooltip_markup(None)
++
+ 
+ class CoversWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+     """The plugin class."""
+@@ -405,6 +416,8 @@ class CoversWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+              None, False, lambda *x: self.__coversbox.update_labels()),
+             (plugin_id + '_size_in_label', _("Show image size in label"),
+              None, False, lambda *x: self.__coversbox.update_labels()),
++            (plugin_id + '_size_in_tooltip', _("Show image size in tooltip"),
++             None, True, lambda *x: self.__coversbox.update_tooltips()),
+         ]
+ 
+         for key, label, tooltip, default, changed_cb in toggles:
+-- 
+1.8.4
+
