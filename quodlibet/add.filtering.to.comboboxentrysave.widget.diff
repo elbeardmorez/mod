@@ -1,0 +1,195 @@
+From cff7cf38011b72116b6208a69f21d2f995083edf Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sat, 19 Aug 2017 09:50:29 +0100
+Subject: add filtering to ComboBoxEntrySave widget
+
+---
+ quodlibet/quodlibet/qltk/cbes.py  | 48 +++++++++++++++++++++++----------------
+ quodlibet/tests/test_qltk_cbes.py | 13 ++++++++---
+ 2 files changed, 39 insertions(+), 22 deletions(-)
+
+diff --git a/quodlibet/quodlibet/qltk/cbes.py b/quodlibet/quodlibet/qltk/cbes.py
+index 1936632..1dba95b 100644
+--- a/quodlibet/quodlibet/qltk/cbes.py
++++ b/quodlibet/quodlibet/qltk/cbes.py
+@@ -161,20 +161,22 @@ class CBESEditor(_KeyValueEditor):
+         self.value.set_text(cbes.get_child().get_text())
+ 
+     def fill_values(self):
+-        for row in self.cbes.get_model():
++        for row in self.cbes.model_filter:
+             if row[2] is not None:
+                 break
+             else:
+                 self.model.append((row[0], row[1]))
+ 
+     def __finish(self, cbes):
+-        cbes_model = cbes.get_model()
+-        iter = cbes_model.get_iter_first()
+-        while cbes_model[iter][2] is None:
+-            cbes_model.remove(iter)
+-            iter = cbes_model.get_iter_first()
++        iter = cbes.model_filter.get_iter_first()
++        while cbes.model_filter[iter][2] is None:
++            iter_store = cbes.model_filter.convert_iter_to_child_iter(iter)
++            cbes.model_store.remove(iter_store)
++            iter = cbes.model_filter.get_iter_first()
++        iter_store = cbes.model_filter.convert_iter_to_child_iter(iter)
+         for row in self.model:
+-            cbes_model.insert_before(iter, row=[row[0], row[1], None])
++            cbes.model_store.insert_before(
++                iter_store, row=[row[0], row[1], None])
+         cbes.write()
+ 
+ 
+@@ -260,18 +262,22 @@ class ComboBoxEntrySave(Gtk.ComboBox):
+ 
+     def __init__(self, filename=None, initial=[], count=5, id=None,
+                  validator=None, title=_("Saved Values"),
+-                 edit_title=_(u"Edit saved values…")):
++                 edit_title=_(u"Edit saved values…"),
++                 filter=lambda *x: True, filter_data=None):
+         self.count = count
+         self.filename = filename
+         id = filename or id
+ 
+         try:
+-            model = self.__models[id]
++            self.model_store = self.__models[id]
+         except KeyError:
+-            model = type(self).__models[id] = Gtk.ListStore(str, str, str)
++            self.model_store = \
++            type(self).__models[id] = \
++                Gtk.ListStore(str, str, str)
+ 
+         super(ComboBoxEntrySave, self).__init__(
+-            model=model, entry_text_column=0, has_entry=True)
++            model=self.model_store, entry_text_column=0, has_entry=True)
++
+         self.clear()
+ 
+         render = Gtk.CellRendererPixbuf()
+@@ -284,9 +290,13 @@ class ComboBoxEntrySave(Gtk.ComboBox):
+ 
+         self.set_row_separator_func(self.__separator_func, None)
+ 
+-        if not len(model):
++        if not len(self.model_store):
+             self.__fill(filename, initial, edit_title)
+ 
++        self.model_filter = self.model_store.filter_new()
++        self.model_filter.set_visible_func(filter, filter_data)
++        self.set_model(self.model_filter)
++
+         old_entry = self.get_child()
+         new_entry = entry.ValidatingEntry(validator)
+         clone_css_classes(old_entry, new_entry)
+@@ -294,7 +304,7 @@ class ComboBoxEntrySave(Gtk.ComboBox):
+         self.add(new_entry)
+ 
+         connect_obj(self, 'destroy', self.set_model, None)
+-        connect_obj(self, 'changed', self.__changed, model,
++        connect_obj(self, 'changed', self.__changed, self.model_filter,
+             validator, title)
+ 
+     def enable_clear_button(self):
+@@ -303,7 +313,7 @@ class ComboBoxEntrySave(Gtk.ComboBox):
+     def __changed(self, model, validator, title):
+         iter = self.get_active_iter()
+         if iter:
+-            if model[iter][2]:
++            if self.model_filter[iter][2]:
+                 self.get_child().set_text(self.__last)
+                 win = CBESEditor(self, title, validator)
+                 win.show()
+@@ -321,7 +331,7 @@ class ComboBoxEntrySave(Gtk.ComboBox):
+                               Gtk.MovementStep.BUFFER_ENDS, 0, False)
+ 
+     def __fill(self, filename, initial, edit_title):
+-        model = self.get_model()
++        model = self.model_store
+         model.append(row=["", edit_title, Icons.DOCUMENT_PROPERTIES])
+         model.append(row=[None, None, None])
+ 
+@@ -351,7 +361,7 @@ class ComboBoxEntrySave(Gtk.ComboBox):
+         return model[iter][1] is None
+ 
+     def __shorten(self):
+-        model = self.get_model()
++        model = self.model_store
+         for row in model:
+             if row[0] is None:
+                 offset = row.path.get_indices()[0] + 1
+@@ -374,7 +384,7 @@ class ComboBoxEntrySave(Gtk.ComboBox):
+             with open(filename + ".saved", "w") as saved:
+                 with open(filename, "w") as memory:
+                     target = saved
+-                    for row in self.get_model():
++                    for row in self.model_store:
+                         if row[0] is None:
+                             target = memory
+                         elif row[2] is None:
+@@ -388,7 +398,7 @@ class ComboBoxEntrySave(Gtk.ComboBox):
+         # Removes an item from the list if it's present in the remembered
+         # values, or returns true if it's in the saved values.
+         removable = False
+-        model = self.get_model()
++        model = self.model_store
+         for row in model:
+             if row[0] is None:
+                 # Not found in the saved values, so if we find it from now
+@@ -406,7 +416,7 @@ class ComboBoxEntrySave(Gtk.ComboBox):
+         if self.__remove_if_present(text):
+             return
+ 
+-        model = self.get_model()
++        model = self.model_store
+         for row in model:
+             if row[0] is None:
+                 model.insert_after(row.iter, row=[text, text, None])
+diff --git a/quodlibet/tests/test_qltk_cbes.py b/quodlibet/tests/test_qltk_cbes.py
+index 181c7a9..732e705 100644
+--- a/quodlibet/tests/test_qltk_cbes.py
++++ b/quodlibet/tests/test_qltk_cbes.py
+@@ -27,10 +27,12 @@ class TComboBoxEntrySave(TestCase):
+             f.write(self.saved)
+         self.cbes = ComboBoxEntrySave(self.fname, count=2)
+         self.cbes2 = ComboBoxEntrySave(self.fname, count=2)
++        self.cbes3 = ComboBoxEntrySave(self.fname, count=2,
++            filter=lambda ls, it, *d: ls.get_value(it, 0) == "filter")
+ 
+     def test_equivalence(self):
+-        model1 = self.cbes.get_model()
+-        model2 = self.cbes2.get_model()
++        model1 = self.cbes.model_store
++        model2 = self.cbes2.model_store
+         self.failUnlessEqual(model1, model2)
+ 
+         rows1 = list(model1)
+@@ -67,7 +69,7 @@ class TComboBoxEntrySave(TestCase):
+         self.test_equivalence()
+ 
+     def test_initial_size(self):
+-        # 1 saved, Edit, separator, 2 remembered
++        # 1 saved, Edit, separator, 3 remembered
+         self.failUnlessEqual(5, len(self.cbes.get_model()))
+ 
+     def test_prepend_text(self):
+@@ -86,9 +88,14 @@ class TComboBoxEntrySave(TestCase):
+         self.memory = "foobar\npattern 1\n"
+         self.test_save()
+ 
++    def test_filter(self):
++        self.cbes3.prepend_text("filter")
++        self.failUnlessEqual(1, len(self.cbes3.get_model()))
++
+     def tearDown(self):
+         self.cbes.destroy()
+         self.cbes2.destroy()
++        self.cbes3.destroy()
+         os.unlink(self.fname)
+         os.unlink(self.fname + ".saved")
+         quodlibet.config.quit()
+-- 
+1.8.4
+
