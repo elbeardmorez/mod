@@ -89,3 +89,5 @@ bigger OR smaller. in practice, this is not really noticable
 # add.filtering.to.comboboxentrysave.widget.diff [git sha:cff7cf38011b72116b6208a69f21d2f995083edf | pending]
 
 # create.an.actions.dialog.diff [git sha:dbfb362e8336e63080c00c64b14fc2bf32f97949 | pending]
+
+# expose.pluginmanager's.scanned.modules.diff [git sha:5edfa21dc12fc30b80fd9635eea5d962146aaa68 | pending]

@@ -1,0 +1,29 @@
+From 5edfa21dc12fc30b80fd9635eea5d962146aaa68 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sun, 20 Aug 2017 11:05:44 +0100
+Subject: expose PluginManager's scanned modules
+
+---
+ quodlibet/quodlibet/plugins/__init__.py | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/quodlibet/quodlibet/plugins/__init__.py b/quodlibet/quodlibet/plugins/__init__.py
+index d89aeb4..88289f8 100644
+--- a/quodlibet/quodlibet/plugins/__init__.py
++++ b/quodlibet/quodlibet/plugins/__init__.py
+@@ -303,6 +303,12 @@ class PluginManager(GObject.GObject):
+ 
+         return [p for p in self._plugins if p.handlers]
+ 
++    @property
++    def modules(self):
++        """Returns a list of modules in the plugins folders"""
++
++        return self._modules
++
+     def register_handler(self, handler):
+         """
+         Registers a handler, attaching it to any current plugins it
+-- 
+1.8.4
+
