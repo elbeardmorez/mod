@@ -91,3 +91,36 @@ bigger OR smaller. in practice, this is not really noticable
 # create.an.actions.dialog.diff [git sha:dbfb362e8336e63080c00c64b14fc2bf32f97949 | pending]
 
 # expose.pluginmanager's.scanned.modules.diff [git sha:5edfa21dc12fc30b80fd9635eea5d962146aaa68 | pending]
+
+# pluginswidgetbar.plugin.[#2042.part].diff [git sha:1921bfce6b1779c10ac13f158542c56e8f0f5bfa | pending]
+-part implementation of #2042, lacking DnD
+-configurable actions via silly string magic in right-click 'actions'
+dialog which perists preferences
+-action strings can use combinations of plugin or module/class and method names with arguments that are either known (e.g. <songs>, <library>) or simple
+strings. they MUST be prefixed by either 'default' (if you want the
+action to be visible to all plugins), or the plugin id (visible only to
+a specific plugin)
+
+e.g.
+[lyrics]
+View Lyrics | <pluginswidgetbar> | <plugin preferences>
+[burn]
+Burn CD | <Burn CD> | <plugin_songs> | <xfburn>
+[albumart]
+Download Album Art | <Download Album Art> | <plugin_album> | <songs> <library>
+Download Album Art | <Download Album Art> | <plugin_album>
+Download Album Art | <albumart> | <AlbumArtWindow>.<show> | <songs>
+Download Album Art | <albumart> | <AlbumArtWindow>.<show>
+
+in the latter albumart cases, they all do the same thing. known arguments
+are substituted if missing
+
+there are also several default actions, namely:
+
+default | <pluginswidgetbar> | <plugin default action>
+default | <pluginswidgetbar> | <plugin toggle>
+default | <pluginswidgetbar> | <plugin preferences>
+
+<plugin default action> calls the default public callback of a widget,
+which should be overridden by plugin implementors. the default is to
+open the plugin's preferences pane in the preferences dialog
