@@ -103,4 +103,5 @@ a dumping ground for patches which modify or add functionality
 -create.an.actions.dialog.diff [git sha:dbfb362e8336e63080c00c64b14fc2bf32f97949 | pending]
 -expose.pluginmanager's.scanned.modules.diff [git sha:5edfa21dc12fc30b80fd9635eea5d962146aaa68 | pending]
 -pluginswidgetbar.plugin.[#2042.part].diff [git sha:1921bfce6b1779c10ac13f158542c56e8f0f5bfa | pending]
+-pluginswidgetbar,.add.'enabled.only'.toggle.diff [git sha:c765323dce5439a37c4833ba2bb214864ba414ac | pending]
 

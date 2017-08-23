@@ -124,3 +124,5 @@ default | <pluginswidgetbar> | <plugin preferences>
 <plugin default action> calls the default public callback of a widget,
 which should be overridden by plugin implementors. the default is to
 open the plugin's preferences pane in the preferences dialog
+
+# pluginswidgetbar,.add.'enabled.only'.toggle.diff [git sha:c765323dce5439a37c4833ba2bb214864ba414ac | pending]
