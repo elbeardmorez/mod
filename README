@@ -104,4 +104,5 @@ a dumping ground for patches which modify or add functionality
 -expose.pluginmanager's.scanned.modules.diff [git sha:5edfa21dc12fc30b80fd9635eea5d962146aaa68 | pending]
 -pluginswidgetbar.plugin.[#2042.part].diff [git sha:1921bfce6b1779c10ac13f158542c56e8f0f5bfa | pending]
 -pluginswidgetbar,.add.'enabled.only'.toggle.diff [git sha:c765323dce5439a37c4833ba2bb214864ba414ac | pending]
+-pluginswidgetbar,.add.'show.labels'.toggle.diff [git sha:9a3226c16db8cb97095f73f57c83016788eb0315 | pending]
 
