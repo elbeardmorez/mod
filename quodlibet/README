@@ -130,3 +130,5 @@ open the plugin's preferences pane in the preferences dialog
 # pluginswidgetbar,.add.'show.labels'.toggle.diff [git sha:9a3226c16db8cb97095f73f57c83016788eb0315 | pending]
 
 # pluginswidgetbar,.add.'small.icons'.toggle.diff [git sha:8a6544ca4870478ec57967c6446f3b524e45dffe | pending]
+
+# pluginswidgetbar,.add.plugin.errors.icon.diff [git sha:69b5c106bad415bf42b47ea52d1130ffca0cbfe8 | pending]
