@@ -1,0 +1,156 @@
+From c5c13b6f4a054b69e6cc0db82fe605fa02984510 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Fri, 25 Aug 2017 08:01:18 +0100
+Subject: pluginswidgetbar, add highlight strips for enabled plugins
+
+---
+ quodlibet/quodlibet/ext/ui/plugins_widgetbar.py | 55 ++++++++++++++++++++++---
+ 1 file changed, 50 insertions(+), 5 deletions(-)
+
+diff --git a/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
+index dc7dcec..67b654c 100644
+--- a/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
++++ b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
+@@ -8,7 +8,7 @@
+ import os
+ from collections import OrderedDict
+ from inspect import isclass, getargspec
+-from gi.repository import Gtk
++from gi.repository import Gtk, Gdk
+ 
+ import quodlibet
+ from quodlibet import app
+@@ -50,6 +50,8 @@ class Config(object):
+     show_labels = BoolConfProp(_config, "show_labels", True)
+     small_icons = BoolConfProp(_config, "small_icons", False)
+     enable_errors_icon = BoolConfProp(_config, "enable_errors_icon", True)
++    highlight_enabled = BoolConfProp(_config, "highlight_enabled", True)
++    highlight_below = BoolConfProp(_config, "highlight_below", False)
+ 
+ 
+ CONFIG = Config()
+@@ -71,6 +73,15 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+         self.__song_playing = None
+         self.__songs_selected = None
+ 
++        css = Gtk.CssProvider()
++        css.load_from_data("""
++            .highlightbox {background-color: #558fcb;
++                           border-radius: 2px;}
++            """)
++        Gtk.StyleContext.add_provider_for_screen(
++            Gdk.Screen.get_default(), css,
++            Gtk.STYLE_PROVIDER_PRIORITY_USER) # enforce
++
+     def enabled(self):
+         # setup
+         pass
+@@ -426,11 +437,15 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+         self.__content.foreach(lambda w: self.__content.remove(w))
+         # (re)display icons
+         icon_size = self.__icon_size
++        highlight_enabled = CONFIG.highlight_enabled
++        highlight_below = CONFIG.highlight_below
+         for p in plugins:
+             plugin_box = self.__icon_box(p.name, p.id, pm.enabled(p),
+                                          p.icon, icon_size,
+                                          self.__plugin_action_click, p,
+-                                         self.__plugin_action_dragdrop, p)
++                                         self.__plugin_action_dragdrop, p,
++                                         highlight_enabled=highlight_enabled,
++                                         highlight_below=highlight_below)
+             self.__content.pack_start(plugin_box, False, False, 0)
+ 
+         self.__content.show_all()
+@@ -439,10 +454,11 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+ 
+     def __icon_box(self, name, id, enabled, icon, icon_size,
+                    click_cb, click_cb_data, dragdrop_cb, dragdrop_cb_data,
+-                   show_tooltip=True, show_label=None):
+-
++                   show_tooltip=True, show_label=None, highlight_enabled=None,                    highlight_below=None):
+         if not show_label:
+             show_label = CONFIG.show_labels
++        if not highlight_enabled:
++            highlight_enabled = CONFIG.highlight_enabled
+ 
+         plugin_align = Align(bottom=15, top=2) # clear scroll
+         plugin_box_outer = Gtk.VBox()
+@@ -457,6 +473,12 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+         plugin_separator_box = Gtk.VBox()
+         plugin_separator_box_align.add(plugin_separator_box)
+ 
++        if enabled:
++            plugin_separator_box.get_style_context().add_class('highlightbox')
++        if highlight_enabled:
++            plugin_separator_box.show_all()
++            plugin_separator_box_align.show()
++
+         plugin_box_inner = Gtk.VBox()
+         plugin_box_align = Align(left=4, right=4)
+         plugin_box_align.add(plugin_box_inner)
+@@ -481,7 +503,13 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+             plugin_label.set_use_markup(True)
+             plugin_box_inner.pack_start(plugin_label, True, True, 2)
+ 
++        if not highlight_below:
++            plugin_box_outer.pack_start(
++                plugin_separator_box_align, False, True, 0)
+         plugin_box_outer.pack_start(plugin_box_align, True, False, 0)
++        if highlight_below:
++            plugin_box_outer.pack_start(
++                plugin_separator_box_align, False, False, 4)
+ 
+         return plugin_align
+ 
+@@ -558,7 +586,7 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+                 self.__icon_box(
+                     "Show Errors", "", False, Icons.DIALOG_WARNING,
+                     self.__icon_size, lambda *x: self.__show_errors(),
+-                    None, None, None),
++                    None, None, None, highlight_enabled=False),
+                 False, False, 5)
+             self.__content_right.show_all()
+ 
+@@ -570,8 +598,17 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+ 
+     def PluginPreferences(self, window):
+ 
++        controls = {}
+         box = Gtk.VBox(spacing=6)
+ 
++        def update_controls():
++            controls['highlight_below'].\
++                set_sensitive(CONFIG.highlight_enabled)
++
++        def highlight_enabled_changed(self):
++            update_controls()
++            self.__update_plugins()
++
+         # filters
+         filters = [
+             (CONFIG.filter_positive,
+@@ -611,6 +648,11 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+              None, True, lambda w: self.__update_plugins(), 0),
+             (plugin_id + '_enable_errors_icon', _("Enable errors window icon"),
+              None, True, lambda w: self.__update_errors_icon(), 0),
++            (plugin_id + '_highlight_enabled', _("Highlight enabled plugins"),
++             None, True,
++             lambda w, s=self, f=highlight_enabled_changed: f(s), 0),
++            (plugin_id + '_highlight_below', _("Highlights below icons"),
++             None, True, lambda w: self.__update_plugins(), 15),
+         ]
+         for key, label, tooltip, default, changed_cb, indent in toggles:
+             ccb = ConfigCheckButton(label, 'plugins', key,
+@@ -621,5 +663,8 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+             ccb_align = Align(left=indent)
+             ccb_align.add(ccb)
+             box.pack_start(ccb_align, True, True, 0)
++            controls[key.replace(plugin_id, "").strip("_")] = ccb
++
++        update_controls()
+ 
+         return box
+-- 
+1.8.4
+
