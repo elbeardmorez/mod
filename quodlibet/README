@@ -136,3 +136,5 @@ open the plugin's preferences pane in the preferences dialog
 # pluginswidgetbar,.add.highlight.strips.for.enabled.plugins.diff [git sha:c5c13b6f4a054b69e6cc0db82fe605fa02984510 | pending]
 
 # burn.cd,.fascilitate.non-song-menu.initialisation.diff [git sha:84ba2193a58a5fb5a7f1b7a6e264c02d81f1472d | pending]
+
+# xpaned.based.tests.diff [git sha:4e3845c8086ad42b9ad163df609f9f9eb100dd85 | pending]
