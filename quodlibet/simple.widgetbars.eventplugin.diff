@@ -1,7 +1,7 @@
-From 584cbc75a4b05d781a59c45b3087c0da3b7e7b6e Mon Sep 17 00:00:00 2001
+From bc3aaf005fbda87176d945291e34b82c87f7ec0c Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Fri, 11 Aug 2017 10:03:44 +0100
-Subject: simple WidgetBars EventPlugin
+Subject: [PATCH 10/31] simple WidgetBars EventPlugin
 
 ---
  quodlibet/po/POTFILES.in                 |  1 +
@@ -49,7 +49,7 @@ index 0000000..e82e559
 +# published by the Free Software Foundation
 diff --git a/quodlibet/quodlibet/ext/ui/widgetbars.py b/quodlibet/quodlibet/ext/ui/widgetbars.py
 new file mode 100644
-index 0000000..097d301
+index 0000000..ed213a4
 --- /dev/null
 +++ b/quodlibet/quodlibet/ext/ui/widgetbars.py
 @@ -0,0 +1,99 @@
@@ -120,7 +120,7 @@ index 0000000..097d301
 +        entries = [
 +            (CONFIG.pane_order,
 +             _("Pane order"),
-+             _("e.g. main,playbar"),
++             "e.g. main,playbar",
 +             self.__pane_order_changed),
 +        ]
 +        for text, label, tooltip, changed_cb in entries:

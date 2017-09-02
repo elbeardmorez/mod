@@ -1,7 +1,7 @@
-From 601d663d032be7d87a57988c4c99274fe4d6c393 Mon Sep 17 00:00:00 2001
+From d85291f5557ad550d81c58547b92f070b7238862 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Fri, 4 Aug 2017 08:13:51 +0100
-Subject: exposed multipaned paned set
+Subject: [PATCH 02/31] exposed multipaned paned set
 
 ---
  quodlibet/quodlibet/qltk/paned.py      | 12 ++++++------
@@ -68,13 +68,13 @@ index 35b3273..0e1a9c5 100644
          if not widths:
              # If no widths are saved, save the current widths
 diff --git a/quodlibet/tests/test_browsers_paned.py b/quodlibet/tests/test_browsers_paned.py
-index 7b3f452..30e545c 100644
+index d8f3aac..1ec3bcc 100644
 --- a/quodlibet/tests/test_browsers_paned.py
 +++ b/quodlibet/tests/test_browsers_paned.py
 @@ -164,7 +164,7 @@ class TPanedBrowser(TestCase):
          config.set("browsers", "panes", "artist\talbum\t~year\t~#track")
          self.bar.set_all_panes()
-         self.bar.make_pane_widths_equal()
+         self.bar.make_pane_sizes_equal()
 -        paneds = self.bar.multi_paned._get_paneds()
 +        paneds = self.bar.multi_paned.get_paneds()
  

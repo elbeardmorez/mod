@@ -1,7 +1,7 @@
-From 27a964270934662fa73fac1b9e50d2d2145ee2a7 Mon Sep 17 00:00:00 2001
+From 299ba25de64a5b5939a65d682cb8b53b7e2366be Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Thu, 10 Aug 2017 10:56:01 +0100
-Subject: WidgetBar implementation [#152 part]
+Subject: [PATCH 08/31] WidgetBar implementation [#152 part]
 
 -tied in as a UserInterfacePlugin
 ---
@@ -11,9 +11,9 @@ Subject: WidgetBar implementation [#152 part]
  quodlibet/quodlibet/plugins/gui.py          |  52 ++++++---
  quodlibet/quodlibet/qltk/icons.py           |   1 +
  quodlibet/quodlibet/qltk/quodlibetwindow.py | 173 +++++++++++++++++++++++++---
- quodlibet/quodlibet/qltk/widgetbar.py       | 150 ++++++++++++++++++++++++
+ quodlibet/quodlibet/qltk/widgetbar.py       | 148 ++++++++++++++++++++++++
  quodlibet/quodlibet/util/config.py          |   3 +-
- 8 files changed, 370 insertions(+), 31 deletions(-)
+ 8 files changed, 368 insertions(+), 31 deletions(-)
  create mode 100644 quodlibet/quodlibet/qltk/widgetbar.py
 
 diff --git a/quodlibet/po/POTFILES.in b/quodlibet/po/POTFILES.in
@@ -459,10 +459,10 @@ index dd702e4..936344b 100644
  
 diff --git a/quodlibet/quodlibet/qltk/widgetbar.py b/quodlibet/quodlibet/qltk/widgetbar.py
 new file mode 100644
-index 0000000..7dae977
+index 0000000..e77b18d
 --- /dev/null
 +++ b/quodlibet/quodlibet/qltk/widgetbar.py
-@@ -0,0 +1,150 @@
+@@ -0,0 +1,148 @@
 +# -*- coding: utf-8 -*-
 +# Copyright 2017 Pete Beardmore
 +#
@@ -470,12 +470,10 @@ index 0000000..7dae977
 +# it under the terms of the GNU General Public License version 2 as
 +# published by the Free Software Foundation
 +
-+import os
 +from quodlibet.qltk.pluginwin import PluginWindow
 +from quodlibet.plugins import PluginManager
 +
 +from quodlibet import config
-+from quodlibet.util import print_d
 +from quodlibet import _
 +
 +from quodlibet.qltk import get_top_parent

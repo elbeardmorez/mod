@@ -24,9 +24,9 @@ input is imperfect. allow users to override this if the results are off
 
 # escape.special.glob.characters.diff [git sha:35da2605ca89984366c7eb0373a643acd51d33cb | pending]
 
-# orientation.agnostic.names.diff [git sha:7ff7d478997f3d6ee60539476475386a9b5d8e67 | pending]
+# orientation.agnostic.names.diff [git sha:f88d400916867dfd1f71ae660377a93f791df623 | pending]
 
-# exposed.multipaned.paned.set.diff [git sha:601d663d032be7d87a57988c4c99274fe4d6c393 | pending]
+# exposed.multipaned.paned.set.diff [git sha:d85291f5557ad550d81c58547b92f070b7238862 | pending]
 
 # make.multirpaned.more.generic.diff [git sha:c52cfaf9c454d51ddcb8774ee9e04e6f79218dba | pending]
 -add code path for absolute based sizing in 'make_pane_sizes_equal'
@@ -55,12 +55,12 @@ bigger OR smaller. in practice, this is not really noticable
 
 # update.paned.definitions.diff [git sha:2c0ea887f325b938c04bcb5ab3c75c0f54ac5bcf | pending]
 
-# widgetbar.implementation.[#152.part].diff [git sha:27a964270934662fa73fac1b9e50d2d2145ee2a7 | pending]
+# widgetbar.implementation.[#152.part].diff [git sha:299ba25de64a5b5939a65d682cb8b53b7e2366be | pending]
 -tied in as a UserInterfacePlugin
 
 # expose.a.plugin.toggled.event.from.pluginmanager.diff [git sha:8cecbcaa27d69b882a2910570486bd0f33a91225 | pending]
 
-# simple.widgetbars.eventplugin.diff [git sha:584cbc75a4b05d781a59c45b3087c0da3b7e7b6e | pending]
+# simple.widgetbars.eventplugin.diff [git sha:bc3aaf005fbda87176d945291e34b82c87f7ec0c | pending]
 
 # return.default.1x1.for.invalid.image.scaling.diff [git sha:ab552b5efbe790015cf35d43a21fb39d6432a079 | pending]
 
@@ -72,7 +72,7 @@ bigger OR smaller. in practice, this is not really noticable
 -allows multiple big images to remain visible from a single CoverImage
 -toggled via the config 'settings -> multiple_big_images' bool
 
-# coverswidgetbar.plugin.diff [git sha:52e11ef3d86beb92629c2f01dfe233bd7135fb59 | pending]
+# coverswidgetbar.plugin.diff [git sha:159876fd7d619ee96ca581e4b893f78b573488da | pending]
 
 # update.default.widgetbars.tooltip.example.diff [git sha:58f937c9e6c241a72984dbc83660c1b1a0850c89 | pending]
 

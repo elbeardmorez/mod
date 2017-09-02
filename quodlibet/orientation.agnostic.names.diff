@@ -1,14 +1,15 @@
-From 7ff7d478997f3d6ee60539476475386a9b5d8e67 Mon Sep 17 00:00:00 2001
+From f88d400916867dfd1f71ae660377a93f791df623 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Fri, 4 Aug 2017 07:53:58 +0100
-Subject: orientation agnostic names
+Subject: [PATCH 01/31] orientation agnostic names
 
 ---
  quodlibet/quodlibet/browsers/paned/main.py  | 4 ++--
  quodlibet/quodlibet/browsers/paned/prefs.py | 2 +-
  quodlibet/quodlibet/qltk/paned.py           | 2 +-
+ quodlibet/tests/test_browsers_paned.py      | 2 +-
  quodlibet/tests/test_qltk_paned.py          | 4 ++--
- 4 files changed, 6 insertions(+), 6 deletions(-)
+ 5 files changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/quodlibet/quodlibet/browsers/paned/main.py b/quodlibet/quodlibet/browsers/paned/main.py
 index cf37cb5..d816e44 100644
@@ -51,6 +52,19 @@ index adf6f47..35b3273 100644
          paneds = self._get_paneds()
  
          # the relative paned widths must be equal to the reciprocal (1/i) of
+diff --git a/quodlibet/tests/test_browsers_paned.py b/quodlibet/tests/test_browsers_paned.py
+index 7b3f452..d8f3aac 100644
+--- a/quodlibet/tests/test_browsers_paned.py
++++ b/quodlibet/tests/test_browsers_paned.py
+@@ -163,7 +163,7 @@ class TPanedBrowser(TestCase):
+     def test_make_pane_widths_equal(self):
+         config.set("browsers", "panes", "artist\talbum\t~year\t~#track")
+         self.bar.set_all_panes()
+-        self.bar.make_pane_widths_equal()
++        self.bar.make_pane_sizes_equal()
+         paneds = self.bar.multi_paned._get_paneds()
+ 
+         self.failUnlessAlmostEqual(paneds[0].get_relative(), 1.0 / 4.0)
 diff --git a/quodlibet/tests/test_qltk_paned.py b/quodlibet/tests/test_qltk_paned.py
 index 1d4076a..70e9db5 100644
 --- a/quodlibet/tests/test_qltk_paned.py
