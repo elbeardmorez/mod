@@ -79,7 +79,7 @@ a dumping ground for patches which modify or add functionality
 -expose.album.art.downloader.query.results.limit.diff [git sha:3715223ca4d23231570870104ddd8e3d207e7fd7 | pending]
 -fix.use.of.complete.file.paths.for.relative.renames.diff [git sha:954cf9340fd636217c440a54aa70cb3777bacf83 | pending]
 -fix.quality_style.issues.diff [git sha:d683bcd1c634ee30320e378dcb6bdb54046e6c32 | pending]
--escape.special.glob.characters.diff [git sha:35da2605ca89984366c7eb0373a643acd51d33cb | pending]
+-escape.special.glob.characters.diff [git sha:0ebb30232f685fe19ed58ce51acb35f1cd072b1b | pending]
 -orientation.agnostic.names.diff [git sha:f88d400916867dfd1f71ae660377a93f791df623 | pending]
 -exposed.multipaned.paned.set.diff [git sha:d85291f5557ad550d81c58547b92f070b7238862 | pending]
 -make.multirpaned.more.generic.diff [git sha:c52cfaf9c454d51ddcb8774ee9e04e6f79218dba | pending]
@@ -109,5 +109,5 @@ a dumping ground for patches which modify or add functionality
 -pluginswidgetbar,.add.plugin.errors.icon.diff [git sha:69b5c106bad415bf42b47ea52d1130ffca0cbfe8 | pending]
 -pluginswidgetbar,.add.highlight.strips.for.enabled.plugins.diff [git sha:c5c13b6f4a054b69e6cc0db82fe605fa02984510 | pending]
 -burn.cd,.fascilitate.non-song-menu.initialisation.diff [git sha:84ba2193a58a5fb5a7f1b7a6e264c02d81f1472d | pending]
--xpaned.based.tests.diff [git sha:4e3845c8086ad42b9ad163df609f9f9eb100dd85 | pending]
+-xpaned.based.tests.diff [git sha:a624c5a53e11b4538783177a3159aa46e0d7fe90 | pending]
 

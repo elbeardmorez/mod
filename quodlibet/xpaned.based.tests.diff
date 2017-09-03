@@ -1,14 +1,14 @@
-From 4e3845c8086ad42b9ad163df609f9f9eb100dd85 Mon Sep 17 00:00:00 2001
+From a624c5a53e11b4538783177a3159aa46e0d7fe90 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Wed, 30 Aug 2017 07:14:05 +0100
-Subject: XPaned based tests
+Subject: [PATCH] XPaned based tests
 
 ---
- quodlibet/tests/test_qltk_paned.py | 146 ++++++++++++++++++++++++++++++++++++-
- 1 file changed, 144 insertions(+), 2 deletions(-)
+ quodlibet/tests/test_qltk_paned.py | 152 +++++++++++++++++++++++++++++++++++--
+ 1 file changed, 147 insertions(+), 5 deletions(-)
 
 diff --git a/quodlibet/tests/test_qltk_paned.py b/quodlibet/tests/test_qltk_paned.py
-index a82675d..0973015 100644
+index a82675d..0afc9aa 100644
 --- a/quodlibet/tests/test_qltk_paned.py
 +++ b/quodlibet/tests/test_qltk_paned.py
 @@ -5,8 +5,9 @@
@@ -71,6 +71,21 @@ index a82675d..0973015 100644
  class TConfigRPaned(TestCase):
  
      def setUp(self):
+@@ -150,11 +192,11 @@ class TMultiPaned(object):
+                     paneds[2].get_relative(), 1.0 / 2.0, 2)
+             else:
+                 self.failUnless(
+-                    relatively_close(paneds[0].get_position(), size / 4))
++                    relatively_close(paneds[0].get_position(), size / 4, 0.02))
+                 self.failUnless(
+-                    relatively_close(paneds[1].get_position(), size / 4))
++                    relatively_close(paneds[1].get_position(), size / 4, 0.02))
+                 self.failUnless(
+-                    relatively_close(paneds[2].get_position(), size / 4))
++                    relatively_close(paneds[2].get_position(), size / 4, 0.02))
+ 
+     def test_change_orientation(self):
+         p = self.Kind()
 @@ -182,6 +224,106 @@ class TMultiRVPaned(TestCase, TMultiPaned):
      Kind = MultiRVPaned
  

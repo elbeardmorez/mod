@@ -1,25 +1,28 @@
-From 35da2605ca89984366c7eb0373a643acd51d33cb Mon Sep 17 00:00:00 2001
+From 0ebb30232f685fe19ed58ce51acb35f1cd072b1b Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Thu, 10 Aug 2017 19:38:47 +0100
-Subject: escape special glob characters
+Subject: [PATCH] escape special glob characters
 
 ---
- quodlibet/quodlibet/qltk/renamefiles.py | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ quodlibet/quodlibet/qltk/renamefiles.py | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/quodlibet/quodlibet/qltk/renamefiles.py b/quodlibet/quodlibet/qltk/renamefiles.py
-index cc2a5f5..3a506e7 100644
+index cc2a5f5..1d3e399 100644
 --- a/quodlibet/quodlibet/qltk/renamefiles.py
 +++ b/quodlibet/quodlibet/qltk/renamefiles.py
-@@ -352,8 +352,15 @@ class RenameFiles(Gtk.VBox):
+@@ -350,10 +350,17 @@ class RenameFiles(Gtk.VBox):
+         if path_old in art_sets.keys():
+             images = art_sets[path_old]
          else:
-             art_sets[path_old] = images
-             # generate art set for path
+-            art_sets[path_old] = images
 +            def glob_escape(s):
-+                for c in [ '[', '*', '?' ]:
++                for c in ['[', '*', '?']:
 +                    s = s.replace(c, '[' + c + ']')
 +                return s
 +
+             # generate art set for path
++            art_sets[path_old] = images
 +            path_old_escaped = glob_escape(path_old)
              for suffix in self.IMAGE_EXTENSIONS:
 -                images.extend(glob.glob(os.path.join(path_old, "*." + suffix)))
