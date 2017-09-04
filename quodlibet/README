@@ -72,7 +72,7 @@ bigger OR smaller. in practice, this is not really noticable
 -allows multiple big images to remain visible from a single CoverImage
 -toggled via the config 'settings -> multiple_big_images' bool
 
-# coverswidgetbar.plugin.diff [git sha:159876fd7d619ee96ca581e4b893f78b573488da | pending]
+# coverswidgetbar.plugin.diff [git sha:0ad7a3a712229505c06c2a9e49e8dce97c605e6a | pending]
 
 # update.default.widgetbars.tooltip.example.diff [git sha:58f937c9e6c241a72984dbc83660c1b1a0850c89 | pending]
 
@@ -92,7 +92,7 @@ bigger OR smaller. in practice, this is not really noticable
 
 # expose.pluginmanager's.scanned.modules.diff [git sha:5edfa21dc12fc30b80fd9635eea5d962146aaa68 | pending]
 
-# pluginswidgetbar.plugin.[#2042.part].diff [git sha:1921bfce6b1779c10ac13f158542c56e8f0f5bfa | pending]
+# pluginswidgetbar.plugin.[#2042.part].diff [git sha:ac987928bf8d3a5cc3a19ffe66b1ea1eb51a3d90 | pending]
 -part implementation of #2042, lacking DnD
 -configurable actions via silly string magic in right-click 'actions'
 dialog which perists preferences

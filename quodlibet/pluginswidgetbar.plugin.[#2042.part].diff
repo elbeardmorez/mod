@@ -1,4 +1,4 @@
-From 1921bfce6b1779c10ac13f158542c56e8f0f5bfa Mon Sep 17 00:00:00 2001
+From ac987928bf8d3a5cc3a19ffe66b1ea1eb51a3d90 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Tue, 22 Aug 2017 17:53:03 +0100
 Subject: PluginsWidgetBar plugin [#2042 part]
@@ -36,9 +36,9 @@ which should be overridden by plugin implementors. the default is to
 open the plugin's preferences pane in the preferences dialog
 ---
  quodlibet/po/POTFILES.in                        |   1 +
- quodlibet/quodlibet/ext/ui/plugins_widgetbar.py | 539 ++++++++++++++++++++++++
+ quodlibet/quodlibet/ext/ui/plugins_widgetbar.py | 538 ++++++++++++++++++++++++
  quodlibet/quodlibet/plugins/actions.py          |   2 +
- 3 files changed, 542 insertions(+)
+ 3 files changed, 541 insertions(+)
  create mode 100644 quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
 
 diff --git a/quodlibet/po/POTFILES.in b/quodlibet/po/POTFILES.in
@@ -55,10 +55,10 @@ index b6f1a3c..3e8da6f 100644
  quodlibet/formats/__init__.py
 diff --git a/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
 new file mode 100644
-index 0000000..5846795
+index 0000000..ff792e4
 --- /dev/null
 +++ b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
-@@ -0,0 +1,539 @@
+@@ -0,0 +1,538 @@
 +# -*- coding: utf-8 -*-
 +# Copyright 2017 Pete Beardmore
 +#
@@ -312,7 +312,6 @@ index 0000000..5846795
 +                # hunt
 +                paths = [['__call__']] # add more paths to try
 +                params_set = False
-+                #debug()
 +                for p in paths:
 +                    target_pos = target
 +                    for pp in p:
@@ -555,7 +554,7 @@ index 0000000..5846795
 +                    self.__callbacks_dragdrop[plugin_id] = dragdrop_cb_new
 +            else:
 +                persist = True
-+                self.__callbacks_dragdrop[plugin_id] != dragdrop_cb_new
++                self.__callbacks_dragdrop[plugin_id] = dragdrop_cb_new
 +        else:
 +            if plugin_id in self.__callbacks_dragdrop:
 +                persist = True

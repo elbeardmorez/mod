@@ -1,14 +1,14 @@
-From 159876fd7d619ee96ca581e4b893f78b573488da Mon Sep 17 00:00:00 2001
+From 0ad7a3a712229505c06c2a9e49e8dce97c605e6a Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Mon, 14 Aug 2017 18:00:53 +0100
-Subject: [PATCH 14/31] CoversWidgetBar plugin
+Subject: CoversWidgetBar plugin
 
 ---
  quodlibet/po/POTFILES.in                           |   1 +
  quodlibet/quodlibet/ext/covers/covers_widgetbar.py | 375 +++++++++++++++++++++
  quodlibet/quodlibet/ext/ui/widgetbars.py           |   2 +-
- quodlibet/quodlibet/qltk/widgetbar.py              |  31 ++
- 4 files changed, 408 insertions(+), 1 deletion(-)
+ quodlibet/quodlibet/qltk/widgetbar.py              |  32 ++
+ 4 files changed, 409 insertions(+), 1 deletion(-)
  create mode 100644 quodlibet/quodlibet/ext/covers/covers_widgetbar.py
 
 diff --git a/quodlibet/po/POTFILES.in b/quodlibet/po/POTFILES.in
@@ -418,10 +418,10 @@ index ed213a4..8aa5876 100644
          ]
          for text, label, tooltip, changed_cb in entries:
 diff --git a/quodlibet/quodlibet/qltk/widgetbar.py b/quodlibet/quodlibet/qltk/widgetbar.py
-index e77b18d..45040ff 100644
+index e77b18d..a18220e 100644
 --- a/quodlibet/quodlibet/qltk/widgetbar.py
 +++ b/quodlibet/quodlibet/qltk/widgetbar.py
-@@ -5,6 +5,7 @@
+@@ -5,11 +5,13 @@
  # it under the terms of the GNU General Public License version 2 as
  # published by the Free Software Foundation
  
@@ -429,7 +429,13 @@ index e77b18d..45040ff 100644
  from quodlibet.qltk.pluginwin import PluginWindow
  from quodlibet.plugins import PluginManager
  
-@@ -132,6 +133,36 @@ class WidgetBar(Gtk.Expander):
+ from quodlibet import config
+ from quodlibet import _
++from quodlibet.util import print_d
+ 
+ from quodlibet.qltk import get_top_parent
+ from quodlibet.qltk import Icons
+@@ -132,6 +134,36 @@ class WidgetBar(Gtk.Expander):
          # no guarantee that this will be called -> :(
          self.__save()
  
