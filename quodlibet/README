@@ -138,3 +138,18 @@ open the plugin's preferences pane in the preferences dialog
 # burn.cd,.fascilitate.non-song-menu.initialisation.diff [git sha:84ba2193a58a5fb5a7f1b7a6e264c02d81f1472d | pending]
 
 # xpaned.based.tests.diff [git sha:a624c5a53e11b4538783177a3159aa46e0d7fe90 | pending]
+
+# pluginswidgetbar,.add.drag.'n'.drop.re-ordering.of.icons.diff [git sha:2c3f45eba9499ddd07e0ab217b0e9bc777e316c0 | pending]
+-implementation note:
+to try and ensure the sorted list isn't a complete list of plugins we
+only care about a move in relation to existing ordered items. hence
+consequently, if you've only ordered 3 of 10 items, and move pos 4 to
+pos 10, it will not do anything! you would have to explicitly move
+others items (5 to 10) in front of it in order to push it out to
+position 10. also, moving item 10 to position 9 will thus push the
+item all the way to position 4. this might look like broken behaviour,
+but only when shuffling around previously unordered items. a benefit
+here would be trying to order item 999 down to position 2, no
+excessive drag operation would be needed, scroll to 999, move it 1
+position, and it'll pop to the end of the sorted items (i.e. near the
+front of the full list)
