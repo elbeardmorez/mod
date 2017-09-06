@@ -1,4 +1,4 @@
-From ac987928bf8d3a5cc3a19ffe66b1ea1eb51a3d90 Mon Sep 17 00:00:00 2001
+From d2c8360a45131b3e7054ff040170bf227c1da1d4 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Tue, 22 Aug 2017 17:53:03 +0100
 Subject: PluginsWidgetBar plugin [#2042 part]
@@ -36,9 +36,9 @@ which should be overridden by plugin implementors. the default is to
 open the plugin's preferences pane in the preferences dialog
 ---
  quodlibet/po/POTFILES.in                        |   1 +
- quodlibet/quodlibet/ext/ui/plugins_widgetbar.py | 538 ++++++++++++++++++++++++
+ quodlibet/quodlibet/ext/ui/plugins_widgetbar.py | 541 ++++++++++++++++++++++++
  quodlibet/quodlibet/plugins/actions.py          |   2 +
- 3 files changed, 541 insertions(+)
+ 3 files changed, 544 insertions(+)
  create mode 100644 quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
 
 diff --git a/quodlibet/po/POTFILES.in b/quodlibet/po/POTFILES.in
@@ -55,10 +55,10 @@ index b6f1a3c..3e8da6f 100644
  quodlibet/formats/__init__.py
 diff --git a/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
 new file mode 100644
-index 0000000..ff792e4
+index 0000000..c21b33c
 --- /dev/null
 +++ b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
-@@ -0,0 +1,538 @@
+@@ -0,0 +1,541 @@
 +# -*- coding: utf-8 -*-
 +# Copyright 2017 Pete Beardmore
 +#
@@ -513,6 +513,9 @@ index 0000000..ff792e4
 +        self.__widgetbar.write_datafile(
 +            CLICK_ACTION_SET, iter(self.__callbacks_click.items()),
 +            lambda x: x)
++        self.__widgetbar.write_datafile(
++            DRAGDROP_ACTION_SET, iter(self.__callbacks_dragdrop.items()),
++            lambda x: x)
 +
 +    def __plugin_actions(self, plugin):
 +
@@ -598,10 +601,10 @@ index 0000000..ff792e4
 +
 +        return box
 diff --git a/quodlibet/quodlibet/plugins/actions.py b/quodlibet/quodlibet/plugins/actions.py
-index ff42d2d..ef34a45 100644
+index c814ef9..4380059 100644
 --- a/quodlibet/quodlibet/plugins/actions.py
 +++ b/quodlibet/quodlibet/plugins/actions.py
-@@ -84,6 +84,8 @@ class PluginActionSelector(qltk.Window, PersistentWindowMixin):
+@@ -88,6 +88,8 @@ class PluginActionSelector(qltk.Window, PersistentWindowMixin):
          dragdrop_box.pack_end(self.__dragdrop_cbes, True, True, 2)
          box.pack_start(dragdrop_box, True, True, 5)
  

@@ -1,12 +1,12 @@
-From dbfb362e8336e63080c00c64b14fc2bf32f97949 Mon Sep 17 00:00:00 2001
+From f7c0c65d7f460cd0f8a60b7ea959387fea96ac43 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Sun, 20 Aug 2017 11:03:49 +0100
 Subject: create an actions dialog
 
 ---
  quodlibet/po/POTFILES.in               |   1 +
- quodlibet/quodlibet/plugins/actions.py | 113 +++++++++++++++++++++++++++++++++
- 2 files changed, 114 insertions(+)
+ quodlibet/quodlibet/plugins/actions.py | 117 +++++++++++++++++++++++++++++++++
+ 2 files changed, 118 insertions(+)
  create mode 100644 quodlibet/quodlibet/plugins/actions.py
 
 diff --git a/quodlibet/po/POTFILES.in b/quodlibet/po/POTFILES.in
@@ -23,10 +23,10 @@ index 1c1af63..b6f1a3c 100644
  quodlibet/qltk/about.py
 diff --git a/quodlibet/quodlibet/plugins/actions.py b/quodlibet/quodlibet/plugins/actions.py
 new file mode 100644
-index 0000000..ff42d2d
+index 0000000..c814ef9
 --- /dev/null
 +++ b/quodlibet/quodlibet/plugins/actions.py
-@@ -0,0 +1,113 @@
+@@ -0,0 +1,117 @@
 +# -*- coding: utf-8 -*-
 +# Copyright 2017 Pete Beardmore
 +#
@@ -107,8 +107,12 @@ index 0000000..ff42d2d
 +        self.__dragdrop_cbes = \
 +            ComboBoxEntrySave(DRAGDROP_ACTION_STORE,
 +                              DRAGDROP_ACTION_DEFAULTS.split("\n"),
-+                              title=_("Default dragdrop actions"),
-+                              edit_title=_(u"Edit actions"))
++                              title=plugin.id + " " +
++                                    _("default dragdrop actions"),
++                              edit_title=_(u"Edit actions"),
++                              validator=self.validate,
++                              filter=self.__filter,
++                              filter_data=valid_items)
 +        self.__dragdrop_cbes.get_child().set_text(dragdrop_cb)
 +        dragdrop_box.pack_end(self.__dragdrop_cbes, True, True, 2)
 +        box.pack_start(dragdrop_box, True, True, 5)

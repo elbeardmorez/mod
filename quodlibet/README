@@ -92,7 +92,7 @@ bigger OR smaller. in practice, this is not really noticable
 
 # expose.pluginmanager's.scanned.modules.diff [git sha:5edfa21dc12fc30b80fd9635eea5d962146aaa68 | pending]
 
-# pluginswidgetbar.plugin.[#2042.part].diff [git sha:ac987928bf8d3a5cc3a19ffe66b1ea1eb51a3d90 | pending]
+# pluginswidgetbar.plugin.[#2042.part].diff [git sha:d2c8360a45131b3e7054ff040170bf227c1da1d4 | pending]
 -part implementation of #2042, lacking DnD
 -configurable actions via silly string magic in right-click 'actions'
 dialog which perists preferences
@@ -153,3 +153,5 @@ here would be trying to order item 999 down to position 2, no
 excessive drag operation would be needed, scroll to 999, move it 1
 position, and it'll pop to the end of the sorted items (i.e. near the
 front of the full list)
+
+# create.an.actions.dialog.diff [git sha:f7c0c65d7f460cd0f8a60b7ea959387fea96ac43 | pending]
