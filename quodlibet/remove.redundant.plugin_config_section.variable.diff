@@ -1,0 +1,24 @@
+From a392d03ab6fd32e4dd56573fea08b2e6fa5a2859 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Wed, 6 Sep 2017 16:44:01 +0100
+Subject: remove redundant PLUGIN_CONFIG_SECTION variable
+
+---
+ quodlibet/quodlibet/ext/ui/widgetbars.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/quodlibet/quodlibet/ext/ui/widgetbars.py b/quodlibet/quodlibet/ext/ui/widgetbars.py
+index ed213a4..87719d6 100644
+--- a/quodlibet/quodlibet/ext/ui/widgetbars.py
++++ b/quodlibet/quodlibet/ext/ui/widgetbars.py
+@@ -36,7 +36,6 @@ class WidgetBars(EventPlugin):
+     PLUGIN_ID = "widgetbars"
+     PLUGIN_NAME = _("WidgetBars")
+     PLUGIN_DESC = _("Control plugin for WidgetBars.")
+-    PLUGIN_CONFIG_SECTION = __name__
+     PLUGIN_ICON = Icons.PREFERENCES_PLUGIN
+ 
+     def enabled(self):
+-- 
+1.8.4
+
