@@ -93,6 +93,7 @@ a dumping ground for patches which modify or add functionality
 -add.'widgetbars_enabled'.property.docstring.for.clarity.diff [git sha:d68dedfbde33ca9a63380db0adb91698d2396891 | pending]
 -add.'widgetbar'.class.docstring.diff [git sha:4bf1756ef8b9a5b684f3e712bf30864691cfe5de | pending]
 -remove.redundant.plugin_config_section.variable.diff [git sha:a392d03ab6fd32e4dd56573fea08b2e6fa5a2859 | pending]
+-change.widgetbars.plugin.path.diff [git sha:42e888bdedc5bc1c3fe09bba471f57c95b18c4c1 | pending]
 -return.default.1x1.for.invalid.image.scaling.diff [git sha:85076f1e50e2eec5fb957dd4c4d9af7e677d0f55 | pending]
 -persistent.moveable.big.images.diff [git sha:bf3969e4fed0658d0f225a1a0537a26d746293b7 | pending]
 -support.multiple.big.images.diff [git sha:d394ce2a8e86f2365bfe4e836cb1fe9b00ab8220 | pending]
