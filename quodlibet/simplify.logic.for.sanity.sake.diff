@@ -1,0 +1,34 @@
+From a94078f498b1aaa373761c4032a9c3cb275cdfa2 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Wed, 6 Sep 2017 15:55:45 +0100
+Subject: simplify logic for sanity sake
+
+---
+ quodlibet/quodlibet/qltk/paned.py | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/quodlibet/quodlibet/qltk/paned.py b/quodlibet/quodlibet/qltk/paned.py
+index b6ca7b9..72b2b48 100644
+--- a/quodlibet/quodlibet/qltk/paned.py
++++ b/quodlibet/quodlibet/qltk/paned.py
+@@ -181,9 +181,14 @@ class XPaned(Paned):
+ 
+         # lock other non-expander or expanded widgets
+         widgets = self.panelocks(self.root)
+-        for w in (w for w in widgets
+-            if w is not widget
+-                 and (not isinstance(w, Gtk.Expander) or w.get_expanded())):
++        for w in widgets:
++            if w is widget:
++                # ignore as this is the widget we're targetting to update!
++                continue
++            if isinstance(w, Gtk.Expander) and not w.get_expanded():
++                # ignore collapsed expanders
++                continue
++
+             # widget already changed. use stored if available
+             size = w.panelock.size
+ #            print_d("%r | setting size request: %d" % (w.id, size))
+-- 
+1.8.4
+
