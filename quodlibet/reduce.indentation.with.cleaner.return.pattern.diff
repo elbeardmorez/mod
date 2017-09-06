@@ -1,0 +1,63 @@
+From 1f8524cc279ac3f5f25da4389a8b5e633f032792 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Wed, 6 Sep 2017 17:59:00 +0100
+Subject: reduce indentation with cleaner return pattern
+
+---
+ quodlibet/quodlibet/qltk/paned.py | 39 ++++++++++++++++++++-------------------
+ 1 file changed, 20 insertions(+), 19 deletions(-)
+
+diff --git a/quodlibet/quodlibet/qltk/paned.py b/quodlibet/quodlibet/qltk/paned.py
+index 72b2b48..fe30e4a 100644
+--- a/quodlibet/quodlibet/qltk/paned.py
++++ b/quodlibet/quodlibet/qltk/paned.py
+@@ -253,26 +253,27 @@ class XPaned(Paned):
+         # clear size requests to allow shrinking
+         Gtk.HPaned.do_size_allocate(self, *args)
+ 
+-        if not self.__updating:
++        if self.__resizing:
++            return
+ 
+-            if not self.__panelocks:
+-                widgets = self.panelocks(self.root)
+-                for w in widgets:
+-                    if isinstance(w, Gtk.Expander) and not w.get_expanded():
+-                        continue
+-#                    print_d("%r | adding to panelocks, size: %d"
+-#                            % (w.id, w.panelock.size))
+-                    self.__panelocks.append(w)
+-#                    print_d("%r | setting parent pane(s) to respect "
+-#                            "handle position" % w.id)
+-                    parent = self
+-                    while parent:
+-                        if isinstance(parent, Gtk.Paned):
+-                            parent.props.position_set = True
+-                        parent = parent.get_parent()
+-
+-#                    print_d("%r | clearing size request" % w.id)
+-                    w.set_size_request(-1, -1)
++        if not self.__panelocks:
++            widgets = self.panelocks(self.root)
++            for w in widgets:
++                if isinstance(w, Gtk.Expander) and not w.get_expanded():
++                    continue
++#                print_d("%r | adding to panelocks, size: %d"
++#                        % (w.id, w.panelock.size))
++                self.__panelocks.append(w)
++#                print_d("%r | setting parent pane(s) to respect "
++#                        "handle position" % w.id)
++                parent = self
++                while parent:
++                    if isinstance(parent, Gtk.Paned):
++                        parent.props.position_set = True
++                    parent = parent.get_parent()
++
++#                print_d("%r | clearing size request" % w.id)
++                w.set_size_request(-1, -1)
+ 
+     def __check_resize(self, data, *args):
+ 
+-- 
+1.8.4
+
