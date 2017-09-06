@@ -111,4 +111,5 @@ a dumping ground for patches which modify or add functionality
 -burn.cd,.fascilitate.non-song-menu.initialisation.diff [git sha:84ba2193a58a5fb5a7f1b7a6e264c02d81f1472d | pending]
 -xpaned.based.tests.diff [git sha:a624c5a53e11b4538783177a3159aa46e0d7fe90 | pending]
 -pluginswidgetbar,.add.drag.'n'.drop.re-ordering.of.icons.diff [git sha:2c3f45eba9499ddd07e0ab217b0e9bc777e316c0 | pending]
+-pluginswidgetbar,.add.alpha.to.drag.icon.diff [git sha:fcb8c9832d5b6c05ec3a997a0d721715e669a7c0 | pending]
 
