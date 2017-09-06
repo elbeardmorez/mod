@@ -1,0 +1,33 @@
+From a1508c5a41a7675d4643a440c37f28ef8178136c Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Wed, 6 Sep 2017 16:02:04 +0100
+Subject: remove variable access repetition
+
+---
+ quodlibet/quodlibet/qltk/quodlibetwindow.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/quodlibet/quodlibet/qltk/quodlibetwindow.py b/quodlibet/quodlibet/qltk/quodlibetwindow.py
+index 91d7e44..df64e5e 100644
+--- a/quodlibet/quodlibet/qltk/quodlibetwindow.py
++++ b/quodlibet/quodlibet/qltk/quodlibetwindow.py
+@@ -867,13 +867,13 @@ class QuodLibetWindow(Window, PersistentWindowMixin, AppWindow):
+         ui_elements = self.get_ui_elements()
+ 
+         # unparent all ui elements
+-        if self.__dyn_elements_box.get_children():
++        dyn_elements = self.__dyn_elements_box.get_children()
++        if dyn_elements:
+             for w in ui_elements:
+                 parent = w.get_parent()
+                 if parent:
+                     parent.remove(w)
+-            self.__dyn_elements_box.remove(
+-                self.__dyn_elements_box.get_children()[0])
++            self.__dyn_elements_box.remove(dyn_elements[0])
+ 
+         # add ui elements to multipane
+         print_d("adding %d widgets to multipane" % len(ui_elements))
+-- 
+1.8.4
+

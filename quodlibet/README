@@ -61,6 +61,8 @@ bigger OR smaller. in practice, this is not really noticable
 
 # simplify.logic.for.sanity.sake.diff [git sha:a94078f498b1aaa373761c4032a9c3cb275cdfa2 | pending]
 
+# remove.variable.access.repetition.diff [git sha:a1508c5a41a7675d4643a440c37f28ef8178136c | pending]
+
 # return.default.1x1.for.invalid.image.scaling.diff [git sha:85076f1e50e2eec5fb957dd4c4d9af7e677d0f55 | pending]
 
 # persistent.moveable.big.images.diff [git sha:bf3969e4fed0658d0f225a1a0537a26d746293b7 | pending]
