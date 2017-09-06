@@ -65,6 +65,8 @@ bigger OR smaller. in practice, this is not really noticable
 
 # add.'widgetbars_enabled'.property.docstring.for.clarity.diff [git sha:d68dedfbde33ca9a63380db0adb91698d2396891 | pending]
 
+# add.'widgetbar'.class.docstring.diff [git sha:4bf1756ef8b9a5b684f3e712bf30864691cfe5de | pending]
+
 # return.default.1x1.for.invalid.image.scaling.diff [git sha:85076f1e50e2eec5fb957dd4c4d9af7e677d0f55 | pending]
 
 # persistent.moveable.big.images.diff [git sha:bf3969e4fed0658d0f225a1a0537a26d746293b7 | pending]
