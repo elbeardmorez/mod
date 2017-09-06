@@ -95,6 +95,7 @@ a dumping ground for patches which modify or add functionality
 -remove.redundant.plugin_config_section.variable.diff [git sha:a392d03ab6fd32e4dd56573fea08b2e6fa5a2859 | pending]
 -change.widgetbars.plugin.path.diff [git sha:42e888bdedc5bc1c3fe09bba471f57c95b18c4c1 | pending]
 -inline.some.logic.to.improve.readability.diff [git sha:b7a373092c108efb3995ab3891705dc9337cea7e | pending]
+-remove.multiline.debug.statement.diff [git sha:0fc57c42f6e062c6d6c67f4a10f955c95e16430c | pending]
 -return.default.1x1.for.invalid.image.scaling.diff [git sha:85076f1e50e2eec5fb957dd4c4d9af7e677d0f55 | pending]
 -persistent.moveable.big.images.diff [git sha:bf3969e4fed0658d0f225a1a0537a26d746293b7 | pending]
 -support.multiple.big.images.diff [git sha:d394ce2a8e86f2365bfe4e836cb1fe9b00ab8220 | pending]
