@@ -92,7 +92,7 @@ bigger OR smaller. in practice, this is not really noticable
 
 # expose.pluginmanager's.scanned.modules.diff [git sha:5edfa21dc12fc30b80fd9635eea5d962146aaa68 | pending]
 
-# pluginswidgetbar.plugin.[#2042.part].diff [git sha:d2c8360a45131b3e7054ff040170bf227c1da1d4 | pending]
+# pluginswidgetbar.plugin.[#2042.part].diff [git sha:c5f3d41b45af992ec4394ae3f65321903e4151b4 | pending]
 -part implementation of #2042, lacking DnD
 -configurable actions via silly string magic in right-click 'actions'
 dialog which perists preferences

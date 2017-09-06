@@ -1,4 +1,4 @@
-From d2c8360a45131b3e7054ff040170bf227c1da1d4 Mon Sep 17 00:00:00 2001
+From c5f3d41b45af992ec4394ae3f65321903e4151b4 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Tue, 22 Aug 2017 17:53:03 +0100
 Subject: PluginsWidgetBar plugin [#2042 part]
@@ -36,9 +36,9 @@ which should be overridden by plugin implementors. the default is to
 open the plugin's preferences pane in the preferences dialog
 ---
  quodlibet/po/POTFILES.in                        |   1 +
- quodlibet/quodlibet/ext/ui/plugins_widgetbar.py | 541 ++++++++++++++++++++++++
+ quodlibet/quodlibet/ext/ui/plugins_widgetbar.py | 544 ++++++++++++++++++++++++
  quodlibet/quodlibet/plugins/actions.py          |   2 +
- 3 files changed, 544 insertions(+)
+ 3 files changed, 547 insertions(+)
  create mode 100644 quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
 
 diff --git a/quodlibet/po/POTFILES.in b/quodlibet/po/POTFILES.in
@@ -55,10 +55,10 @@ index b6f1a3c..3e8da6f 100644
  quodlibet/formats/__init__.py
 diff --git a/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
 new file mode 100644
-index 0000000..c21b33c
+index 0000000..b6ebdfe
 --- /dev/null
 +++ b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
-@@ -0,0 +1,541 @@
+@@ -0,0 +1,544 @@
 +# -*- coding: utf-8 -*-
 +# Copyright 2017 Pete Beardmore
 +#
@@ -508,6 +508,9 @@ index 0000000..c21b33c
 +        items = self.__widgetbar.read_datafile(CLICK_ACTION_SET, 2)
 +        for kv in items:
 +            self.__callbacks_click[kv[0]] = kv[1]
++        items = self.__widgetbar.read_datafile(DRAGDROP_ACTION_SET, 2)
++        for kv in items:
++            self.__callbacks_dragdrop[kv[0]] = kv[1]
 +
 +    def __write_actions(self):
 +        self.__widgetbar.write_datafile(
