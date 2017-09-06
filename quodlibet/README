@@ -57,6 +57,8 @@ bigger OR smaller. in practice, this is not really noticable
 
 # xpaned.based.tests.diff [git sha:449aadbb0a4634bf4ee7fe868868c2b1b33da154 | pending]
 
+# variable.name.refactoring.diff [git sha:007e03d6f1126393c45e62c99cc47099501af093 | pending]
+
 # return.default.1x1.for.invalid.image.scaling.diff [git sha:85076f1e50e2eec5fb957dd4c4d9af7e677d0f55 | pending]
 
 # persistent.moveable.big.images.diff [git sha:bf3969e4fed0658d0f225a1a0537a26d746293b7 | pending]
