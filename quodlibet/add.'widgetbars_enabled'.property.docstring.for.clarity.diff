@@ -1,0 +1,24 @@
+From d68dedfbde33ca9a63380db0adb91698d2396891 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Wed, 6 Sep 2017 16:08:07 +0100
+Subject: add 'widgetbars_enabled' property docstring for clarity
+
+---
+ quodlibet/quodlibet/qltk/quodlibetwindow.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/quodlibet/quodlibet/qltk/quodlibetwindow.py b/quodlibet/quodlibet/qltk/quodlibetwindow.py
+index df64e5e..7c0c8ff 100644
+--- a/quodlibet/quodlibet/qltk/quodlibetwindow.py
++++ b/quodlibet/quodlibet/qltk/quodlibetwindow.py
+@@ -945,6 +945,7 @@ class QuodLibetWindow(Window, PersistentWindowMixin, AppWindow):
+ 
+     @property
+     def widgetbars_enabled(self):
++        """Returns True if the 'WidgetBars' plugin is currently enabled"""
+         pm = PluginManager.instance
+         if not pm:
+             return False
+-- 
+1.8.4
+
