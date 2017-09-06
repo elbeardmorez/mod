@@ -1,0 +1,45 @@
+From b7a373092c108efb3995ab3891705dc9337cea7e Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Wed, 6 Sep 2017 17:10:40 +0100
+Subject: inline some logic to improve readability
+
+---
+ quodlibet/quodlibet/qltk/quodlibetwindow.py | 21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
+
+diff --git a/quodlibet/quodlibet/qltk/quodlibetwindow.py b/quodlibet/quodlibet/qltk/quodlibetwindow.py
+index 7c0c8ff..45b2d28 100644
+--- a/quodlibet/quodlibet/qltk/quodlibetwindow.py
++++ b/quodlibet/quodlibet/qltk/quodlibetwindow.py
+@@ -880,16 +880,19 @@ class QuodLibetWindow(Window, PersistentWindowMixin, AppWindow):
+         self.__multipaned.set_widgets(ui_elements, [(False, False)])
+ 
+         # ensure initial panelocks
++        def lockable(widget):
++            return hasattr(widget, 'panelock') and \
++                not (isinstance(w, Gtk.Expander) and not w.get_expanded())
++
+         for w in ui_elements:
+-            if hasattr(w, 'panelock') and not (isinstance(w, Gtk.Expander)
+-                                               and not w.get_expanded()):
+-                print_d("%r | setting panelock size: %d" %
+-                            (w.id, w.panelock.size))
+-                if w.panelock.orientation == Gtk.Orientation.VERTICAL:
+-                    w.set_size_request(-1, w.panelock.size)
+-                else:
+-                    w.set_size_request(w.panelock.size, -1)
+-                w.get_parent().queue_resize()
++            if not lockable(w):
++                continue
++            print_d("%r | setting panelock size: %d" % (w.id, w.panelock.size))
++            if w.panelock.orientation == Gtk.Orientation.VERTICAL:
++                w.set_size_request(-1, w.panelock.size)
++            else:
++                w.set_size_request(w.panelock.size, -1)
++            w.get_parent().queue_resize()
+ 
+         # expand browser only, implicitly meaning any pane in which it nests
+         w = self.ui_elements['main']
+-- 
+1.8.4
+
