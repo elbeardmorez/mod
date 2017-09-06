@@ -1,0 +1,121 @@
+From 42cb6412910045fdfe189376cb83355a1dd048c9 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Wed, 6 Sep 2017 10:00:51 +0100
+Subject: pluginswidgetbar, add drag scrolling
+
+---
+ quodlibet/quodlibet/ext/ui/plugins_widgetbar.py |  9 +++++
+ quodlibet/quodlibet/qltk/widgetbar.py           | 54 ++++++++++++++++++++++++-
+ 2 files changed, 62 insertions(+), 1 deletion(-)
+
+diff --git a/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
+index 128f486..c33ba36 100644
+--- a/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
++++ b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
+@@ -65,6 +65,7 @@ class PluginsWidgetBarPluginDnDMixin(object):
+     def setup_drop(self, widget):
+         widget.connect('button-press-event', self.__click, widget)
+         widget.connect('drag-begin', self.__drag_begin, widget)
++        widget.connect('drag-end', self.__drag_end, widget)
+         widget.connect('drag-motion', self.__drag_motion)
+         widget.connect('drag-data-get', self.__drag_data_get)
+         widget.connect('drag-data-received', self.__drag_data_received)
+@@ -96,6 +97,7 @@ class PluginsWidgetBarPluginDnDMixin(object):
+ 
+     def __drag_begin(self, widget, drag_ctx, source):
+         self._dragged = True
++        self.widgetbar.drag_scroll_setup()
+ 
+         def drag_pixbuf(widget):
+ 
+@@ -140,8 +142,15 @@ class PluginsWidgetBarPluginDnDMixin(object):
+ 
+         ok, state = Gtk.get_current_event_state()
+ 
++    def __drag_end(self, widget, ctx, time):
++        self.widgetbar.drag_scroll_disable()
++
+     def __drag_motion(self, widget, ctx, x, y, time):
+ 
++        mouse_pos = \
++            widget.translate_coordinates(self.widgetbar.scroll, x, y)
++        self.widgetbar.drag_scroll(mouse_pos)
++
+         if hasattr(Gtk.drag_get_source_widget(ctx), 'drag_widget'):
+             self.__drag_side = round(float(x) / widget.get_allocation().width)
+ 
+diff --git a/quodlibet/quodlibet/qltk/widgetbar.py b/quodlibet/quodlibet/qltk/widgetbar.py
+index a18220e..9c52042 100644
+--- a/quodlibet/quodlibet/qltk/widgetbar.py
++++ b/quodlibet/quodlibet/qltk/widgetbar.py
+@@ -19,7 +19,9 @@ from quodlibet.qltk.menubutton import SmallMenuButton
+ from quodlibet.qltk.x import ScrolledWindow, SymbolicIconImage, \
+     SmallImageButton, MenuItem, PaneLock
+ 
+-from gi.repository import Gtk
++from gi.repository import Gtk, GLib
++
++SCROLL_AREA = 60
+ 
+ 
+ class WidgetBar(Gtk.Expander):
+@@ -130,6 +132,56 @@ class WidgetBar(Gtk.Expander):
+             pm.save()
+         self.__save()
+ 
++    def __scroll_size(self, offset):
++        if offset > SCROLL_AREA:
++            offset = SCROLL_AREA
++        change = round((float(offset) / SCROLL_AREA)**1.5)
++        if change <= 0:
++            change = 1
++#        print_d("scroll size offset %d, change %d" % (offset, change))
++        return change
++
++    def drag_scroll_setup(self):
++        self.__drag_scroll = True
++        self.__scrolling_size = 0
++
++    def drag_scroll_disable(self):
++        self.__drag_scroll = False
++        self.__scroll_callback_handle = None
++        self.__scrolling_size = 0
++
++    def drag_scroll(self, mouse_pos):
++
++        min_pos = SCROLL_AREA
++        max_pos = self.scroll.get_allocation().width - SCROLL_AREA
++
++        if not mouse_pos:
++            return
++
++        pos = mouse_pos[0]
++        if pos < min_pos or pos > max_pos:
++            self.__drag_scroll = True
++            self.__scroll_callback_handle = \
++                GLib.timeout_add(10, self.__scrolling)
++        else:
++            self.__drag_scroll = False
++
++        if pos < min_pos:
++            self.__scrolling_size = -1 * self.__scroll_size(min_pos - pos)
++        elif pos > max_pos:
++            self.__scrolling_size = self.__scroll_size(pos - max_pos)
++
++    def __scrolling(self):
++
++        if not self.__drag_scroll:
++            return False
++
++#        print_d("scrolling by %d" % self.__scrolling_size)
++        adj = self.scroll.get_hadjustment()
++        adj.set_value(adj.get_value() + self.__scrolling_size)
++
++        return True
++
+     def __destroy(self, *args):
+         # no guarantee that this will be called -> :(
+         self.__save()
+-- 
+1.8.4
+

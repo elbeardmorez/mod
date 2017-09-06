@@ -157,3 +157,5 @@ front of the full list)
 # create.an.actions.dialog.diff [git sha:f7c0c65d7f460cd0f8a60b7ea959387fea96ac43 | pending]
 
 # pluginswidgetbar,.add.alpha.to.drag.icon.diff [git sha:fcb8c9832d5b6c05ec3a997a0d721715e669a7c0 | pending]
+
+# pluginswidgetbar,.add.drag.scrolling.diff [git sha:42cb6412910045fdfe189376cb83355a1dd048c9 | pending]

@@ -112,4 +112,5 @@ a dumping ground for patches which modify or add functionality
 -xpaned.based.tests.diff [git sha:a624c5a53e11b4538783177a3159aa46e0d7fe90 | pending]
 -pluginswidgetbar,.add.drag.'n'.drop.re-ordering.of.icons.diff [git sha:2c3f45eba9499ddd07e0ab217b0e9bc777e316c0 | pending]
 -pluginswidgetbar,.add.alpha.to.drag.icon.diff [git sha:fcb8c9832d5b6c05ec3a997a0d721715e669a7c0 | pending]
+-pluginswidgetbar,.add.drag.scrolling.diff [git sha:42cb6412910045fdfe189376cb83355a1dd048c9 | pending]
 
