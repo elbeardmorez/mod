@@ -1,7 +1,8 @@
-From 2c3f45eba9499ddd07e0ab217b0e9bc777e316c0 Mon Sep 17 00:00:00 2001
+From c1f54296d70c5c4298643929238d9273be772af2 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Tue, 5 Sep 2017 18:01:19 +0100
-Subject: pluginswidgetbar, add drag 'n' drop re-ordering of icons
+Subject: pluginswidgetbar, add drag 'n' drop re-ordering of
+ icons
 
 -implementation note:
 to try and ensure the sorted list isn't a complete list of plugins we
@@ -21,7 +22,7 @@ front of the full list)
  1 file changed, 146 insertions(+), 12 deletions(-)
 
 diff --git a/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
-index 3414e04..040ecb2 100644
+index e7955be..efdb6c9 100644
 --- a/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
 +++ b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
 @@ -30,6 +30,7 @@ from quodlibet.qltk.ccb import ConfigCheckButton
@@ -252,7 +253,7 @@ index 3414e04..040ecb2 100644
          return plugin_align
  
      def __read_actions(self):
-@@ -604,6 +731,13 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+@@ -610,6 +737,13 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
          self.__preferences_controls['highlight_below'].\
              set_sensitive(CONFIG.highlight_enabled)
  

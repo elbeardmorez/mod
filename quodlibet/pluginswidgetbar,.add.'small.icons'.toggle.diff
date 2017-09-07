@@ -1,4 +1,4 @@
-From 8a6544ca4870478ec57967c6446f3b524e45dffe Mon Sep 17 00:00:00 2001
+From d2661638ee95d8973401ab07d25d36d50b04efcd Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Wed, 23 Aug 2017 07:25:22 +0100
 Subject: pluginswidgetbar, add 'small icons' toggle
@@ -8,7 +8,7 @@ Subject: pluginswidgetbar, add 'small icons' toggle
  1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
-index e9b2196..13f424c 100644
+index 8bf48b8..45b3391 100644
 --- a/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
 +++ b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
 @@ -48,6 +48,7 @@ class Config(object):
@@ -19,7 +19,7 @@ index e9b2196..13f424c 100644
  
  
  CONFIG = Config()
-@@ -441,8 +442,11 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+@@ -440,8 +441,11 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
              plugin_box_align = Align(left=4, right=4)
              plugin_box_align.add(plugin_box_inner)
  
@@ -32,7 +32,7 @@ index e9b2196..13f424c 100644
              plugin_icon_image.set_tooltip_markup(
                  _("name: " + p.name + "\nid: " + p.id))
              padding = 10 if CONFIG.show_labels else 5
-@@ -564,6 +568,8 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+@@ -569,6 +573,8 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
               None, True, lambda w: self.__update_plugins(), 0),
              (plugin_id + '_show_labels', _("Show labels"),
               None, True, lambda w: self.__update_plugins(), 0),

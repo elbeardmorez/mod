@@ -1,4 +1,4 @@
-From fcb8c9832d5b6c05ec3a997a0d721715e669a7c0 Mon Sep 17 00:00:00 2001
+From 84225d972a0e2896c9f9af922b5342e7733c255c Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Wed, 6 Sep 2017 09:01:15 +0100
 Subject: pluginswidgetbar, add alpha to drag icon
@@ -8,7 +8,7 @@ Subject: pluginswidgetbar, add alpha to drag icon
  1 file changed, 41 insertions(+), 8 deletions(-)
 
 diff --git a/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
-index e29055b..128f486 100644
+index efdb6c9..ca28e48 100644
 --- a/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
 +++ b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
 @@ -6,13 +6,14 @@

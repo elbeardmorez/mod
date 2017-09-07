@@ -1,4 +1,4 @@
-From 11d45592218c27cead4e3c99c1f8a265a0536c17 Mon Sep 17 00:00:00 2001
+From 68ab0cb64def1076780f36f89a9a74eefd19be9d Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Tue, 8 Aug 2017 07:15:10 +0100
 Subject: add 'Expander-aware' X-Paned flavours

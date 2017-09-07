@@ -1,4 +1,4 @@
-From 69b5c106bad415bf42b47ea52d1130ffca0cbfe8 Mon Sep 17 00:00:00 2001
+From 564c8cb08f73ade18b843bb3a1857023af5159c7 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Thu, 24 Aug 2017 08:04:58 +0100
 Subject: pluginswidgetbar, add plugin errors icon
@@ -8,7 +8,7 @@ Subject: pluginswidgetbar, add plugin errors icon
  1 file changed, 84 insertions(+), 43 deletions(-)
 
 diff --git a/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
-index 13f424c..dc7dcec 100644
+index 45b3391..3b803d8 100644
 --- a/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
 +++ b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
 @@ -18,7 +18,7 @@ from quodlibet import _
@@ -28,7 +28,7 @@ index 13f424c..dc7dcec 100644
  
  
  CONFIG = Config()
-@@ -424,52 +425,66 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+@@ -423,52 +424,66 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
          # clear container
          self.__content.foreach(lambda w: self.__content.remove(w))
          # (re)display icons
@@ -137,7 +137,7 @@ index 13f424c..dc7dcec 100644
      def __read_actions(self):
          items = self.__widgetbar.read_datafile(CLICK_ACTION_SET, 2)
          for kv in items:
-@@ -529,6 +544,30 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+@@ -534,6 +549,30 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
          if persist:
              self.__write_actions()
  
@@ -168,7 +168,7 @@ index 13f424c..dc7dcec 100644
      def PluginPreferences(self, window):
  
          box = Gtk.VBox(spacing=6)
-@@ -570,6 +609,8 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+@@ -575,6 +614,8 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
               None, True, lambda w: self.__update_plugins(), 0),
              (plugin_id + '_small_icons', _("Use small icons"),
               None, True, lambda w: self.__update_plugins(), 0),

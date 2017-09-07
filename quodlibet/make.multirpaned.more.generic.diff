@@ -1,4 +1,4 @@
-From c52cfaf9c454d51ddcb8774ee9e04e6f79218dba Mon Sep 17 00:00:00 2001
+From 312d0a012a59097699c6563bf4a5b5d493a57441 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Sat, 5 Aug 2017 07:52:12 +0100
 Subject: make MultiRPaned more generic

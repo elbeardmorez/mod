@@ -1,7 +1,7 @@
-From a624c5a53e11b4538783177a3159aa46e0d7fe90 Mon Sep 17 00:00:00 2001
+From 449aadbb0a4634bf4ee7fe868868c2b1b33da154 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Wed, 30 Aug 2017 07:14:05 +0100
-Subject: [PATCH] XPaned based tests
+Subject: XPaned based tests
 
 ---
  quodlibet/tests/test_qltk_paned.py | 152 +++++++++++++++++++++++++++++++++++--

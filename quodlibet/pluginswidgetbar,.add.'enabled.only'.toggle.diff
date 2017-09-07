@@ -1,4 +1,4 @@
-From c765323dce5439a37c4833ba2bb214864ba414ac Mon Sep 17 00:00:00 2001
+From 61e09b72aacf15801e8b8f5d43a004bab72a4799 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Wed, 23 Aug 2017 06:41:59 +0100
 Subject: pluginswidgetbar, add 'enabled only' toggle
@@ -8,7 +8,7 @@ Subject: pluginswidgetbar, add 'enabled only' toggle
  1 file changed, 35 insertions(+), 1 deletion(-)
 
 diff --git a/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
-index 5846795..d84f46b 100644
+index b6ebdfe..29c7a41 100644
 --- a/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
 +++ b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
 @@ -25,6 +25,7 @@ from quodlibet.qltk.entry import UndoEntry
@@ -46,7 +46,7 @@ index 5846795..d84f46b 100644
          separator = Gtk.VSeparator()
          separator_align = Gtk.Alignment(yscale=0.8)
          separator_align.add(separator)
-@@ -352,6 +362,12 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+@@ -351,6 +361,12 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
          if not self.live:
              return
  
@@ -59,7 +59,7 @@ index 5846795..d84f46b 100644
          # sort and filter
  
          # condition maps
-@@ -364,6 +380,7 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+@@ -363,6 +379,7 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
          filter_negative = {}
          if CONFIG.filter_negative:
              filter_negative = set(CONFIG.filter_negative.split(','))
@@ -67,7 +67,7 @@ index 5846795..d84f46b 100644
  
          plugins_map = OrderedDict()
          plugins_map_first = OrderedDict()
-@@ -371,6 +388,8 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+@@ -370,6 +387,8 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
  
          # map plugins and discard disabled if required
          for p in pm.plugins:
@@ -76,7 +76,7 @@ index 5846795..d84f46b 100644
              if p.id in sort_order:
                  plugins_map_first[p.id] = p
              else:
-@@ -536,4 +555,19 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+@@ -541,4 +560,19 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
              filter_box.pack_start(filter_entry, True, True, 0)
              box.pack_start(filter_box, True, True, 0)
  

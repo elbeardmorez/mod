@@ -1,4 +1,4 @@
-From cff7cf38011b72116b6208a69f21d2f995083edf Mon Sep 17 00:00:00 2001
+From 7e07dd260f392bf55ef96d8bb4dfd1051448cc14 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Sat, 19 Aug 2017 09:50:29 +0100
 Subject: add filtering to ComboBoxEntrySave widget

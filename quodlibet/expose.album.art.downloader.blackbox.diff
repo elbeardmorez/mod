@@ -1,20 +1,20 @@
-From 88193ee84525e2e003c6e49ddde9c5d24f33b05b Mon Sep 17 00:00:00 2001
+From e6bf84b2599412924f9f01ecdb57a04a4c572e3d Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Tue, 1 Aug 2017 23:09:39 +0100
-Subject: expose album art downloader's blackbox
+Subject: expose album art downloader blackbox
 
 the algorithm for construction of a final 'query to send'  based on user
 input is imperfect. allow users to override this if the results are off
 (e.g. missing words) whilst giving them insight into what's usually best.
 ---
  quodlibet/quodlibet/ext/songsmenu/albumart.py | 125 ++++++++++++++++++--------
- 1 file changed, 89 insertions(+), 36 deletions(-)
+ 1 file changed, 90 insertions(+), 35 deletions(-)
 
 diff --git a/quodlibet/quodlibet/ext/songsmenu/albumart.py b/quodlibet/quodlibet/ext/songsmenu/albumart.py
-index 9a4fca3..6d5bfb4 100644
+index abefab1..30e3889 100644
 --- a/quodlibet/quodlibet/ext/songsmenu/albumart.py
 +++ b/quodlibet/quodlibet/ext/songsmenu/albumart.py
-@@ -691,21 +691,57 @@ class AlbumArtWindow(qltk.Window, PluginConfigMixin):
+@@ -693,21 +693,57 @@ class AlbumArtWindow(qltk.Window, PluginConfigMixin):
          sw_list.set_shadow_type(Gtk.ShadowType.IN)
          sw_list.add(treeview)
  
@@ -79,7 +79,7 @@ index 9a4fca3..6d5bfb4 100644
          left_vbox.pack_start(sw_list, True, True, 0)
  
          hpaned = Paned()
-@@ -720,11 +756,16 @@ class AlbumArtWindow(qltk.Window, PluginConfigMixin):
+@@ -722,11 +758,16 @@ class AlbumArtWindow(qltk.Window, PluginConfigMixin):
  
          left_vbox.pack_start(self.progress, False, True, 0)
  
@@ -96,7 +96,7 @@ index 9a4fca3..6d5bfb4 100644
      def __drag_data_get(self, view, ctx, sel, tid, etime, treeselection):
          model, iter = treeselection.get_selected()
          if not iter:
-@@ -732,10 +773,19 @@ class AlbumArtWindow(qltk.Window, PluginConfigMixin):
+@@ -734,10 +775,19 @@ class AlbumArtWindow(qltk.Window, PluginConfigMixin):
          cover = model.get_value(iter, 1)
          sel.set_uris([cover['cover']])
  
@@ -117,7 +117,7 @@ index 9a4fca3..6d5bfb4 100644
          if not text or self.search_lock:
              return
  
-@@ -755,7 +805,8 @@ class AlbumArtWindow(qltk.Window, PluginConfigMixin):
+@@ -757,7 +807,8 @@ class AlbumArtWindow(qltk.Window, PluginConfigMixin):
                      CONFIG_ENG_PREFIX + eng['config_id'], True):
                  search.add_engine(eng['class'], eng['replace'])
  
@@ -127,7 +127,7 @@ index 9a4fca3..6d5bfb4 100644
  
          # Focus the list
          self.treeview.grab_focus()
-@@ -768,8 +819,8 @@ class AlbumArtWindow(qltk.Window, PluginConfigMixin):
+@@ -770,8 +821,8 @@ class AlbumArtWindow(qltk.Window, PluginConfigMixin):
      def set_text(self, text):
          """set the text and move the cursor to the end"""
  
@@ -138,7 +138,7 @@ index 9a4fca3..6d5bfb4 100644
              0, False)
  
      def __select_callback(self, selection, image):
-@@ -837,13 +888,13 @@ class CoverSearch(object):
+@@ -839,13 +890,13 @@ class CoverSearch(object):
  
          self._stop = True
  
@@ -154,7 +154,7 @@ index 9a4fca3..6d5bfb4 100644
              thr.setDaemon(True)
              thr.start()
  
-@@ -851,14 +902,17 @@ class CoverSearch(object):
+@@ -853,14 +904,17 @@ class CoverSearch(object):
          if not len(self.engine_list):
              GLib.idle_add(self.callback, [], 1)
  
@@ -175,20 +175,24 @@ index 9a4fca3..6d5bfb4 100644
          except Exception:
              print_w("[AlbumArt] %s: %r" % (engine.__name__, query))
              print_exc()
-@@ -868,31 +922,30 @@ class CoverSearch(object):
+@@ -870,30 +924,31 @@ class CoverSearch(object):
          progress = float(self.finished) / len(self.engine_list)
          GLib.idle_add(self.callback, result, progress)
  
 -    def __cleanup_query(self, query, replace):
 -        """split up at '-', remove some chars, only keep the longest words..
 -        more false positives but much better results"""
--
+ 
 -        query = query.lower()
 -        if query.startswith("the "):
 -            query = query[4:]
 +def cleanup_query(query, replace):
 +    """split up at '-', remove some chars, only keep the longest words..
 +    more false positives but much better results"""
++
++    query = query.lower()
++    if query.startswith("the "):
++        query = query[4:]
  
 -        split = query.split('-')
 -        replace_str = ('+', '&', ',', '.', '!', '´',
@@ -197,14 +201,6 @@ index 9a4fca3..6d5bfb4 100644
 -        for part in split:
 -            for stri in replace_str:
 -                part = part.replace(stri, replace)
-+    query = query.lower()
-+    if query.startswith("the "):
-+        query = query[4:]
- 
--            p_split = part.split()
--            p_split.sort(key=len, reverse=True)
--            end = max(int(len(p_split) / 4), max(4 - len(p_split), 2))
--            p_split = p_split[:end]
 +    split = query.split('-')
 +    replace_str = ('+', '&', ',', '.', '!', '´',
 +                   '\'', ':', ' and ', '(', ')')
@@ -213,19 +209,23 @@ index 9a4fca3..6d5bfb4 100644
 +        for stri in replace_str:
 +            part = part.replace(stri, replace)
  
--            new_query += ' '.join(p_split) + ' '
+-            p_split = part.split()
+-            p_split.sort(key=len, reverse=True)
+-            end = max(int(len(p_split) / 4), max(4 - len(p_split), 2))
+-            p_split = p_split[:end]
 +        p_split = part.split()
 +        p_split.sort(key=len, reverse=True)
 +        end = max(int(len(p_split) / 4), max(4 - len(p_split), 2))
 +        p_split = p_split[:end]
  
--        return new_query.rstrip()
+-            new_query += ' '.join(p_split) + ' '
 +        new_query += ' '.join(p_split) + ' '
  
+-        return new_query.rstrip()
 +    return new_query.rstrip()
  
+ 
  def get_size_of_url(url):
-     request = Request(url)
 -- 
 1.8.4
 

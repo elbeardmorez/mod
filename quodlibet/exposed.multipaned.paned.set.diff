@@ -1,7 +1,7 @@
-From d85291f5557ad550d81c58547b92f070b7238862 Mon Sep 17 00:00:00 2001
+From 759f306db07154d1c19df499201c1f6fd49cf627 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Fri, 4 Aug 2017 08:13:51 +0100
-Subject: [PATCH 02/31] exposed multipaned paned set
+Subject: exposed multipaned paned set
 
 ---
  quodlibet/quodlibet/qltk/paned.py      | 12 ++++++------

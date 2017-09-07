@@ -1,15 +1,16 @@
-From c5f3d41b45af992ec4394ae3f65321903e4151b4 Mon Sep 17 00:00:00 2001
+From 8459f94c6a04477e1b7201b1f2fecde6ace6cfa0 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Tue, 22 Aug 2017 17:53:03 +0100
 Subject: PluginsWidgetBar plugin [#2042 part]
 
--part implementation of #2042, lacking DnD
+-part implementation of #2042 (drag and drop to follow)
 -configurable actions via silly string magic in right-click 'actions'
 dialog which perists preferences
--action strings can use combinations of plugin or module/class and method names with arguments that are either known (e.g. <songs>, <library>) or simple
-strings. they MUST be prefixed by either 'default' (if you want the
-action to be visible to all plugins), or the plugin id (visible only to
-a specific plugin)
+-action strings can use combinations of plugin or module/class and
+method names with arguments that are either known (e.g. <songs>,
+<library>) or simple strings. they MUST be prefixed by either 'default'
+(if you want the action to be visible to all plugins), or the plugin id
+(visible only to a specific plugin)
 
 e.g.
 [lyrics]
@@ -22,8 +23,8 @@ Download Album Art | <Download Album Art> | <plugin_album>
 Download Album Art | <albumart> | <AlbumArtWindow>.<show> | <songs>
 Download Album Art | <albumart> | <AlbumArtWindow>.<show>
 
-in the latter albumart cases, they all do the same thing. known arguments
-are substituted if missing
+in the latter album art cases, they all do the same thing. known
+arguments are substituted if missing
 
 there are also several default actions, namely:
 
@@ -31,9 +32,10 @@ default | <pluginswidgetbar> | <plugin default action>
 default | <pluginswidgetbar> | <plugin toggle>
 default | <pluginswidgetbar> | <plugin preferences>
 
-<plugin default action> calls the default public callback of a widget,
-which should be overridden by plugin implementors. the default is to
-open the plugin's preferences pane in the preferences dialog
+<plugin default action> calls the default 'action' callback of a
+plugin, which should be overridden by plugin implementors. the
+default is to open the plugin's preferences pane in the preferences
+dialog
 ---
  quodlibet/po/POTFILES.in                        |   1 +
  quodlibet/quodlibet/ext/ui/plugins_widgetbar.py | 544 ++++++++++++++++++++++++
@@ -42,17 +44,17 @@ open the plugin's preferences pane in the preferences dialog
  create mode 100644 quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
 
 diff --git a/quodlibet/po/POTFILES.in b/quodlibet/po/POTFILES.in
-index b6f1a3c..3e8da6f 100644
+index f7a2ed4..cb9f154 100644
 --- a/quodlibet/po/POTFILES.in
 +++ b/quodlibet/po/POTFILES.in
-@@ -132,6 +132,7 @@ quodlibet/ext/songsmenu/splitting.py
+@@ -133,6 +133,7 @@ quodlibet/ext/songsmenu/splitting.py
  quodlibet/ext/songsmenu/tapbpm.py
  quodlibet/ext/songsmenu/website_search.py
  quodlibet/ext/songsmenu/wikipedia.py
 +quodlibet/ext/ui/plugins_widgetbar.py
- quodlibet/ext/ui/widgetbars.py
  quodlibet/formats/_audio.py
  quodlibet/formats/__init__.py
+ quodlibet/__init__.py
 diff --git a/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
 new file mode 100644
 index 0000000..b6ebdfe

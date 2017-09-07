@@ -1,4 +1,4 @@
-From 5edfa21dc12fc30b80fd9635eea5d962146aaa68 Mon Sep 17 00:00:00 2001
+From 94b1aa6bbb79dbde2db472851cc38738769400be Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Sun, 20 Aug 2017 11:05:44 +0100
 Subject: expose PluginManager's scanned modules
@@ -8,7 +8,7 @@ Subject: expose PluginManager's scanned modules
  1 file changed, 6 insertions(+)
 
 diff --git a/quodlibet/quodlibet/plugins/__init__.py b/quodlibet/quodlibet/plugins/__init__.py
-index d89aeb4..88289f8 100644
+index 926fb96..1377e1c 100644
 --- a/quodlibet/quodlibet/plugins/__init__.py
 +++ b/quodlibet/quodlibet/plugins/__init__.py
 @@ -303,6 +303,12 @@ class PluginManager(GObject.GObject):

@@ -1,19 +1,19 @@
-From 299ba25de64a5b5939a65d682cb8b53b7e2366be Mon Sep 17 00:00:00 2001
+From e1b6c70567c574883581ea9b46e2b6b09eac9fce Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Thu, 10 Aug 2017 10:56:01 +0100
-Subject: [PATCH 08/31] WidgetBar implementation [#152 part]
+Subject: WidgetBar implementation [#152 part]
 
 -tied in as a UserInterfacePlugin
 ---
  quodlibet/po/POTFILES.in                    |   1 +
  quodlibet/quodlibet/config.py               |   3 +
- quodlibet/quodlibet/plugins/__init__.py     |  18 +++
+ quodlibet/quodlibet/plugins/__init__.py     |  15 +++
  quodlibet/quodlibet/plugins/gui.py          |  52 ++++++---
  quodlibet/quodlibet/qltk/icons.py           |   1 +
  quodlibet/quodlibet/qltk/quodlibetwindow.py | 173 +++++++++++++++++++++++++---
  quodlibet/quodlibet/qltk/widgetbar.py       | 148 ++++++++++++++++++++++++
  quodlibet/quodlibet/util/config.py          |   3 +-
- 8 files changed, 368 insertions(+), 31 deletions(-)
+ 8 files changed, 365 insertions(+), 31 deletions(-)
  create mode 100644 quodlibet/quodlibet/qltk/widgetbar.py
 
 diff --git a/quodlibet/po/POTFILES.in b/quodlibet/po/POTFILES.in
@@ -43,10 +43,10 @@ index bf15288..164917c 100644
  
      "browsers": {
 diff --git a/quodlibet/quodlibet/plugins/__init__.py b/quodlibet/quodlibet/plugins/__init__.py
-index 04190ef..101ba54 100644
+index 2760883..eb423aa 100644
 --- a/quodlibet/quodlibet/plugins/__init__.py
 +++ b/quodlibet/quodlibet/plugins/__init__.py
-@@ -492,6 +492,15 @@ class PluginConfigMixin(object):
+@@ -494,6 +494,12 @@ class PluginConfigMixin(object):
          return config.getboolean(PM.CONFIG_SECTION, cls._config_key(name),
                                   default)
  
@@ -56,13 +56,10 @@ index 04190ef..101ba54 100644
 +        return config.getstringlist(PM.CONFIG_SECTION, cls._config_key(name),
 +                                 default)
 +
-+    def __get__(self, *args, **kwargs):
-+        return self._conf.getfloat(self._name)
-+
      def config_entry_changed(self, entry, key):
          """React to a change in an gtk.Entry (by saving it to config)"""
          if entry.get_property('sensitive'):
-@@ -544,6 +553,15 @@ class FloatConfProp(ConfProp):
+@@ -546,6 +552,15 @@ class FloatConfProp(ConfProp):
          return self._conf.getfloat(self._name)
  
  
@@ -181,7 +178,7 @@ index 5da4a99..6810b43 100644
      SYSTEM_RUN = "system-run"  # "_Execute"
      SYSTEM_SEARCH = "system-search"
 diff --git a/quodlibet/quodlibet/qltk/quodlibetwindow.py b/quodlibet/quodlibet/qltk/quodlibetwindow.py
-index dd702e4..936344b 100644
+index ef3e709..f18b9af 100644
 --- a/quodlibet/quodlibet/qltk/quodlibetwindow.py
 +++ b/quodlibet/quodlibet/qltk/quodlibetwindow.py
 @@ -10,6 +10,7 @@
@@ -251,7 +248,7 @@ index dd702e4..936344b 100644
  
  class QueueButton(HighlightToggleButton):
  
-@@ -744,16 +765,26 @@ class QuodLibetWindow(Window, PersistentWindowMixin, AppWindow):
+@@ -743,16 +764,26 @@ class QuodLibetWindow(Window, PersistentWindowMixin, AppWindow):
          self.playlist = PlaylistMux(
              player, self.qexpander.model, self.songlist.model)
  
@@ -285,7 +282,7 @@ index dd702e4..936344b 100644
  
          play_order = PlayOrderWidget(self.songlist.model, player)
          statusbox = StatusBarBox(play_order, self.qexpander)
-@@ -761,11 +792,9 @@ class QuodLibetWindow(Window, PersistentWindowMixin, AppWindow):
+@@ -760,11 +791,9 @@ class QuodLibetWindow(Window, PersistentWindowMixin, AppWindow):
          self.statusbar = statusbox.statusbar
  
          main_box.pack_start(
@@ -298,7 +295,7 @@ index dd702e4..936344b 100644
  
          try:
              orders = []
-@@ -779,8 +808,6 @@ class QuodLibetWindow(Window, PersistentWindowMixin, AppWindow):
+@@ -778,8 +807,6 @@ class QuodLibetWindow(Window, PersistentWindowMixin, AppWindow):
          self.browser = None
          self.ui = ui
  
@@ -307,7 +304,7 @@ index dd702e4..936344b 100644
          self._playback_error_dialog = None
          connect_destroy(player, 'song-started', self.__song_started)
          connect_destroy(player, 'paused', self.__update_paused, True)
-@@ -834,6 +861,98 @@ class QuodLibetWindow(Window, PersistentWindowMixin, AppWindow):
+@@ -833,6 +860,98 @@ class QuodLibetWindow(Window, PersistentWindowMixin, AppWindow):
  
          self.enable_window_tracking("quodlibet")
  
@@ -406,7 +403,7 @@ index dd702e4..936344b 100644
      def hide_side_book(self):
          self.side_book.hide()
  
-@@ -852,18 +971,37 @@ class QuodLibetWindow(Window, PersistentWindowMixin, AppWindow):
+@@ -851,18 +970,37 @@ class QuodLibetWindow(Window, PersistentWindowMixin, AppWindow):
          self.side_book.remove_page(self.side_book.page_num(widget))
          if self.side_book_empty:
              print_d("Hiding sidebar")
@@ -446,7 +443,7 @@ index dd702e4..936344b 100644
      def set_seekbar_widget(self, widget):
          """Add an alternative seek bar widget.
  
-@@ -1262,8 +1400,9 @@ class QuodLibetWindow(Window, PersistentWindowMixin, AppWindow):
+@@ -1261,8 +1399,9 @@ class QuodLibetWindow(Window, PersistentWindowMixin, AppWindow):
  
          player.replaygain_profiles[1] = self.browser.replaygain_profiles
          player.reset_replaygain()

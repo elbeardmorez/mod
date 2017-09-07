@@ -1,4 +1,4 @@
-From b0a1f923e17e9c678251f83831d7bad306a57480 Mon Sep 17 00:00:00 2001
+From 4f74e51555ea34c839166e89e6c9be789f1cbf2e Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Sat, 5 Aug 2017 08:41:40 +0100
 Subject: allow custom widget packing in MultiPaned

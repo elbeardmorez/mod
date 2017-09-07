@@ -1,7 +1,7 @@
-From bc3aaf005fbda87176d945291e34b82c87f7ec0c Mon Sep 17 00:00:00 2001
+From 83af63939768ff4cb729ff7288301eaad28edaa4 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Fri, 11 Aug 2017 10:03:44 +0100
-Subject: [PATCH 10/31] simple WidgetBars EventPlugin
+Subject: simple WidgetBars EventPlugin
 
 ---
  quodlibet/po/POTFILES.in                 |  1 +

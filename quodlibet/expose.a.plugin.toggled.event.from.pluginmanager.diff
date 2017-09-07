@@ -1,4 +1,4 @@
-From 8cecbcaa27d69b882a2910570486bd0f33a91225 Mon Sep 17 00:00:00 2001
+From a7d61b1a2e7fa29a9a52285e2619d6af09b4fded Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Fri, 11 Aug 2017 07:00:56 +0100
 Subject: expose a plugin toggled event from PluginManager
@@ -34,7 +34,7 @@ index e0c507c..3866bbe 100644
  
      from quodlibet.mmkeys import MMKeysHandler
 diff --git a/quodlibet/quodlibet/plugins/__init__.py b/quodlibet/quodlibet/plugins/__init__.py
-index 101ba54..d89aeb4 100644
+index eb423aa..926fb96 100644
 --- a/quodlibet/quodlibet/plugins/__init__.py
 +++ b/quodlibet/quodlibet/plugins/__init__.py
 @@ -5,6 +5,8 @@

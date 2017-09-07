@@ -1,7 +1,7 @@
-From f88d400916867dfd1f71ae660377a93f791df623 Mon Sep 17 00:00:00 2001
+From aa36c73cbd3d00fc051c2cdceacdc1f4671a8d11 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Fri, 4 Aug 2017 07:53:58 +0100
-Subject: [PATCH 01/31] orientation agnostic names
+Subject: orientation agnostic names
 
 ---
  quodlibet/quodlibet/browsers/paned/main.py  | 4 ++--

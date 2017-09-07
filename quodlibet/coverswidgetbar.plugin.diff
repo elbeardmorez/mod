@@ -1,4 +1,4 @@
-From 0ad7a3a712229505c06c2a9e49e8dce97c605e6a Mon Sep 17 00:00:00 2001
+From fbd346a340ef8695a82959747eacc6d1d3ed5ffa Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Mon, 14 Aug 2017 18:00:53 +0100
 Subject: CoversWidgetBar plugin
@@ -6,13 +6,13 @@ Subject: CoversWidgetBar plugin
 ---
  quodlibet/po/POTFILES.in                           |   1 +
  quodlibet/quodlibet/ext/covers/covers_widgetbar.py | 375 +++++++++++++++++++++
- quodlibet/quodlibet/ext/ui/widgetbars.py           |   2 +-
+ quodlibet/quodlibet/ext/events/widgetbars.py       |   2 +-
  quodlibet/quodlibet/qltk/widgetbar.py              |  32 ++
  4 files changed, 409 insertions(+), 1 deletion(-)
  create mode 100644 quodlibet/quodlibet/ext/covers/covers_widgetbar.py
 
 diff --git a/quodlibet/po/POTFILES.in b/quodlibet/po/POTFILES.in
-index 28533ea..1c1af63 100644
+index 0db1fac..de93703 100644
 --- a/quodlibet/po/POTFILES.in
 +++ b/quodlibet/po/POTFILES.in
 @@ -31,6 +31,7 @@ quodlibet/ext/covers/artwork_url.py
@@ -404,11 +404,11 @@ index 0000000..c2c78da
 +            box.pack_start(spin_box, True, True, 0)
 +
 +        return box
-diff --git a/quodlibet/quodlibet/ext/ui/widgetbars.py b/quodlibet/quodlibet/ext/ui/widgetbars.py
-index ed213a4..8aa5876 100644
---- a/quodlibet/quodlibet/ext/ui/widgetbars.py
-+++ b/quodlibet/quodlibet/ext/ui/widgetbars.py
-@@ -65,7 +65,7 @@ class WidgetBars(EventPlugin):
+diff --git a/quodlibet/quodlibet/ext/events/widgetbars.py b/quodlibet/quodlibet/ext/events/widgetbars.py
+index 87719d6..97e73d3 100644
+--- a/quodlibet/quodlibet/ext/events/widgetbars.py
++++ b/quodlibet/quodlibet/ext/events/widgetbars.py
+@@ -64,7 +64,7 @@ class WidgetBars(EventPlugin):
          entries = [
              (CONFIG.pane_order,
               _("Pane order"),
@@ -418,7 +418,7 @@ index ed213a4..8aa5876 100644
          ]
          for text, label, tooltip, changed_cb in entries:
 diff --git a/quodlibet/quodlibet/qltk/widgetbar.py b/quodlibet/quodlibet/qltk/widgetbar.py
-index e77b18d..a18220e 100644
+index 93347ae..726b145 100644
 --- a/quodlibet/quodlibet/qltk/widgetbar.py
 +++ b/quodlibet/quodlibet/qltk/widgetbar.py
 @@ -5,11 +5,13 @@
@@ -435,7 +435,7 @@ index e77b18d..a18220e 100644
  
  from quodlibet.qltk import get_top_parent
  from quodlibet.qltk import Icons
-@@ -132,6 +134,36 @@ class WidgetBar(Gtk.Expander):
+@@ -147,6 +149,36 @@ class WidgetBar(Gtk.Expander):
          # no guarantee that this will be called -> :(
          self.__save()
  

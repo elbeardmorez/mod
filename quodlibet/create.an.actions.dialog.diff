@@ -1,4 +1,4 @@
-From f7c0c65d7f460cd0f8a60b7ea959387fea96ac43 Mon Sep 17 00:00:00 2001
+From 5903ef144a244abcb0a0fac6b6f1564af55c7bfb Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Sun, 20 Aug 2017 11:03:49 +0100
 Subject: create an actions dialog
@@ -10,7 +10,7 @@ Subject: create an actions dialog
  create mode 100644 quodlibet/quodlibet/plugins/actions.py
 
 diff --git a/quodlibet/po/POTFILES.in b/quodlibet/po/POTFILES.in
-index 1c1af63..b6f1a3c 100644
+index de93703..f7a2ed4 100644
 --- a/quodlibet/po/POTFILES.in
 +++ b/quodlibet/po/POTFILES.in
 @@ -153,6 +153,7 @@ quodlibet/player/gstbe/util.py

@@ -1,14 +1,15 @@
-From c5c13b6f4a054b69e6cc0db82fe605fa02984510 Mon Sep 17 00:00:00 2001
+From 661ddcf74cf968bcf4c798ff3d642b72096f34ba Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Fri, 25 Aug 2017 08:01:18 +0100
-Subject: pluginswidgetbar, add highlight strips for enabled plugins
+Subject: pluginswidgetbar, add highlight strips for enabled
+ plugins
 
 ---
  quodlibet/quodlibet/ext/ui/plugins_widgetbar.py | 55 ++++++++++++++++++++++---
  1 file changed, 50 insertions(+), 5 deletions(-)
 
 diff --git a/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
-index dc7dcec..67b654c 100644
+index 3b803d8..e3f215f 100644
 --- a/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
 +++ b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
 @@ -8,7 +8,7 @@
@@ -45,7 +46,7 @@ index dc7dcec..67b654c 100644
      def enabled(self):
          # setup
          pass
-@@ -426,11 +437,15 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+@@ -425,11 +436,15 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
          self.__content.foreach(lambda w: self.__content.remove(w))
          # (re)display icons
          icon_size = self.__icon_size
@@ -62,7 +63,7 @@ index dc7dcec..67b654c 100644
              self.__content.pack_start(plugin_box, False, False, 0)
  
          self.__content.show_all()
-@@ -439,10 +454,11 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+@@ -438,10 +453,11 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
  
      def __icon_box(self, name, id, enabled, icon, icon_size,
                     click_cb, click_cb_data, dragdrop_cb, dragdrop_cb_data,
@@ -76,7 +77,7 @@ index dc7dcec..67b654c 100644
  
          plugin_align = Align(bottom=15, top=2) # clear scroll
          plugin_box_outer = Gtk.VBox()
-@@ -457,6 +473,12 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+@@ -456,6 +472,12 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
          plugin_separator_box = Gtk.VBox()
          plugin_separator_box_align.add(plugin_separator_box)
  
@@ -89,7 +90,7 @@ index dc7dcec..67b654c 100644
          plugin_box_inner = Gtk.VBox()
          plugin_box_align = Align(left=4, right=4)
          plugin_box_align.add(plugin_box_inner)
-@@ -481,7 +503,13 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+@@ -480,7 +502,13 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
              plugin_label.set_use_markup(True)
              plugin_box_inner.pack_start(plugin_label, True, True, 2)
  
@@ -103,7 +104,7 @@ index dc7dcec..67b654c 100644
  
          return plugin_align
  
-@@ -558,7 +586,7 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+@@ -563,7 +591,7 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
                  self.__icon_box(
                      "Show Errors", "", False, Icons.DIALOG_WARNING,
                      self.__icon_size, lambda *x: self.__show_errors(),
@@ -112,7 +113,7 @@ index dc7dcec..67b654c 100644
                  False, False, 5)
              self.__content_right.show_all()
  
-@@ -570,8 +598,17 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+@@ -575,8 +603,17 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
  
      def PluginPreferences(self, window):
  
@@ -130,7 +131,7 @@ index dc7dcec..67b654c 100644
          # filters
          filters = [
              (CONFIG.filter_positive,
-@@ -611,6 +648,11 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+@@ -616,6 +653,11 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
               None, True, lambda w: self.__update_plugins(), 0),
              (plugin_id + '_enable_errors_icon', _("Enable errors window icon"),
               None, True, lambda w: self.__update_errors_icon(), 0),
@@ -142,7 +143,7 @@ index dc7dcec..67b654c 100644
          ]
          for key, label, tooltip, default, changed_cb, indent in toggles:
              ccb = ConfigCheckButton(label, 'plugins', key,
-@@ -621,5 +663,8 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+@@ -626,5 +668,8 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
              ccb_align = Align(left=indent)
              ccb_align.add(ccb)
              box.pack_start(ccb_align, True, True, 0)
