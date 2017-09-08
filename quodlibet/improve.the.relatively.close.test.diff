@@ -1,0 +1,110 @@
+From c77888949c5a869cbe9e122c459c5918ba122df0 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Fri, 8 Sep 2017 13:24:32 +0100
+Subject: improve the relatively close test
+
+---
+ quodlibet/tests/helper.py          | 19 ++++++++++++++++---
+ quodlibet/tests/test_qltk_paned.py | 35 ++++++++++++++++++++---------------
+ 2 files changed, 36 insertions(+), 18 deletions(-)
+
+diff --git a/quodlibet/tests/helper.py b/quodlibet/tests/helper.py
+index 37c1636..f682ba3 100644
+--- a/quodlibet/tests/helper.py
++++ b/quodlibet/tests/helper.py
+@@ -279,9 +279,22 @@ def temp_filename(*args, **kwargs):
+             raise
+ 
+ 
+-def relatively_close(x, y, tolerance=0.01):
+-    """Returns True if x is within tolerance of y, else returns False"""
+-    return abs(x - y) <= tolerance * max(abs(x), abs(y))
++def relatively_close_test(x, y, tolerance=0.01):
++    """Returns a tuple (success, reason), where 'success' is True if
++       :param x: is within the specificed % :param tolerance: of
++       :param y:, else False, and in this event 'reason' is the reason
++       for the failure"""
++
++    success = abs(x - y) <= tolerance * max(abs(x), abs(y))
++    reason = ""
++    if not success:
++        reason = \
++            str("compared %f to %f, failed as their %0.2f%% difference is "
++                "greater than the %0.2f%% tolerance" %
++                (x, y, 100 * float(abs(x - y)) / max(abs(x), abs(y)),
++                 100 * tolerance))
++
++    return success, reason
+ 
+ 
+ def get_temp_copy(path):
+diff --git a/quodlibet/tests/test_qltk_paned.py b/quodlibet/tests/test_qltk_paned.py
+index 0afc9aa..93cdb5a 100644
+--- a/quodlibet/tests/test_qltk_paned.py
++++ b/quodlibet/tests/test_qltk_paned.py
+@@ -11,7 +11,7 @@ from quodlibet.qltk.paned import RPaned, RVPaned, RHPaned, ConfigRVPaned, \
+ from quodlibet import config
+ 
+ from . import TestCase
+-from .helper import visible, relatively_close
++from .helper import visible, relatively_close_test
+ 
+ 
+ class TRPaned(object):
+@@ -191,12 +191,15 @@ class TMultiPaned(object):
+                 self.failUnlessAlmostEqual(
+                     paneds[2].get_relative(), 1.0 / 2.0, 2)
+             else:
+-                self.failUnless(
+-                    relatively_close(paneds[0].get_position(), size / 4, 0.02))
+-                self.failUnless(
+-                    relatively_close(paneds[1].get_position(), size / 4, 0.02))
+-                self.failUnless(
+-                    relatively_close(paneds[2].get_position(), size / 4, 0.02))
++                res, msg = relatively_close_test(
++                               paneds[0].get_position(), size / 4, 0.02)
++                self.failUnless(res, msg)
++                res, msg = relatively_close_test(
++                               paneds[1].get_position(), size / 4, 0.02)
++                self.failUnless(res, msg)
++                res, msg = relatively_close_test(
++                               paneds[2].get_position(), size / 4, 0.02)
++                self.failUnless(res, msg)
+ 
+     def test_change_orientation(self):
+         p = self.Kind()
+@@ -295,10 +298,11 @@ class TMultiXVPaned(TestCase, TMultiPaned):
+             for w in [w for w in exps if w is not exp]:
+                 w.get_parent().update(w)
+ 
+-            self.failUnless(relatively_close(
+-                exp.get_allocation().height,
+-                p.get_paned().get_allocation().height - 2 *
+-                (title_size + 5 + handle_size)))
++            res, msg = relatively_close_test(
++                           exp.get_allocation().height,
++                           p.get_paned().get_allocation().height - 2 *
++                           (title_size + 5 + handle_size))
++            self.failUnless(res, msg)
+ 
+         # 4 widgets, 2nd expandable
+         p = self.Kind()
+@@ -318,10 +322,11 @@ class TMultiXVPaned(TestCase, TMultiPaned):
+             for w in [w for w in exps if w is not exp]:
+                 w.get_parent().update(w)
+ 
+-            self.failUnless(relatively_close(
+-                exp.get_allocation().height,
+-                p.get_paned().get_allocation().height - 3 *
+-                (title_size + 5 + handle_size)))
++            res, msg = relatively_close_test(
++                           exp.get_allocation().height,
++                           p.get_paned().get_allocation().height - 3 *
++                           (title_size + 5 + handle_size))
++            self.failUnless(res, msg)
+ 
+ 
+ class TConfigMultiRPaned(object):
+-- 
+1.8.4
+

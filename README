@@ -97,6 +97,7 @@ a dumping ground for patches which modify or add functionality
 -inline.some.logic.to.improve.readability.diff [git sha:b7a373092c108efb3995ab3891705dc9337cea7e | pending]
 -remove.multiline.debug.statement.diff [git sha:0fc57c42f6e062c6d6c67f4a10f955c95e16430c | pending]
 -reduce.indentation.with.cleaner.return.pattern.diff [git sha:1f8524cc279ac3f5f25da4389a8b5e633f032792 | pending]
+-improve.the.relatively.close.test.diff [git sha:c77888949c5a869cbe9e122c459c5918ba122df0 | pending]
 -return.default.1x1.for.invalid.image.scaling.diff [git sha:85076f1e50e2eec5fb957dd4c4d9af7e677d0f55 | pending]
 -persistent.moveable.big.images.diff [git sha:bf3969e4fed0658d0f225a1a0537a26d746293b7 | pending]
 -support.multiple.big.images.diff [git sha:d394ce2a8e86f2365bfe4e836cb1fe9b00ab8220 | pending]
