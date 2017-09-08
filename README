@@ -122,4 +122,5 @@ a dumping ground for patches which modify or add functionality
 -pluginswidgetbar,.add.alpha.to.drag.icon.diff [git sha:84225d972a0e2896c9f9af922b5342e7733c255c | pending]
 -pluginswidgetbar,.add.drag.scrolling.diff [git sha:1af193e987b6133ef6200c2e5048ded5fea14c38 | pending]
 -pluginswidgetbar,.fix.drag.drop.on.same.icon.diff [git sha:f1ee7224cdedb64680f19be134c000d8b22c32cb | pending]
+-pluginswidgetbar,.add.drag.highlights.diff [git sha:991c663b75133ba74f360a0d2735ac46bd00f41f | pending]
 
