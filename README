@@ -121,4 +121,5 @@ a dumping ground for patches which modify or add functionality
 -pluginswidgetbar,.add.drag.'n'.drop.re-ordering.of.icons.diff [git sha:c1f54296d70c5c4298643929238d9273be772af2 | pending]
 -pluginswidgetbar,.add.alpha.to.drag.icon.diff [git sha:84225d972a0e2896c9f9af922b5342e7733c255c | pending]
 -pluginswidgetbar,.add.drag.scrolling.diff [git sha:1af193e987b6133ef6200c2e5048ded5fea14c38 | pending]
+-pluginswidgetbar,.fix.drag.drop.on.same.icon.diff [git sha:f1ee7224cdedb64680f19be134c000d8b22c32cb | pending]
 
