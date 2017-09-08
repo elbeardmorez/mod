@@ -69,7 +69,7 @@ bigger OR smaller. in practice, this is not really noticable
 
 # remove.redundant.plugin_config_section.variable.diff [git sha:a392d03ab6fd32e4dd56573fea08b2e6fa5a2859 | pending]
 
-# change.widgetbars.plugin.path.diff [git sha:42e888bdedc5bc1c3fe09bba471f57c95b18c4c1 | pending]
+# change.widgetbars.plugin.path.diff [git sha:c2396664578994ebe03b36128d24ec7ee4308a42 | pending]
 
 # inline.some.logic.to.improve.readability.diff [git sha:b7a373092c108efb3995ab3891705dc9337cea7e | pending]
 
@@ -87,7 +87,7 @@ bigger OR smaller. in practice, this is not really noticable
 -allows multiple big images to remain visible from a single CoverImage
 -toggled via the config 'settings -> multiple_big_images' bool
 
-# coverswidgetbar.plugin.diff [git sha:fbd346a340ef8695a82959747eacc6d1d3ed5ffa | pending]
+# coverswidgetbar.plugin.diff [git sha:38358c6ffb97f891019e8d70f4a14512ff00b36b | pending]
 
 # avoid.pixmap.error.diff [git sha:74b6648e09c8720f6b08a8933bce10a45e8dda6e | pending]
 
@@ -105,7 +105,7 @@ bigger OR smaller. in practice, this is not really noticable
 
 # expose.pluginmanager's.scanned.modules.diff [git sha:94b1aa6bbb79dbde2db472851cc38738769400be | pending]
 
-# pluginswidgetbar.plugin.[#2042.part].diff [git sha:8459f94c6a04477e1b7201b1f2fecde6ace6cfa0 | pending]
+# pluginswidgetbar.plugin.[#2042.part].diff [git sha:38153177f896b90b411ac15315767f4cf0d0b04f | pending]
 -part implementation of #2042 (drag and drop to follow)
 -configurable actions via silly string magic in right-click 'actions'
 dialog which perists preferences

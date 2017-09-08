@@ -1,7 +1,7 @@
-From 8459f94c6a04477e1b7201b1f2fecde6ace6cfa0 Mon Sep 17 00:00:00 2001
+From 38153177f896b90b411ac15315767f4cf0d0b04f Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Tue, 22 Aug 2017 17:53:03 +0100
-Subject: PluginsWidgetBar plugin [#2042 part]
+Subject: [PATCH] PluginsWidgetBar plugin [#2042 part]
 
 -part implementation of #2042 (drag and drop to follow)
 -configurable actions via silly string magic in right-click 'actions'
@@ -37,29 +37,29 @@ plugin, which should be overridden by plugin implementors. the
 default is to open the plugin's preferences pane in the preferences
 dialog
 ---
- quodlibet/po/POTFILES.in                        |   1 +
- quodlibet/quodlibet/ext/ui/plugins_widgetbar.py | 544 ++++++++++++++++++++++++
- quodlibet/quodlibet/plugins/actions.py          |   2 +
+ quodlibet/po/POTFILES.in                           |   1 +
+ .../quodlibet/ext/events/plugins_widgetbar.py      | 544 +++++++++++++++++++++
+ quodlibet/quodlibet/plugins/actions.py             |   2 +
  3 files changed, 547 insertions(+)
- create mode 100644 quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
+ create mode 100644 quodlibet/quodlibet/ext/events/plugins_widgetbar.py
 
 diff --git a/quodlibet/po/POTFILES.in b/quodlibet/po/POTFILES.in
-index f7a2ed4..cb9f154 100644
+index e607dfb..b6b09d9 100644
 --- a/quodlibet/po/POTFILES.in
 +++ b/quodlibet/po/POTFILES.in
-@@ -133,6 +133,7 @@ quodlibet/ext/songsmenu/splitting.py
- quodlibet/ext/songsmenu/tapbpm.py
- quodlibet/ext/songsmenu/website_search.py
- quodlibet/ext/songsmenu/wikipedia.py
-+quodlibet/ext/ui/plugins_widgetbar.py
- quodlibet/formats/_audio.py
- quodlibet/formats/__init__.py
- quodlibet/__init__.py
-diff --git a/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
+@@ -56,6 +56,7 @@ quodlibet/ext/events/mpdserver/__init__.py
+ quodlibet/ext/events/mpris/__init__.py
+ quodlibet/ext/events/mqtt.py
+ quodlibet/ext/events/notify.py
++quodlibet/ext/events/plugins_widgetbar.py
+ quodlibet/ext/events/qlscrobbler.py
+ quodlibet/ext/events/radioadmute.py
+ quodlibet/ext/events/randomalbum.py
+diff --git a/quodlibet/quodlibet/ext/events/plugins_widgetbar.py b/quodlibet/quodlibet/ext/events/plugins_widgetbar.py
 new file mode 100644
 index 0000000..b6ebdfe
 --- /dev/null
-+++ b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
++++ b/quodlibet/quodlibet/ext/events/plugins_widgetbar.py
 @@ -0,0 +1,544 @@
 +# -*- coding: utf-8 -*-
 +# Copyright 2017 Pete Beardmore

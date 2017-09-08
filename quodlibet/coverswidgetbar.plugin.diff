@@ -1,7 +1,7 @@
-From fbd346a340ef8695a82959747eacc6d1d3ed5ffa Mon Sep 17 00:00:00 2001
+From 38358c6ffb97f891019e8d70f4a14512ff00b36b Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Mon, 14 Aug 2017 18:00:53 +0100
-Subject: CoversWidgetBar plugin
+Subject: [PATCH] CoversWidgetBar plugin
 
 ---
  quodlibet/po/POTFILES.in                           |   1 +
@@ -12,17 +12,17 @@ Subject: CoversWidgetBar plugin
  create mode 100644 quodlibet/quodlibet/ext/covers/covers_widgetbar.py
 
 diff --git a/quodlibet/po/POTFILES.in b/quodlibet/po/POTFILES.in
-index 0db1fac..de93703 100644
+index 0db1fac..0bf0a65 100644
 --- a/quodlibet/po/POTFILES.in
 +++ b/quodlibet/po/POTFILES.in
-@@ -31,6 +31,7 @@ quodlibet/ext/covers/artwork_url.py
+@@ -28,6 +28,7 @@ quodlibet/cli.py
+ quodlibet/errorreport/ui.py
+ quodlibet/exfalso.py
+ quodlibet/ext/covers/artwork_url.py
++quodlibet/ext/covers/covers_widgetbar.py
  quodlibet/ext/covers/discogs.py
  quodlibet/ext/covers/lastfm.py
  quodlibet/ext/covers/musicbrainz.py
-+quodlibet/ext/covers/covers_widgetbar.py
- quodlibet/ext/editing/iconv.py
- quodlibet/ext/editing/kakasi.py
- quodlibet/ext/editing/resub.py
 diff --git a/quodlibet/quodlibet/ext/covers/covers_widgetbar.py b/quodlibet/quodlibet/ext/covers/covers_widgetbar.py
 new file mode 100644
 index 0000000..c2c78da

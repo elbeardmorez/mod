@@ -1,15 +1,17 @@
-From 42e888bdedc5bc1c3fe09bba471f57c95b18c4c1 Mon Sep 17 00:00:00 2001
+From c2396664578994ebe03b36128d24ec7ee4308a42 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Wed, 6 Sep 2017 16:50:19 +0100
-Subject: change widgetbars plugin path
+Subject: [PATCH] change widgetbars plugin path
 
 ---
  quodlibet/po/POTFILES.in                     |  2 +-
  quodlibet/quodlibet/_main.py                 |  2 +-
  quodlibet/quodlibet/ext/events/widgetbars.py | 98 ++++++++++++++++++++++++++++
+ quodlibet/quodlibet/ext/ui/__init__.py       |  4 --
  quodlibet/quodlibet/ext/ui/widgetbars.py     | 98 ----------------------------
- 4 files changed, 100 insertions(+), 100 deletions(-)
+ 5 files changed, 100 insertions(+), 104 deletions(-)
  create mode 100644 quodlibet/quodlibet/ext/events/widgetbars.py
+ delete mode 100644 quodlibet/quodlibet/ext/ui/__init__.py
  delete mode 100644 quodlibet/quodlibet/ext/ui/widgetbars.py
 
 diff --git a/quodlibet/po/POTFILES.in b/quodlibet/po/POTFILES.in
@@ -149,6 +151,16 @@ index 0000000..87719d6
 +            box.pack_start(button_box, True, True, 0)
 +
 +        return box
+diff --git a/quodlibet/quodlibet/ext/ui/__init__.py b/quodlibet/quodlibet/ext/ui/__init__.py
+deleted file mode 100644
+index e82e559..0000000
+--- a/quodlibet/quodlibet/ext/ui/__init__.py
++++ /dev/null
+@@ -1,4 +0,0 @@
+-# -*- coding: utf-8 -*-
+-# This program is free software; you can redistribute it and/or modify
+-# it under the terms of the GNU General Public License version 2 as
+-# published by the Free Software Foundation
 diff --git a/quodlibet/quodlibet/ext/ui/widgetbars.py b/quodlibet/quodlibet/ext/ui/widgetbars.py
 deleted file mode 100644
 index 87719d6..0000000
