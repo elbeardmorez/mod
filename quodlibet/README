@@ -184,3 +184,6 @@ front of the full list)
 
 # pluginswidgetbar,.improve.drag.and.drop.highlighting.diff [git sha:a5964fde5fb4642ae80a42d562531ad414feb242 | pending]
 -the visual experience now makes the drop strategy very clear
+
+# coverswidgetbar,.add.uri.to.tooltip.option.diff [git sha:fc96094cf5924da98ee94cfa467059bf583b7ac6 | pending]
+-so one can discern which art is internal vs external
