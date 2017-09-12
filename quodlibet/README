@@ -85,6 +85,13 @@ bigger OR smaller. in practice, this is not really noticable
 -widgets don't automatically expand to fill space in their parent
 as they did previously
 
+# add.handle.position.locking.for.a.paned.child2.diff [git sha:3e4cbf9fa1c297d746b09350309cde321ac81d98 | pending]
+-only where child1 isn't already locked!
+-without this change, where the last pane in a MultiPaned contained a
+collapsed expander, its parent pane would proportionally resize whenever
+any parent paneds were resized, as opposed to it being locked into position
+as we'd want with any collapsed item
+
 # return.default.1x1.for.invalid.image.scaling.diff [git sha:85076f1e50e2eec5fb957dd4c4d9af7e677d0f55 | pending]
 
 # persistent.moveable.big.images.diff [git sha:bf3969e4fed0658d0f225a1a0537a26d746293b7 | pending]
