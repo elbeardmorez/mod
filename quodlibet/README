@@ -79,6 +79,8 @@ bigger OR smaller. in practice, this is not really noticable
 
 # improve.the.relatively.close.test.diff [git sha:c77888949c5a869cbe9e122c459c5918ba122df0 | pending]
 
+# remove.superfluous.widgetbar.updating.diff [git sha:781dc2cf0963ae9f0cb084b055b37eb4e795028e | pending]
+
 # return.default.1x1.for.invalid.image.scaling.diff [git sha:85076f1e50e2eec5fb957dd4c4d9af7e677d0f55 | pending]
 
 # persistent.moveable.big.images.diff [git sha:bf3969e4fed0658d0f225a1a0537a26d746293b7 | pending]

@@ -1,0 +1,30 @@
+From 781dc2cf0963ae9f0cb084b055b37eb4e795028e Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Tue, 12 Sep 2017 18:53:26 +0100
+Subject: remove superfluous widgetbar updating
+
+---
+ quodlibet/quodlibet/qltk/widgetbar.py | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/quodlibet/quodlibet/qltk/widgetbar.py b/quodlibet/quodlibet/qltk/widgetbar.py
+index 93347ae..0006f1d 100644
+--- a/quodlibet/quodlibet/qltk/widgetbar.py
++++ b/quodlibet/quodlibet/qltk/widgetbar.py
+@@ -151,13 +151,6 @@ class WidgetBar(Gtk.Expander):
+         config.set("plugins", self.id + "_size", self.panelock.size)
+ 
+     def __size_allocate(self, widget, allocation):
+-
+-        if not self.get_expanded():
+-            title_height = self.get_label_widget().get_allocation().height
+-            self.set_size_request(-1, title_height + 5)
+-        self.get_parent().queue_resize()
+-        self.get_parent().check_resize()
+-
+         self.panelock.size_allocate(allocation)
+         # persistence overkill as __destroy failing
+         config.set("plugins", self.id + "_size", self.panelock.size)
+-- 
+1.8.4
+
