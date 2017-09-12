@@ -92,6 +92,12 @@ collapsed expander, its parent pane would proportionally resize whenever
 any parent paneds were resized, as opposed to it being locked into position
 as we'd want with any collapsed item
 
+# paned.handle.position.considerations.diff [git sha:ee2927128e2165d27c0dc1ce5c47416e346052d7 | pending]
+-fix all paned handle position calculations by adding handle size
+corrections to account for 'wide handle' support in later Gtk versions
+-removes the 'seemingly arbitrary' +/-5px handle positioning for collapsed
+expanders, calculating the position based on size instead
+
 # return.default.1x1.for.invalid.image.scaling.diff [git sha:85076f1e50e2eec5fb957dd4c4d9af7e677d0f55 | pending]
 
 # persistent.moveable.big.images.diff [git sha:bf3969e4fed0658d0f225a1a0537a26d746293b7 | pending]
