@@ -112,6 +112,7 @@ a dumping ground for patches which modify or add functionality
 -coverswidgetbar,.make.cover.label.more.configurable.diff [git sha:e820bc28aab1935d8573f655729fd7bfd19b6609 | pending]
 -coverswidgetbar,.add.cover.size.to.tooltip.option.diff [git sha:4071b67395eba63ddf6bbc82e65017538ffa8662 | pending]
 -coverswidgetbar,.add.uri.to.tooltip.option.diff [git sha:fbb35ba58c012aee1866280adcc3ccaec262d55c | pending]
+-coverswidgetbar,.python3.compatibility.diff [git sha:e93ee54431f9cdd0be90f8496cd9a9312761937c | pending]
 -add.filtering.to.comboboxentrysave.widget.diff [git sha:7e07dd260f392bf55ef96d8bb4dfd1051448cc14 | pending]
 -create.an.actions.dialog.diff [git sha:5903ef144a244abcb0a0fac6b6f1564af55c7bfb | pending]
 -expose.pluginmanager's.scanned.modules.diff [git sha:94b1aa6bbb79dbde2db472851cc38738769400be | pending]

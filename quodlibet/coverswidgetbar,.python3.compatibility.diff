@@ -1,0 +1,42 @@
+From e93ee54431f9cdd0be90f8496cd9a9312761937c Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Tue, 12 Sep 2017 16:54:44 +0100
+Subject: coverswidgetbar, python3 compatibility
+
+---
+ quodlibet/quodlibet/ext/covers/covers_widgetbar.py | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/quodlibet/quodlibet/ext/covers/covers_widgetbar.py b/quodlibet/quodlibet/ext/covers/covers_widgetbar.py
+index e4a3650..747a3c7 100644
+--- a/quodlibet/quodlibet/ext/covers/covers_widgetbar.py
++++ b/quodlibet/quodlibet/ext/covers/covers_widgetbar.py
+@@ -372,20 +372,21 @@ class CoversWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+     def __save(self):
+         print_d("saving config data")
+         image_paths = \
+-            map(lambda ii: ii.path, self.__coversbox.covers)
++            list(map(lambda ii: ii.path, self.__coversbox.covers))
+         image_paths_nonconcurrent_unique = \
+-                 map(itemgetter(0), groupby(image_paths))[
++                 list(map(itemgetter(0), groupby(image_paths)))[
+                -1 * min(len(self.__coversbox.covers), CONFIG.songs_save):]
+         CONFIG.songs_history = image_paths_nonconcurrent_unique
+         self.__write_songs_history()
+ 
+     def __read_songs_history(self):
+         items = WidgetBar.read_datafile(SONGS_HISTORY_SET, 1)
+-        CONFIG.songs_history = map(lambda x: x[0], items)
++        CONFIG.songs_history = list(map(lambda x: x[0], items))
+ 
+     def __write_songs_history(self):
+         WidgetBar.write_datafile(
+-            SONGS_HISTORY_SET, map(lambda x: [x], CONFIG.songs_history),
++            SONGS_HISTORY_SET,
++            list(map(lambda x: [x], CONFIG.songs_history)),
+             lambda x: x)
+ 
+     def __songs_save_changed(self, widget, *data):
+-- 
+1.8.4
+
