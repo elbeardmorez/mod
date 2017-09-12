@@ -1,25 +1,28 @@
-From 0fc57c42f6e062c6d6c67f4a10f955c95e16430c Mon Sep 17 00:00:00 2001
+From f7dc9be1cf8daaf28720db3ff6876c4eebca9b4a Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Wed, 6 Sep 2017 17:13:28 +0100
 Subject: remove multiline debug statement
 
 ---
- quodlibet/quodlibet/qltk/quodlibetwindow.py | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ quodlibet/quodlibet/qltk/quodlibetwindow.py | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/quodlibet/quodlibet/qltk/quodlibetwindow.py b/quodlibet/quodlibet/qltk/quodlibetwindow.py
-index 45b2d28..4ad8a23 100644
+index 45b2d28..2d16671 100644
 --- a/quodlibet/quodlibet/qltk/quodlibetwindow.py
 +++ b/quodlibet/quodlibet/qltk/quodlibetwindow.py
-@@ -940,9 +940,8 @@ class QuodLibetWindow(Window, PersistentWindowMixin, AppWindow):
+@@ -940,9 +940,11 @@ class QuodLibetWindow(Window, PersistentWindowMixin, AppWindow):
                  [val for key, val in self.ui_elements.items()
                      if key in extra])
  
 -        print_d("%d ui elements live:" % len(self.ui_elements_ordered))
 -        for w in self.ui_elements_ordered:
 -            print_d("%r" % w)
-+        print_d("%d ui elements live: %s" %
-+                    (len(self.ui_elements_ordered), self.ui_elements_ordered))
++        print_d("%d ui elements live:\n%s" %
++                    (len(self.ui_elements_ordered),
++                     '\n'.join(list(
++                         map(lambda s: s[0] + ' | ' + str(s[1]),
++                             list(zip(order, self.ui_elements_ordered)))))))
  
          return self.ui_elements_ordered
  

@@ -1,4 +1,4 @@
-From 1f8524cc279ac3f5f25da4389a8b5e633f032792 Mon Sep 17 00:00:00 2001
+From 535cecc7027a037fb4a503824af4be20f3ddbf90 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Wed, 6 Sep 2017 17:59:00 +0100
 Subject: reduce indentation with cleaner return pattern
@@ -8,7 +8,7 @@ Subject: reduce indentation with cleaner return pattern
  1 file changed, 20 insertions(+), 19 deletions(-)
 
 diff --git a/quodlibet/quodlibet/qltk/paned.py b/quodlibet/quodlibet/qltk/paned.py
-index 72b2b48..fe30e4a 100644
+index 72b2b48..de9e769 100644
 --- a/quodlibet/quodlibet/qltk/paned.py
 +++ b/quodlibet/quodlibet/qltk/paned.py
 @@ -253,26 +253,27 @@ class XPaned(Paned):
@@ -16,7 +16,7 @@ index 72b2b48..fe30e4a 100644
          Gtk.HPaned.do_size_allocate(self, *args)
  
 -        if not self.__updating:
-+        if self.__resizing:
++        if self.__updating:
 +            return
  
 -            if not self.__panelocks:

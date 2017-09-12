@@ -73,9 +73,9 @@ bigger OR smaller. in practice, this is not really noticable
 
 # inline.some.logic.to.improve.readability.diff [git sha:b7a373092c108efb3995ab3891705dc9337cea7e | pending]
 
-# remove.multiline.debug.statement.diff [git sha:0fc57c42f6e062c6d6c67f4a10f955c95e16430c | pending]
+# remove.multiline.debug.statement.diff [git sha:f7dc9be1cf8daaf28720db3ff6876c4eebca9b4a | pending]
 
-# reduce.indentation.with.cleaner.return.pattern.diff [git sha:1f8524cc279ac3f5f25da4389a8b5e633f032792 | pending]
+# reduce.indentation.with.cleaner.return.pattern.diff [git sha:535cecc7027a037fb4a503824af4be20f3ddbf90 | pending]
 
 # improve.the.relatively.close.test.diff [git sha:c77888949c5a869cbe9e122c459c5918ba122df0 | pending]
 
