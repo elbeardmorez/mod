@@ -131,4 +131,5 @@ a dumping ground for patches which modify or add functionality
 -pluginswidgetbar,.add.drag.highlights.diff [git sha:991c663b75133ba74f360a0d2735ac46bd00f41f | pending]
 -pluginswidgetbar,.drag.'n'.drop.target.support.diff [git sha:639bb18e42ce9acf74a254719d8176f2197671c9 | pending]
 -pluginswidgetbar,.improve.drag.and.drop.highlighting.diff [git sha:a5964fde5fb4642ae80a42d562531ad414feb242 | pending]
+-pluginswidgetbar,.python3.compatibility.diff [git sha:2c38a9865ce7bd19f102e1f7bd52fc6346144383 | pending]
 
