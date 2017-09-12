@@ -99,6 +99,7 @@ a dumping ground for patches which modify or add functionality
 -reduce.indentation.with.cleaner.return.pattern.diff [git sha:535cecc7027a037fb4a503824af4be20f3ddbf90 | pending]
 -improve.the.relatively.close.test.diff [git sha:c77888949c5a869cbe9e122c459c5918ba122df0 | pending]
 -remove.superfluous.widgetbar.updating.diff [git sha:781dc2cf0963ae9f0cb084b055b37eb4e795028e | pending]
+-gtk.version.compatibility.diff [git sha:7c86af22d61eff1c126915641567f27c93c199a5 | pending]
 -return.default.1x1.for.invalid.image.scaling.diff [git sha:85076f1e50e2eec5fb957dd4c4d9af7e677d0f55 | pending]
 -persistent.moveable.big.images.diff [git sha:bf3969e4fed0658d0f225a1a0537a26d746293b7 | pending]
 -support.multiple.big.images.diff [git sha:d394ce2a8e86f2365bfe4e836cb1fe9b00ab8220 | pending]

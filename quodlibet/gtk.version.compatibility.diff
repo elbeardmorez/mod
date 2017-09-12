@@ -1,0 +1,26 @@
+From 7c86af22d61eff1c126915641567f27c93c199a5 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Tue, 12 Sep 2017 17:08:09 +0100
+Subject: Gtk version compatibility
+
+-widgets don't automatically expand to fill space in their parent
+as they did previously
+---
+ quodlibet/quodlibet/qltk/widgetbar.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/quodlibet/quodlibet/qltk/widgetbar.py b/quodlibet/quodlibet/qltk/widgetbar.py
+index 0006f1d..9c21c1c 100644
+--- a/quodlibet/quodlibet/qltk/widgetbar.py
++++ b/quodlibet/quodlibet/qltk/widgetbar.py
+@@ -63,6 +63,7 @@ class WidgetBar(Gtk.Expander):
+         self.preferences_cb = self.__preferences
+ 
+         outer = Gtk.HBox()
++        outer.props.vexpand = True
+         self.box_left = Gtk.HBox()
+         self.box_right = Gtk.HBox()
+         self.box = Gtk.HBox()
+-- 
+1.8.4
+
