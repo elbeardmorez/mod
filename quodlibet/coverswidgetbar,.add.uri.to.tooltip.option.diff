@@ -1,15 +1,15 @@
-From fc96094cf5924da98ee94cfa467059bf583b7ac6 Mon Sep 17 00:00:00 2001
+From fbb35ba58c012aee1866280adcc3ccaec262d55c Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Sun, 10 Sep 2017 10:22:04 +0100
 Subject: coverswidgetbar, add uri to tooltip option
 
 -so one can discern which art is internal vs external
 ---
- quodlibet/quodlibet/ext/covers/covers_widgetbar.py | 25 +++++++++++++++++-----
- 1 file changed, 20 insertions(+), 5 deletions(-)
+ quodlibet/quodlibet/ext/covers/covers_widgetbar.py | 26 +++++++++++++++++-----
+ 1 file changed, 21 insertions(+), 5 deletions(-)
 
 diff --git a/quodlibet/quodlibet/ext/covers/covers_widgetbar.py b/quodlibet/quodlibet/ext/covers/covers_widgetbar.py
-index e3d0dad..8f9c0ca 100644
+index e3d0dad..1ef1d7a 100644
 --- a/quodlibet/quodlibet/ext/covers/covers_widgetbar.py
 +++ b/quodlibet/quodlibet/ext/covers/covers_widgetbar.py
 @@ -49,6 +49,7 @@ class Config(object):
@@ -20,16 +20,17 @@ index e3d0dad..8f9c0ca 100644
      songs_history = []
  
  
-@@ -121,6 +122,8 @@ class CoversBox(Gtk.HBox):
+@@ -121,6 +122,9 @@ class CoversBox(Gtk.HBox):
              name = os.path.splitext(os.path.basename(image.name))[0] \
                         .split('_')[-1]
              size = "x".join([str(image.width), str(image.height)])
-+            uri = ("external: " + image.name) if image.external \
-+                                              else ("internal: " + name)
++            uri = GLib.markup_escape_text(("external: " + image.name)
++                                          if image.external
++                                          else ("internal: " + name))
  
              coverimage = CoverImage(resize=True)
              coverimage.set_song(song)
-@@ -132,13 +135,19 @@ class CoversBox(Gtk.HBox):
+@@ -132,13 +136,19 @@ class CoversBox(Gtk.HBox):
              coverimage_box = Gtk.VBox()
              coverimage_box.image = coverimage
              coverimage_box.image_title = title
@@ -51,7 +52,7 @@ index e3d0dad..8f9c0ca 100644
  
              desc = str.format("%s%s%s") % (
                  title,
-@@ -294,10 +303,14 @@ class CoversBox(Gtk.HBox):
+@@ -294,10 +304,14 @@ class CoversBox(Gtk.HBox):
  
      def update_tooltips(self):
          for box in self.get_children():
@@ -69,7 +70,7 @@ index e3d0dad..8f9c0ca 100644
  
  
  class CoversWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
-@@ -418,6 +431,8 @@ class CoversWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+@@ -418,6 +432,8 @@ class CoversWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
               None, False, lambda *x: self.__coversbox.update_labels()),
              (plugin_id + '_size_in_tooltip', _("Show image size in tooltip"),
               None, True, lambda *x: self.__coversbox.update_tooltips()),

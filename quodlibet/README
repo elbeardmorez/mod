@@ -108,7 +108,7 @@ expanders, calculating the position based on size instead
 -allows multiple big images to remain visible from a single CoverImage
 -toggled via the config 'settings -> multiple_big_images' bool
 
-# coverswidgetbar.plugin.diff [git sha:38358c6ffb97f891019e8d70f4a14512ff00b36b | pending]
+# coverswidgetbar.plugin.diff [git sha:d15f19e38168cfcff153e1acdf7e6808c918eae0 | pending]
 
 # avoid.pixmap.error.diff [git sha:74b6648e09c8720f6b08a8933bce10a45e8dda6e | pending]
 
@@ -119,6 +119,9 @@ expanders, calculating the position based on size instead
 # coverswidgetbar,.make.cover.label.more.configurable.diff [git sha:e820bc28aab1935d8573f655729fd7bfd19b6609 | pending]
 
 # coverswidgetbar,.add.cover.size.to.tooltip.option.diff [git sha:4071b67395eba63ddf6bbc82e65017538ffa8662 | pending]
+
+# coverswidgetbar,.add.uri.to.tooltip.option.diff [git sha:fbb35ba58c012aee1866280adcc3ccaec262d55c | pending]
+-so one can discern which art is internal vs external
 
 # add.filtering.to.comboboxentrysave.widget.diff [git sha:7e07dd260f392bf55ef96d8bb4dfd1051448cc14 | pending]
 
@@ -203,6 +206,3 @@ front of the full list)
 
 # pluginswidgetbar,.improve.drag.and.drop.highlighting.diff [git sha:a5964fde5fb4642ae80a42d562531ad414feb242 | pending]
 -the visual experience now makes the drop strategy very clear
-
-# coverswidgetbar,.add.uri.to.tooltip.option.diff [git sha:fc96094cf5924da98ee94cfa467059bf583b7ac6 | pending]
--so one can discern which art is internal vs external
