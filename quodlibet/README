@@ -131,6 +131,9 @@ positioning calculations). doing this is no different to enforcing
 styling via use of widget properties (e.g. margin) or style properties,
 for which users obviously have zero influence upon
 
+# harmonise.the.widgetbars.initial.pane.sort.order.diff [git sha:7553947c912ca095f1f4baa7ff924ccbee62feb9 | pending]
+-with no sort order set, make it the same as the order without widgetbars
+
 # return.default.1x1.for.invalid.image.scaling.diff [git sha:85076f1e50e2eec5fb957dd4c4d9af7e677d0f55 | pending]
 
 # persistent.moveable.big.images.diff [git sha:bf3969e4fed0658d0f225a1a0537a26d746293b7 | pending]
