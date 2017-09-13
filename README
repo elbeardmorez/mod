@@ -77,6 +77,7 @@ a dumping ground for patches which modify or add functionality
 -expose.album.art.downloader.query.results.limit.diff [git sha:6d15d03750fb8f668b43a17fa8a6412e7581a578 | pending]
 -move.album.art.when.renaming.[#237].diff [git sha:7cd099d5587c88b9bd84f67558342993a249b42a | pending]
 -add.option.to.remove.empty.directories.post.rename.diff [git sha:94e4c199be65ef237ad323e1de38fd7b5c6d686d | pending]
+-make.'lyric_filename()'.search.harder.diff [git sha:001c4273f159d9e4df858b906ee4ac596e371f68 | pending]
 -orientation.agnostic.names.diff [git sha:aa36c73cbd3d00fc051c2cdceacdc1f4671a8d11 | pending]
 -exposed.multipaned.paned.set.diff [git sha:759f306db07154d1c19df499201c1f6fd49cf627 | pending]
 -make.multirpaned.more.generic.diff [git sha:312d0a012a59097699c6563bf4a5b5d493a57441 | pending]
