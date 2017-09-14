@@ -1,0 +1,28 @@
+From 4b99a31a21e68569556c05edc1bacf9466643ef0 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Thu, 14 Sep 2017 08:49:55 +0100
+Subject: FilterPluginBox, no_show_all on plugins expander
+
+-this facilitates show_all() calls on containers holding this widget
+without exposing the 'More options..' expander for plugins which has
+its own visibility logic triggered via its 'changed' signal callback
+-verified no impact through toggling of the 'Regex Substitution' plugin
+---
+ quodlibet/quodlibet/qltk/_editutils.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/quodlibet/quodlibet/qltk/_editutils.py b/quodlibet/quodlibet/qltk/_editutils.py
+index 0efaadb..71fb5b1 100644
+--- a/quodlibet/quodlibet/qltk/_editutils.py
++++ b/quodlibet/quodlibet/qltk/_editutils.py
+@@ -141,6 +141,7 @@ class FilterPluginBox(Gtk.VBox):
+         hb = Gtk.HBox()
+         expander = Gtk.Expander(label=_(u"_More options…"))
+         expander.set_use_underline(True)
++        expander.set_no_show_all(True)
+         hb.pack_start(expander, True, True, 0)
+         self.pack_start(hb, False, True, 0)
+ 
+-- 
+1.8.4
+

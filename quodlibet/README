@@ -23,6 +23,12 @@ input is imperfect. allow users to override this if the results are off
 
 # code.style.improvements.diff [git sha:13f510909cf40341d56e7987c01ffb934bd79fac | pending]
 
+# filterpluginbox,.no_show_all.on.plugins.expander.diff [git sha:4b99a31a21e68569556c05edc1bacf9466643ef0 | pending]
+-this facilitates show_all() calls on containers holding this widget
+without exposing the 'More options..' expander for plugins which has
+its own visibility logic triggered via its 'changed' signal callback
+-verified no impact through toggling of the 'Regex Substitution' plugin
+
 # make.'lyric_filename()'.search.harder.diff [git sha:001c4273f159d9e4df858b906ee4ac596e371f68 | pending]
 -search alternate extensions: 'lyrics', '', 'txt'
 -add another default 'root'/'<artist> - <title>/lyric search path
