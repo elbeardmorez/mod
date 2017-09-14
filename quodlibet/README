@@ -19,6 +19,8 @@ input is imperfect. allow users to override this if the results are off
 
 # update.config.variable.names.diff [git sha:1b2ac52404e0a40b6dc4f4ca9c0c3743cc1b7854 | pending]
 
+# code.purpose._.clarity.improvements.diff [git sha:121d31bd6d72de289784fe1669da895445b2de8e | pending]
+
 # make.'lyric_filename()'.search.harder.diff [git sha:001c4273f159d9e4df858b906ee4ac596e371f68 | pending]
 -search alternate extensions: 'lyrics', '', 'txt'
 -add another default 'root'/'<artist> - <title>/lyric search path

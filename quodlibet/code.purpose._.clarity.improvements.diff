@@ -1,0 +1,54 @@
+From 121d31bd6d72de289784fe1669da895445b2de8e Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Thu, 14 Sep 2017 07:52:06 +0100
+Subject: code purpose / clarity improvements
+
+---
+ quodlibet/quodlibet/qltk/renamefiles.py | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
+
+diff --git a/quodlibet/quodlibet/qltk/renamefiles.py b/quodlibet/quodlibet/qltk/renamefiles.py
+index 695cb0d..20a9878 100644
+--- a/quodlibet/quodlibet/qltk/renamefiles.py
++++ b/quodlibet/quodlibet/qltk/renamefiles.py
+@@ -269,7 +269,7 @@ class RenameFiles(Gtk.VBox):
+         was_changed = set()
+         skip_all = False
+         self.view.freeze_child_notify()
+-        move_art = config.getboolean("rename", "move_art")
++        should_move_art = config.getboolean("rename", "move_art")
+         moveart_sets = {}
+         remove_empty_dirs = config.getboolean("rename", "remove_empty_dirs")
+ 
+@@ -280,10 +280,15 @@ class RenameFiles(Gtk.VBox):
+             old_name = entry.name
+             old_pathfile = song['~filename']
+             new_name = entry.new_name
+-            new_pathfile = new_name if (
+-                os.path.abspath(os.path.join(os.getcwd(), new_name)) !=
+-                os.path.abspath(new_name)) else (
+-                os.path.join(os.path.dirname(old_pathfile), new_name))
++            new_pathfile = ""
++            # ensure target is a full path
++            if os.path.abspath(new_name) != \
++                   os.path.abspath(os.path.join(os.getcwd(), new_name)):
++                new_pathfile = new_name
++            else:
++                # must be a relative pattern, so prefix the path
++                new_pathfile = \
++                    os.path.join(os.path.dirname(old_pathfile), new_name)
+ 
+             try:
+                 library.rename(song, text2fsn(new_name), changed=was_changed)
+@@ -316,7 +321,7 @@ class RenameFiles(Gtk.VBox):
+                 if resp != Gtk.ResponseType.OK and resp != RESPONSE_SKIP_ALL:
+                     break
+ 
+-            if move_art:
++            if should_move_art:
+                 self.__moveart(moveart_sets, old_pathfile, new_pathfile, song)
+ 
+             if remove_empty_dirs:
+-- 
+1.8.4
+
