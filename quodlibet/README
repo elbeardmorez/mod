@@ -29,6 +29,10 @@ without exposing the 'More options..' expander for plugins which has
 its own visibility logic triggered via its 'changed' signal callback
 -verified no impact through toggling of the 'Regex Substitution' plugin
 
+# split.rename.options.into.frames.diff [git sha:1f81bff5626d4d145aa9a116e083ba82fa88fd35 | pending]
+-use separate 'File names' and 'Album art' frames to display sets
+of options to make better use of dead space
+
 # make.'lyric_filename()'.search.harder.diff [git sha:001c4273f159d9e4df858b906ee4ac596e371f68 | pending]
 -search alternate extensions: 'lyrics', '', 'txt'
 -add another default 'root'/'<artist> - <title>/lyric search path
