@@ -17,6 +17,8 @@ input is imperfect. allow users to override this if the results are off
 
 # add.option.to.remove.empty.directories.post.rename.diff [git sha:94e4c199be65ef237ad323e1de38fd7b5c6d686d | pending]
 
+# update.config.variable.names.diff [git sha:1b2ac52404e0a40b6dc4f4ca9c0c3743cc1b7854 | pending]
+
 # make.'lyric_filename()'.search.harder.diff [git sha:001c4273f159d9e4df858b906ee4ac596e371f68 | pending]
 -search alternate extensions: 'lyrics', '', 'txt'
 -add another default 'root'/'<artist> - <title>/lyric search path
