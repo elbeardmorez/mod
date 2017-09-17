@@ -1,0 +1,97 @@
+From 3eb6bff11620f0f67c46065f2730c5f141c42a42 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sun, 17 Sep 2017 11:35:48 +0100
+Subject: add a 'force' option to the 'css_add' wrapper
+
+-enforce css overrides by loading as USER priority when absolutely
+necessary (e.g. when a user override would compromise the resizing/
+positioning calculations). doing this is no different to enforcing
+styling via use of widget properties (e.g. margin) or style properties,
+for which users obviously have zero influence upon
+---
+ quodlibet/quodlibet/qltk/__init__.py |  6 ++++--
+ quodlibet/quodlibet/qltk/paned.py    | 12 ++++++------
+ 2 files changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/quodlibet/quodlibet/qltk/__init__.py b/quodlibet/quodlibet/qltk/__init__.py
+index 4022000..5e7c4f9 100644
+--- a/quodlibet/quodlibet/qltk/__init__.py
++++ b/quodlibet/quodlibet/qltk/__init__.py
+@@ -336,7 +336,7 @@ def is_accel(event, *accels):
+     return False
+ 
+ 
+-def add_css(widget, css):
++def add_css(widget, css, force=False):
+     """Add css for the widget, overriding the theme.
+ 
+     Can raise GLib.GError in case the css is invalid
+@@ -348,7 +348,9 @@ def add_css(widget, css):
+     provider = Gtk.CssProvider()
+     provider.load_from_data(css)
+     context = widget.get_style_context()
+-    context.add_provider(provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
++    context.add_provider(provider,
++        Gtk.STYLE_PROVIDER_PRIORITY_USER if force else
++        Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+ 
+ 
+ def remove_padding(widget):
+diff --git a/quodlibet/quodlibet/qltk/paned.py b/quodlibet/quodlibet/qltk/paned.py
+index e9105e3..b1761a5 100644
+--- a/quodlibet/quodlibet/qltk/paned.py
++++ b/quodlibet/quodlibet/qltk/paned.py
+@@ -33,7 +33,7 @@ class Paned(Gtk.Paned):
+                 paned {
+                     padding: 0px;
+                 }
+-            """)
++            """, True)
+             return
+ 
+         if hasattr(self.props, "wide_handle"):
+@@ -45,7 +45,7 @@ class Paned(Gtk.Paned):
+                     border-width: 0;
+                     background: none;
+                 }
+-            """)
++            """, True)
+             return
+ 
+         # gtk 3.14
+@@ -56,7 +56,7 @@ class Paned(Gtk.Paned):
+                 margin: 0;
+                 border-width: 0;
+             }
+-        """)
++        """, True)
+ 
+     @property
+     def handle_size(self):
+@@ -234,12 +234,12 @@ class XPaned(Paned):
+                 }
+                 expander arrow {
+                     padding: """ + str(__expander_spacing) + """px;
+-                }""")
++                }""", True)
+         else:
+             add_css(widget, """
+                 GtkExpander, expander {
+                     -GtkExpander-expander-size: """ +
+-                        str(__expander_size) + "; }")
++                        str(__expander_size) + "; }", True)
+ 
+         # common
+         add_css(widget, """
+@@ -255,7 +255,7 @@ class XPaned(Paned):
+                 background-image: none;
+                 margin: 0px;
+                 padding: """ + str(__label_padding) + """px;
+-            }""")
++            }""", True)
+ 
+         widget.title_size = title_size
+ 
+-- 
+1.8.4
+
