@@ -1,4 +1,4 @@
-From ee2927128e2165d27c0dc1ce5c47416e346052d7 Mon Sep 17 00:00:00 2001
+From 4a709422382dfde796a620ab3e5fabdb21d5f269 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Tue, 12 Sep 2017 18:38:18 +0100
 Subject: paned handle position considerations
@@ -8,10 +8,10 @@ corrections to account for 'wide handle' support in later Gtk versions
 -removes the 'seemingly arbitrary' +/-5px handle positioning for collapsed
 expanders, calculating the position based on size instead
 ---
- quodlibet/quodlibet/qltk/paned.py     | 223 +++++++++++++++++++++++++++-------
- quodlibet/quodlibet/qltk/widgetbar.py |   7 +-
- quodlibet/tests/test_qltk_paned.py    |  69 ++++++-----
- 3 files changed, 217 insertions(+), 82 deletions(-)
+ quodlibet/quodlibet/qltk/paned.py      | 223 ++++++++++++++++++++++++++-------
+ quodlibet/tests/test_browsers_paned.py |  35 ++++--
+ quodlibet/tests/test_qltk_paned.py     |  77 ++++++------
+ 3 files changed, 247 insertions(+), 88 deletions(-)
 
 diff --git a/quodlibet/quodlibet/qltk/paned.py b/quodlibet/quodlibet/qltk/paned.py
 index a7e4303..e9105e3 100644
@@ -321,33 +321,61 @@ index a7e4303..e9105e3 100644
  
      def change_orientation(self, horizontal):
          """Change the orientation of the paned."""
-diff --git a/quodlibet/quodlibet/qltk/widgetbar.py b/quodlibet/quodlibet/qltk/widgetbar.py
-index 9c21c1c..445b298 100644
---- a/quodlibet/quodlibet/qltk/widgetbar.py
-+++ b/quodlibet/quodlibet/qltk/widgetbar.py
-@@ -49,12 +49,6 @@ class WidgetBar(Gtk.Expander):
-         self.title = Gtk.Label()
-         self.title.set_alignment(0.0, 0.5)
-         self.set_label_widget(self.title)
--        title_height = self.get_label_widget().get_allocation().height
+diff --git a/quodlibet/tests/test_browsers_paned.py b/quodlibet/tests/test_browsers_paned.py
+index 1ec3bcc..9b4803d 100644
+--- a/quodlibet/tests/test_browsers_paned.py
++++ b/quodlibet/tests/test_browsers_paned.py
+@@ -4,7 +4,7 @@
+ # published by the Free Software Foundation
+ 
+ from tests import TestCase
+-from .helper import realized
++from .helper import realized, visible, relatively_close_test
+ 
+ from gi.repository import Gtk
+ from senf import fsnative
+@@ -163,12 +163,33 @@ class TPanedBrowser(TestCase):
+     def test_make_pane_widths_equal(self):
+         config.set("browsers", "panes", "artist\talbum\t~year\t~#track")
+         self.bar.set_all_panes()
+-        self.bar.make_pane_sizes_equal()
+-        paneds = self.bar.multi_paned.get_paneds()
 -
--        expanded = config.getboolean("plugins", self.id + "_expanded", True)
--
--        self.set_size_request(-1, self.panelock.size if expanded
--                                                     else title_height + 5)
+-        self.failUnlessAlmostEqual(paneds[0].get_relative(), 1.0 / 4.0)
+-        self.failUnlessAlmostEqual(paneds[1].get_relative(), 1.0 / 3.0)
+-        self.failUnlessAlmostEqual(paneds[2].get_relative(), 1.0 / 2.0)
++        mp = self.bar.multi_paned
++        paneds = mp.get_paneds()
++        root = mp.get_paned()
++        orientation = root.ORIENTATION
++        handle_size = root.handle_size
++        size = 500
++        with visible(self.bar, size, size):
++            self.bar.make_pane_sizes_equal()
++            expected = (size - (len(paneds) * handle_size)) / (len(paneds) + 1)
++
++            for p in paneds:
++                size = 0
++                if orientation == Gtk.Orientation.HORIZONTAL:
++                    size = p.get_child1().get_allocation().width
++                else:
++                    size = p.get_child1().get_allocation().height
++
++                res, msg = relatively_close_test(size, expected)
++                self.failUnless(res, msg)
++
++            if orientation == Gtk.Orientation.HORIZONTAL:
++                size = paneds[-1].get_child1().get_allocation().width
++            else:
++                size = paneds[-1].get_child2().get_allocation().height
++
++        res, msg = relatively_close_test(size, expected)
++        self.failUnless(res, msg)
  
-         self.scroll = ScrolledWindow()
-         self.scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.NEVER)
-@@ -107,6 +101,7 @@ class WidgetBar(Gtk.Expander):
-         self.connect('size_allocate', self.__size_allocate)
-         self.connect("destroy", self.__destroy)
- 
-+        expanded = config.getboolean("plugins", self.id + "_expanded", True)
-         self.set_expanded(expanded)
- 
-     @property
+     def test_wide_mode(self):
+         self.bar.set_all_wide_mode(True)
 diff --git a/quodlibet/tests/test_qltk_paned.py b/quodlibet/tests/test_qltk_paned.py
-index 93cdb5a..501b7e1 100644
+index 93cdb5a..f29284f 100644
 --- a/quodlibet/tests/test_qltk_paned.py
 +++ b/quodlibet/tests/test_qltk_paned.py
 @@ -5,7 +5,7 @@
@@ -376,7 +404,7 @@ index 93cdb5a..501b7e1 100644
  
  
  class XHPaned(TestCase, TXPaned):
-@@ -173,34 +172,39 @@ class TMultiPaned(object):
+@@ -173,34 +172,37 @@ class TMultiPaned(object):
          self.assertIs(sws[2], sub_paned.get_child2())
  
      def test_make_pane_sizes_equal(self):
@@ -384,21 +412,18 @@ index 93cdb5a..501b7e1 100644
 +        mp = self.Kind()
          sws = [Gtk.ScrolledWindow() for _ in range(4)]
 -        p.set_widgets(sws)
+-
 +        mp.set_widgets(sws)
- 
--        size = 500
++        paneds = mp.get_paneds()
++        root = mp.get_paned()
++        handle_size = root.handle_size
++        orientation = root.ORIENTATION
+         size = 500
 -        with visible(p.get_paned(), size, size):
 -            p.make_pane_sizes_equal()
-+        size = 400
-+        root = mp.get_paned()
-+        orientation = root.ORIENTATION
-+        with visible(root, size, size):
-+            mp.make_pane_sizes_equal()
- 
+-
 -            paneds = p.get_paneds()
-+            paneds = mp.get_paneds()
-+            handle_size = root.handle_size
- 
+-
 -            if isinstance(p.PANED(), RPaned):
 -                self.failUnlessAlmostEqual(
 -                    paneds[0].get_relative(), 1.0 / 4.0, 2)
@@ -415,6 +440,9 @@ index 93cdb5a..501b7e1 100644
 -                self.failUnless(res, msg)
 -                res, msg = relatively_close_test(
 -                               paneds[2].get_position(), size / 4, 0.02)
++        with visible(root, size, size):
++            mp.make_pane_sizes_equal()
++
 +            expected = (size - (len(paneds) * handle_size)) / (len(paneds) + 1)
 +
 +            for p in paneds:
@@ -438,7 +466,7 @@ index 93cdb5a..501b7e1 100644
      def test_change_orientation(self):
          p = self.Kind()
          p.set_widgets([Gtk.ScrolledWindow()])
-@@ -259,10 +263,6 @@ class TMultiXVPaned(TestCase, TMultiPaned):
+@@ -259,10 +261,6 @@ class TMultiXVPaned(TestCase, TMultiPaned):
                          p.pack2(w, True, False)
                  w = p
  
@@ -449,17 +477,18 @@ index 93cdb5a..501b7e1 100644
          # 2 widgets, bottom expandable
          p = self.Kind()
          exps = _widgets(2)
-@@ -271,6 +271,9 @@ class TMultiXVPaned(TestCase, TMultiPaned):
+@@ -271,14 +269,17 @@ class TMultiXVPaned(TestCase, TMultiPaned):
          exp.set_expanded(True)
          _repack(exp)
  
+-        with visible(p.get_paned(), 400, 400):
 +        handle_size = self.Kind().PANED().handle_size
 +        title_size = exp.title_size
 +
-         with visible(p.get_paned(), 400, 400):
++        with visible(p.get_paned(), 500, 500):
              for w in [w for w in exps if w is not exp]:
                  w.get_parent().update(w)
-@@ -278,7 +281,7 @@ class TMultiXVPaned(TestCase, TMultiPaned):
+ 
              self.failUnlessEqual(
                  exp.get_allocation().height,
                  p.get_paned().get_allocation().height -
@@ -468,7 +497,16 @@ index 93cdb5a..501b7e1 100644
  
          # 3 widgets, top expandable
          p = self.Kind()
-@@ -301,7 +304,7 @@ class TMultiXVPaned(TestCase, TMultiPaned):
+@@ -287,7 +288,7 @@ class TMultiXVPaned(TestCase, TMultiPaned):
+         exp = exps[0]
+         exp.set_expanded(True)
+         _repack(exp)
+-        with visible(p.get_paned(), 400, 400):
++        with visible(p.get_paned(), 500, 500):
+ 
+             exp.get_parent().update(exp)
+             self.failUnlessEqual(
+@@ -301,7 +302,7 @@ class TMultiXVPaned(TestCase, TMultiPaned):
              res, msg = relatively_close_test(
                             exp.get_allocation().height,
                             p.get_paned().get_allocation().height - 2 *
@@ -477,7 +515,16 @@ index 93cdb5a..501b7e1 100644
              self.failUnless(res, msg)
  
          # 4 widgets, 2nd expandable
-@@ -325,7 +328,7 @@ class TMultiXVPaned(TestCase, TMultiPaned):
+@@ -311,7 +312,7 @@ class TMultiXVPaned(TestCase, TMultiPaned):
+         exp = exps[1]
+         exp.set_expanded(True)
+         _repack(exp)
+-        with visible(p.get_paned(), 400, 400):
++        with visible(p.get_paned(), 500, 500):
+ 
+             exp.get_parent().update(exp)
+             self.failUnlessEqual(
+@@ -325,7 +326,7 @@ class TMultiXVPaned(TestCase, TMultiPaned):
              res, msg = relatively_close_test(
                             exp.get_allocation().height,
                             p.get_paned().get_allocation().height - 3 *

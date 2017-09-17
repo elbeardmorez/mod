@@ -1,17 +1,38 @@
-From 781dc2cf0963ae9f0cb084b055b37eb4e795028e Mon Sep 17 00:00:00 2001
+From 065f63cca78212550d0603f4ec6a5d90c3100f9f Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Tue, 12 Sep 2017 18:53:26 +0100
 Subject: remove superfluous widgetbar updating
 
 ---
- quodlibet/quodlibet/qltk/widgetbar.py | 7 -------
- 1 file changed, 7 deletions(-)
+ quodlibet/quodlibet/qltk/widgetbar.py | 14 +-------------
+ 1 file changed, 1 insertion(+), 13 deletions(-)
 
 diff --git a/quodlibet/quodlibet/qltk/widgetbar.py b/quodlibet/quodlibet/qltk/widgetbar.py
-index 93347ae..0006f1d 100644
+index 93347ae..d37d2ae 100644
 --- a/quodlibet/quodlibet/qltk/widgetbar.py
 +++ b/quodlibet/quodlibet/qltk/widgetbar.py
-@@ -151,13 +151,6 @@ class WidgetBar(Gtk.Expander):
+@@ -49,12 +49,6 @@ class WidgetBar(Gtk.Expander):
+         self.title = Gtk.Label()
+         self.title.set_alignment(0.0, 0.5)
+         self.set_label_widget(self.title)
+-        title_height = self.get_label_widget().get_allocation().height
+-
+-        expanded = config.getboolean("plugins", self.id + "_expanded", True)
+-
+-        self.set_size_request(-1, self.panelock.size if expanded
+-                                                     else title_height + 5)
+ 
+         self.scroll = ScrolledWindow()
+         self.scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.NEVER)
+@@ -106,6 +100,7 @@ class WidgetBar(Gtk.Expander):
+         self.connect('size_allocate', self.__size_allocate)
+         self.connect("destroy", self.__destroy)
+ 
++        expanded = config.getboolean("plugins", self.id + "_expanded", True)
+         self.set_expanded(expanded)
+ 
+     @property
+@@ -151,13 +146,6 @@ class WidgetBar(Gtk.Expander):
          config.set("plugins", self.id + "_size", self.panelock.size)
  
      def __size_allocate(self, widget, allocation):

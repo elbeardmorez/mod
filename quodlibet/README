@@ -95,7 +95,7 @@ bigger OR smaller. in practice, this is not really noticable
 
 # remove.redundant.plugin_config_section.variable.diff [git sha:a392d03ab6fd32e4dd56573fea08b2e6fa5a2859 | pending]
 
-# change.widgetbars.plugin.path.diff [git sha:c2396664578994ebe03b36128d24ec7ee4308a42 | pending]
+# change.widgetbars.plugin.path.diff [git sha:53a1a479fc63ec3880af75d5e1ce66c024dbbc2c | pending]
 
 # inline.some.logic.to.improve.readability.diff [git sha:b7a373092c108efb3995ab3891705dc9337cea7e | pending]
 
@@ -105,7 +105,7 @@ bigger OR smaller. in practice, this is not really noticable
 
 # improve.the.relatively.close.test.diff [git sha:c77888949c5a869cbe9e122c459c5918ba122df0 | pending]
 
-# remove.superfluous.widgetbar.updating.diff [git sha:781dc2cf0963ae9f0cb084b055b37eb4e795028e | pending]
+# remove.superfluous.widgetbar.updating.diff [git sha:065f63cca78212550d0603f4ec6a5d90c3100f9f | pending]
 
 # gtk.version.compatibility.diff [git sha:7c86af22d61eff1c126915641567f27c93c199a5 | pending]
 -widgets don't automatically expand to fill space in their parent
@@ -118,7 +118,7 @@ collapsed expander, its parent pane would proportionally resize whenever
 any parent paneds were resized, as opposed to it being locked into position
 as we'd want with any collapsed item
 
-# paned.handle.position.considerations.diff [git sha:ee2927128e2165d27c0dc1ce5c47416e346052d7 | pending]
+# paned.handle.position.considerations.diff [git sha:4a709422382dfde796a620ab3e5fabdb21d5f269 | pending]
 -fix all paned handle position calculations by adding handle size
 corrections to account for 'wide handle' support in later Gtk versions
 -removes the 'seemingly arbitrary' +/-5px handle positioning for collapsed
@@ -200,7 +200,7 @@ dialog
 
 # pluginswidgetbar,.add.plugin.errors.icon.diff [git sha:564c8cb08f73ade18b843bb3a1857023af5159c7 | pending]
 
-# pluginswidgetbar,.add.highlight.strips.for.enabled.plugins.diff [git sha:661ddcf74cf968bcf4c798ff3d642b72096f34ba | pending]
+# pluginswidgetbar,.add.highlight.strips.for.enabled.plugins.diff [git sha:dba87d4b61cf4fb07abfd9af4b7a93950c66f71a | pending]
 
 # burn.cd,.fascilitate.non-song-menu.initialisation.diff [git sha:0a755cee35894155ab5c49ef7339be1aeb299c17 | pending]
 
@@ -228,7 +228,7 @@ front of the full list)
 
 # pluginswidgetbar,.fix.drag.drop.on.same.icon.diff [git sha:f1ee7224cdedb64680f19be134c000d8b22c32cb | pending]
 
-# pluginswidgetbar,.add.drag.highlights.diff [git sha:991c663b75133ba74f360a0d2735ac46bd00f41f | pending]
+# pluginswidgetbar,.add.drag.highlights.diff [git sha:6d9f8ffc18d69362e62e4c75ea439b9e6ddf7787 | pending]
 
 # pluginswidgetbar,.drag.'n'.drop.target.support.diff [git sha:639bb18e42ce9acf74a254719d8176f2197671c9 | pending]
 
