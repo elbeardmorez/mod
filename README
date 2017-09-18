@@ -82,6 +82,7 @@ a dumping ground for patches which modify or add functionality
 -code.style.improvements.diff [git sha:13f510909cf40341d56e7987c01ffb934bd79fac | pending]
 -filterpluginbox,.no_show_all.on.plugins.expander.diff [git sha:4b99a31a21e68569556c05edc1bacf9466643ef0 | pending]
 -split.rename.options.into.frames.diff [git sha:1f81bff5626d4d145aa9a116e083ba82fa88fd35 | pending]
+-tests.for.moving.album.art.diff [git sha:bdf42f19e5ad1ba4f7b980014703cb564e44eca9 | pending]
 -make.'lyric_filename()'.search.harder.diff [git sha:001c4273f159d9e4df858b906ee4ac596e371f68 | pending]
 -orientation.agnostic.names.diff [git sha:aa36c73cbd3d00fc051c2cdceacdc1f4671a8d11 | pending]
 -exposed.multipaned.paned.set.diff [git sha:759f306db07154d1c19df499201c1f6fd49cf627 | pending]

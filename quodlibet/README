@@ -33,6 +33,8 @@ its own visibility logic triggered via its 'changed' signal callback
 -use separate 'File names' and 'Album art' frames to display sets
 of options to make better use of dead space
 
+# tests.for.moving.album.art.diff [git sha:bdf42f19e5ad1ba4f7b980014703cb564e44eca9 | pending]
+
 # make.'lyric_filename()'.search.harder.diff [git sha:001c4273f159d9e4df858b906ee4ac596e371f68 | pending]
 -search alternate extensions: 'lyrics', '', 'txt'
 -add another default 'root'/'<artist> - <title>/lyric search path
