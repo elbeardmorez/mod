@@ -1,0 +1,41 @@
+From 3c97caaaa44d5b619b9be5f181dbc691f1f57896 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Tue, 19 Sep 2017 11:42:03 +0100
+Subject: add 'add_global_css' wrapper function
+
+-add css to for current (default) screen context
+---
+ quodlibet/quodlibet/qltk/__init__.py | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/quodlibet/quodlibet/qltk/__init__.py b/quodlibet/quodlibet/qltk/__init__.py
+index 5e7c4f9..5aff2b9 100644
+--- a/quodlibet/quodlibet/qltk/__init__.py
++++ b/quodlibet/quodlibet/qltk/__init__.py
+@@ -353,6 +353,23 @@ def add_css(widget, css, force=False):
+         Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+ 
+ 
++def add_global_css(css, force=False):
++    """Add css for the current screen, overriding the theme.
++
++    Can raise GLib.GError in case the css is invalid
++    """
++
++    if not isinstance(css, bytes):
++        css = css.encode("utf-8")
++
++    provider = Gtk.CssProvider()
++    provider.load_from_data(css)
++    Gtk.StyleContext.add_provider_for_screen(
++        Gdk.Screen.get_default(), provider,
++        Gtk.STYLE_PROVIDER_PRIORITY_USER if force else
++        Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
++
++
+ def remove_padding(widget):
+     """Removes padding on supplied widget"""
+     return add_css(widget, " * { padding: 0px; } ")
+-- 
+1.8.4
+

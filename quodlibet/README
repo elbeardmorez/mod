@@ -212,6 +212,9 @@ dialog
 
 # pluginswidgetbar,.add.plugin.errors.icon.diff [git sha:564c8cb08f73ade18b843bb3a1857023af5159c7 | pending]
 
+# add.'add_global_css'.wrapper.function.diff [git sha:3c97caaaa44d5b619b9be5f181dbc691f1f57896 | pending]
+-add css to for current (default) screen context
+
 # pluginswidgetbar,.add.highlight.strips.for.enabled.plugins.diff [git sha:dba87d4b61cf4fb07abfd9af4b7a93950c66f71a | pending]
 
 # burn.cd,.fascilitate.non-song-menu.initialisation.diff [git sha:0a755cee35894155ab5c49ef7339be1aeb299c17 | pending]
