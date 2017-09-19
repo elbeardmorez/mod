@@ -1,4 +1,4 @@
-From dba87d4b61cf4fb07abfd9af4b7a93950c66f71a Mon Sep 17 00:00:00 2001
+From dc07d29b89b79fe4dcb4cc764c32f178752c8222 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Fri, 25 Aug 2017 08:01:18 +0100
 Subject: pluginswidgetbar, add highlight strips for enabled plugins
@@ -8,7 +8,7 @@ Subject: pluginswidgetbar, add highlight strips for enabled plugins
  1 file changed, 47 insertions(+), 6 deletions(-)
 
 diff --git a/quodlibet/quodlibet/ext/events/plugins_widgetbar.py b/quodlibet/quodlibet/ext/events/plugins_widgetbar.py
-index 3b803d8..25e30d1 100644
+index 3b803d8..9f75519 100644
 --- a/quodlibet/quodlibet/ext/events/plugins_widgetbar.py
 +++ b/quodlibet/quodlibet/ext/events/plugins_widgetbar.py
 @@ -8,7 +8,7 @@
@@ -25,7 +25,7 @@ index 3b803d8..25e30d1 100644
  from quodlibet.qltk.pluginwin import PluginWindow, PluginErrorWindow
  from quodlibet.plugins import PluginManager
 -from quodlibet.qltk import Icons
-+from quodlibet.qltk import Icons, add_css
++from quodlibet.qltk import Icons, add_global_css
  from quodlibet.qltk.entry import UndoEntry
  from quodlibet.qltk.x import Align
  from quodlibet.qltk.widgetbar import WidgetBar
@@ -42,7 +42,7 @@ index 3b803d8..25e30d1 100644
          self.__callbacks_dragdrop = {}
          self.__read_actions()
  
-+        add_css(self.__widgetbar, """
++        add_global_css("""
 +            .highlightbox {background-color: #558fcb;
 +                           border-radius: 2px;}
 +            """, True)
