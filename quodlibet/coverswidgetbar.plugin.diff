@@ -1,19 +1,18 @@
-From d15f19e38168cfcff153e1acdf7e6808c918eae0 Mon Sep 17 00:00:00 2001
+From 72cdd3f2b3584c2b1eb7b402c0998777c6834241 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Mon, 14 Aug 2017 18:00:53 +0100
 Subject: CoversWidgetBar plugin
 
 ---
  quodlibet/po/POTFILES.in                           |   1 +
- quodlibet/quodlibet/config.py                      |   1 +
  quodlibet/quodlibet/ext/covers/covers_widgetbar.py | 375 +++++++++++++++++++++
  quodlibet/quodlibet/ext/events/widgetbars.py       |   2 +-
  quodlibet/quodlibet/qltk/widgetbar.py              |  32 ++
- 5 files changed, 410 insertions(+), 1 deletion(-)
+ 4 files changed, 409 insertions(+), 1 deletion(-)
  create mode 100644 quodlibet/quodlibet/ext/covers/covers_widgetbar.py
 
 diff --git a/quodlibet/po/POTFILES.in b/quodlibet/po/POTFILES.in
-index 0db1fac..0bf0a65 100644
+index 1ed0bac..c5d844f 100644
 --- a/quodlibet/po/POTFILES.in
 +++ b/quodlibet/po/POTFILES.in
 @@ -28,6 +28,7 @@ quodlibet/cli.py
@@ -24,21 +23,9 @@ index 0db1fac..0bf0a65 100644
  quodlibet/ext/covers/discogs.py
  quodlibet/ext/covers/lastfm.py
  quodlibet/ext/covers/musicbrainz.py
-diff --git a/quodlibet/quodlibet/config.py b/quodlibet/quodlibet/config.py
-index 164917c..66efbe2 100644
---- a/quodlibet/quodlibet/config.py
-+++ b/quodlibet/quodlibet/config.py
-@@ -260,6 +260,7 @@ INITIAL = {
-         "prefer_embedded": "false",
-         "force_filename": "false",
-         "filename": "folder.jpg",
-+        "filenames": "cover.jpg,folder.jpg,.folder.jpg",
-     },
- 
-     "display": {
 diff --git a/quodlibet/quodlibet/ext/covers/covers_widgetbar.py b/quodlibet/quodlibet/ext/covers/covers_widgetbar.py
 new file mode 100644
-index 0000000..c2c78da
+index 0000000..c5f74d2
 --- /dev/null
 +++ b/quodlibet/quodlibet/ext/covers/covers_widgetbar.py
 @@ -0,0 +1,375 @@
@@ -234,7 +221,7 @@ index 0000000..c2c78da
 +            images.extend(glob.glob(os.path.join(path_escaped, "*." + suffix)))
 +        images_match = []
 +        if len(images) > 0:
-+            filenames = config.getstringlist("albumart", "filenames")
++            filenames = config.getstringlist("albumart", "search_filenames")
 +            for fn in filenames:
 +                fn = os.path.join(path, fn)
 +                if "<" in fn:
@@ -431,7 +418,7 @@ index 87719d6..97e73d3 100644
          ]
          for text, label, tooltip, changed_cb in entries:
 diff --git a/quodlibet/quodlibet/qltk/widgetbar.py b/quodlibet/quodlibet/qltk/widgetbar.py
-index e7068ed..aa25897 100644
+index 445b298..ef6ff14 100644
 --- a/quodlibet/quodlibet/qltk/widgetbar.py
 +++ b/quodlibet/quodlibet/qltk/widgetbar.py
 @@ -5,11 +5,13 @@
@@ -448,7 +435,7 @@ index e7068ed..aa25897 100644
  
  from quodlibet.qltk import get_top_parent
  from quodlibet.qltk import Icons
-@@ -152,6 +154,36 @@ class WidgetBar(Gtk.Expander):
+@@ -143,6 +145,36 @@ class WidgetBar(Gtk.Expander):
          # no guarantee that this will be called -> :(
          self.__save()
  

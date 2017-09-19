@@ -146,7 +146,7 @@ for which users obviously have zero influence upon
 -allows multiple big images to remain visible from a single CoverImage
 -toggled via the config 'settings -> multiple_big_images' bool
 
-# coverswidgetbar.plugin.diff [git sha:d15f19e38168cfcff153e1acdf7e6808c918eae0 | pending]
+# coverswidgetbar.plugin.diff [git sha:72cdd3f2b3584c2b1eb7b402c0998777c6834241 | pending]
 
 # avoid.pixmap.error.diff [git sha:74b6648e09c8720f6b08a8933bce10a45e8dda6e | pending]
 

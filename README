@@ -114,7 +114,7 @@ a dumping ground for patches which modify or add functionality
 -return.default.1x1.for.invalid.image.scaling.diff [git sha:85076f1e50e2eec5fb957dd4c4d9af7e677d0f55 | pending]
 -persistent.moveable.big.images.diff [git sha:bf3969e4fed0658d0f225a1a0537a26d746293b7 | pending]
 -support.multiple.big.images.diff [git sha:d394ce2a8e86f2365bfe4e836cb1fe9b00ab8220 | pending]
--coverswidgetbar.plugin.diff [git sha:d15f19e38168cfcff153e1acdf7e6808c918eae0 | pending]
+-coverswidgetbar.plugin.diff [git sha:72cdd3f2b3584c2b1eb7b402c0998777c6834241 | pending]
 -avoid.pixmap.error.diff [git sha:74b6648e09c8720f6b08a8933bce10a45e8dda6e | pending]
 -center.images.on.their.cairo.surface.diff [git sha:50c66a87cdca68d95f950886529ea670b5b3c9ab | pending]
 -coverswidgetbar,.follow.front.option.diff [git sha:a64d4e34315ba896580fd383a9c9bde48a2d92c9 | pending]
