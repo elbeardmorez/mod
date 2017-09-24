@@ -157,6 +157,8 @@ for which users obviously have zero influence upon
 # embeddedimage,.facilitate.partial.reads.diff [git sha:e5299619a47d71284560f93e97d1a16d1b51bc55 | pending]
 -add 'no_of_bytes' param to read()
 
+# coverswidgetbar,.add.check.to.catch.stale.embedded.art.cache.diff [git sha:4f7a7241af60d52ba8a1458966d1f3a6c80dc2e9 | pending]
+
 # coverswidgetbar,.follow.front.option.diff [git sha:a64d4e34315ba896580fd383a9c9bde48a2d92c9 | pending]
 
 # coverswidgetbar,.make.cover.label.more.configurable.diff [git sha:e820bc28aab1935d8573f655729fd7bfd19b6609 | pending]
