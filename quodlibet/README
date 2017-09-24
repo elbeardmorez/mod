@@ -154,6 +154,9 @@ for which users obviously have zero influence upon
 
 # embeddedimage,.add.size().diff [git sha:68d1f84b228bfc47c32ed103cbd6b2fa40131275 | pending]
 
+# embeddedimage,.facilitate.partial.reads.diff [git sha:e5299619a47d71284560f93e97d1a16d1b51bc55 | pending]
+-add 'no_of_bytes' param to read()
+
 # coverswidgetbar,.follow.front.option.diff [git sha:a64d4e34315ba896580fd383a9c9bde48a2d92c9 | pending]
 
 # coverswidgetbar,.make.cover.label.more.configurable.diff [git sha:e820bc28aab1935d8573f655729fd7bfd19b6609 | pending]
