@@ -152,6 +152,8 @@ for which users obviously have zero influence upon
 
 # center.images.on.their.cairo.surface.diff [git sha:50c66a87cdca68d95f950886529ea670b5b3c9ab | pending]
 
+# embeddedimage,.add.size().diff [git sha:68d1f84b228bfc47c32ed103cbd6b2fa40131275 | pending]
+
 # coverswidgetbar,.follow.front.option.diff [git sha:a64d4e34315ba896580fd383a9c9bde48a2d92c9 | pending]
 
 # coverswidgetbar,.make.cover.label.more.configurable.diff [git sha:e820bc28aab1935d8573f655729fd7bfd19b6609 | pending]

@@ -1,0 +1,28 @@
+From 68d1f84b228bfc47c32ed103cbd6b2fa40131275 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sun, 24 Sep 2017 10:25:05 +0100
+Subject: EmbeddedImage, add size()
+
+---
+ quodlibet/quodlibet/formats/_image.py | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/quodlibet/quodlibet/formats/_image.py b/quodlibet/quodlibet/formats/_image.py
+index 83d22bb..50ed941 100644
+--- a/quodlibet/quodlibet/formats/_image.py
++++ b/quodlibet/quodlibet/formats/_image.py
+@@ -174,6 +174,11 @@ class EmbeddedImage(object):
+             type(self).__name__, self.mime_type, self.width, self.height,
+             APICType.to_string(self.type), self.file)
+ 
++    def size(self):
++        """Read the underlying size of the data."""
++
++        return self.file.tell()
++
+     def read(self):
+         """Read the raw image data
+ 
+-- 
+1.8.4
+
