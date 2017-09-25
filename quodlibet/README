@@ -176,7 +176,7 @@ for which users obviously have zero influence upon
 
 # expose.pluginmanager's.scanned.modules.diff [git sha:94b1aa6bbb79dbde2db472851cc38738769400be | pending]
 
-# pluginswidgetbar.plugin.[#2042.part].diff [git sha:38153177f896b90b411ac15315767f4cf0d0b04f | pending]
+# pluginswidgetbar.plugin.[#2042.part].diff [git sha:3dd32f0aafd81ac426ef1c6e2e85399f4cf56188 | pending]
 -part implementation of #2042 (drag and drop to follow)
 -configurable actions via silly string magic in right-click 'actions'
 dialog which perists preferences
@@ -213,11 +213,11 @@ dialog
 
 # pluginswidgetbar,.add.'enabled.only'.toggle.diff [git sha:61e09b72aacf15801e8b8f5d43a004bab72a4799 | pending]
 
-# pluginswidgetbar,.add.'show.labels'.toggle.diff [git sha:757f258e25ce6e5fe50b708bb1727be833a55b97 | pending]
+# pluginswidgetbar,.add.'show.labels'.toggle.diff [git sha:16b08625ec661598f4f63c0f33d492b364d1dbab | pending]
 
 # pluginswidgetbar,.add.'small.icons'.toggle.diff [git sha:d2661638ee95d8973401ab07d25d36d50b04efcd | pending]
 
-# pluginswidgetbar,.add.plugin.errors.icon.diff [git sha:564c8cb08f73ade18b843bb3a1857023af5159c7 | pending]
+# pluginswidgetbar,.add.plugin.errors.icon.diff [git sha:3c914f03f48dfd846cb3d28d273680b73edf6fe3 | pending]
 
 # add.'add_global_css'.wrapper.function.diff [git sha:3c97caaaa44d5b619b9be5f181dbc691f1f57896 | pending]
 -add css to for current (default) screen context

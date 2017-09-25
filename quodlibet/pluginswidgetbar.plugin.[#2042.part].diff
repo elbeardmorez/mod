@@ -1,7 +1,7 @@
-From 38153177f896b90b411ac15315767f4cf0d0b04f Mon Sep 17 00:00:00 2001
+From 3dd32f0aafd81ac426ef1c6e2e85399f4cf56188 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Tue, 22 Aug 2017 17:53:03 +0100
-Subject: [PATCH] PluginsWidgetBar plugin [#2042 part]
+Subject: PluginsWidgetBar plugin [#2042 part]
 
 -part implementation of #2042 (drag and drop to follow)
 -configurable actions via silly string magic in right-click 'actions'
@@ -44,10 +44,10 @@ dialog
  create mode 100644 quodlibet/quodlibet/ext/events/plugins_widgetbar.py
 
 diff --git a/quodlibet/po/POTFILES.in b/quodlibet/po/POTFILES.in
-index e607dfb..b6b09d9 100644
+index c3eb4dd..067721d 100644
 --- a/quodlibet/po/POTFILES.in
 +++ b/quodlibet/po/POTFILES.in
-@@ -56,6 +56,7 @@ quodlibet/ext/events/mpdserver/__init__.py
+@@ -55,6 +55,7 @@ quodlibet/ext/events/mpdserver/__init__.py
  quodlibet/ext/events/mpris/__init__.py
  quodlibet/ext/events/mqtt.py
  quodlibet/ext/events/notify.py
@@ -57,7 +57,7 @@ index e607dfb..b6b09d9 100644
  quodlibet/ext/events/randomalbum.py
 diff --git a/quodlibet/quodlibet/ext/events/plugins_widgetbar.py b/quodlibet/quodlibet/ext/events/plugins_widgetbar.py
 new file mode 100644
-index 0000000..b6ebdfe
+index 0000000..6883fc6
 --- /dev/null
 +++ b/quodlibet/quodlibet/ext/events/plugins_widgetbar.py
 @@ -0,0 +1,544 @@
@@ -486,7 +486,7 @@ index 0000000..b6ebdfe
 +            plugin_icon_image = Gtk.Image.new_from_icon_name(
 +                p.icon or Icons.SYSTEM_RUN, Gtk.IconSize.LARGE_TOOLBAR)
 +            plugin_icon_image.set_tooltip_markup(
-+                _("name: " + p.name + "\nid: " + p.id))
++                "%s: %s\n%s: %s" % (_(u"name"), p.name, _(u"id"), p.id))
 +            plugin_icon_align = \
 +                Align(left=5, right=5, top=0, bottom=0)
 +            plugin_icon_align.add(plugin_icon_image)

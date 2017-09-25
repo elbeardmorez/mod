@@ -1,16 +1,16 @@
-From 564c8cb08f73ade18b843bb3a1857023af5159c7 Mon Sep 17 00:00:00 2001
+From 3c914f03f48dfd846cb3d28d273680b73edf6fe3 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Thu, 24 Aug 2017 08:04:58 +0100
 Subject: pluginswidgetbar, add plugin errors icon
 
 ---
- quodlibet/quodlibet/ext/ui/plugins_widgetbar.py | 127 ++++++++++++++++--------
+ .../quodlibet/ext/events/plugins_widgetbar.py      | 127 ++++++++++++++-------
  1 file changed, 84 insertions(+), 43 deletions(-)
 
-diff --git a/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
-index 45b3391..3b803d8 100644
---- a/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
-+++ b/quodlibet/quodlibet/ext/ui/plugins_widgetbar.py
+diff --git a/quodlibet/quodlibet/ext/events/plugins_widgetbar.py b/quodlibet/quodlibet/ext/events/plugins_widgetbar.py
+index d78792d..ec4bd32 100644
+--- a/quodlibet/quodlibet/ext/events/plugins_widgetbar.py
++++ b/quodlibet/quodlibet/ext/events/plugins_widgetbar.py
 @@ -18,7 +18,7 @@ from quodlibet import _
  from quodlibet.plugins import PluginConfig, BoolConfProp, ConfProp
  from quodlibet.plugins.events import EventPlugin
@@ -57,7 +57,7 @@ index 45b3391..3b803d8 100644
 -            plugin_icon_image = Gtk.Image.new_from_icon_name(
 -                p.icon or Icons.SYSTEM_RUN, icon_size)
 -            plugin_icon_image.set_tooltip_markup(
--                _("name: " + p.name + "\nid: " + p.id))
+-                "%s: %s\n%s: %s" % (_(u"name"), p.name, _(u"id"), p.id))
 -            padding = 10 if CONFIG.show_labels else 5
 -            plugin_icon_align = \
 -                Align(left=padding, right=padding, top=0, bottom=0)
@@ -114,7 +114,7 @@ index 45b3391..3b803d8 100644
 +            icon or Icons.SYSTEM_RUN, icon_size)
 +        if show_tooltip:
 +            plugin_icon_image.set_tooltip_markup(
-+                _("name: " + name + "\nid: " + id))
++                "%s: %s\n%s: %s" % (_(u"name"), name, _(u"id"), id))
 +        padding = 10 if CONFIG.show_labels else 5
 +        plugin_icon_align = \
 +            Align(left=padding, right=padding, top=0, bottom=0)
