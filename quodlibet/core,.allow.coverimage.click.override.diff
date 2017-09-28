@@ -1,0 +1,68 @@
+From b7834f0ecb5c685cc70a6953817d99ca127961b8 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Thu, 28 Sep 2017 08:52:03 +0100
+Subject: core, allow CoverImage click override
+
+-expose a CoverImage 'cover_click_cb' property to be set in order
+to override the default button-press behaviour
+---
+ quodlibet/quodlibet/qltk/cover.py | 29 +++++++++++++++++++++++------
+ 1 file changed, 23 insertions(+), 6 deletions(-)
+
+diff --git a/quodlibet/quodlibet/qltk/cover.py b/quodlibet/quodlibet/qltk/cover.py
+index a6bc98e02..1cd4bf3fa 100644
+--- a/quodlibet/quodlibet/qltk/cover.py
++++ b/quodlibet/quodlibet/qltk/cover.py
+@@ -246,7 +246,8 @@ class CoverImage(Gtk.EventBox):
+         self.external = False
+ 
+         self.add(ResizeImage(resize, size))
+-        self.connect('button-press-event', self.__show_cover)
++        self.connect('button-press-event', self.__cover_click)
++        self.__cover_click_cb = None
+         self.set_song(song)
+         self.get_child().show_all()
+ 
+@@ -295,7 +296,27 @@ class CoverImage(Gtk.EventBox):
+     def __nonzero__(self):
+         return bool(self.__file)
+ 
+-    def __show_cover(self, box, event):
++    @property
++    def cover_click_cb(self):
++        return self.__cover_click_cb
++
++    @cover_click_cb.setter
++    def cover_click_cb(self, value):
++        self.__cover_click_cb = value
++
++    def __cover_click(self, widget, event):
++        if self.cover_click_cb:
++            handled = self.cover_click_cb(widget, event)
++            if handled:
++                return True
++
++        if (event.button != Gdk.BUTTON_PRIMARY or
++                event.type != Gdk.EventType.BUTTON_PRESS):
++            return
++
++        self._show_cover()
++
++    def _show_cover(self):
+         """Show the cover as a detached BigCenteredImage.
+         If one is already showing, destroy it instead
+         If there is no image, run the AlbumArt plugin
+@@ -310,10 +331,6 @@ class CoverImage(Gtk.EventBox):
+         current_id = "|".join([self.artist, self.album,
+                                self.name, str(self.external)])
+ 
+-        if (event.button != Gdk.BUTTON_PRIMARY or
+-                event.type != Gdk.EventType.BUTTON_PRESS):
+-            return
+-
+         if not self.__file and song.is_file:
+             from quodlibet.qltk.songsmenu import SongsMenu
+             from quodlibet import app
+-- 
+2.14.1
+

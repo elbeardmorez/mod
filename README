@@ -148,4 +148,5 @@ a dumping ground for patches which modify or add functionality
 -embedded.art.widgetbar.diff [git sha:62f076eb1fef78c92bb209fecfa12387d67223ea | pending]
 -embeddedartwidgetbar,.make.icon.selectable.diff [git sha:8b66fc271471978d0d9c14cd2fdd8c4df535d366 | pending]
 -embeddedartwidgetbar,.add.label.and.tooltip.options.diff [git sha:69d0286e76c74716b3c49f4edf6624eec4f6d4a4 | pending]
+-core,.allow.coverimage.click.override.diff [git sha:b7834f0ecb5c685cc70a6953817d99ca127961b8 | pending]
 
