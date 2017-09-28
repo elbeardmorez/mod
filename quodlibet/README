@@ -268,3 +268,8 @@ front of the full list)
 # core,.allow.coverimage.click.override.diff [git sha:b7834f0ecb5c685cc70a6953817d99ca127961b8 | pending]
 -expose a CoverImage 'cover_click_cb' property to be set in order
 to override the default button-press behaviour
+
+# embeddedartwidgetbar,.rewire.mouse.click.events.diff [git sha:509ba2c0cd0e166c7a8dddb2a0a350ab70473caf | pending]
+-override cover image button-press event to facilitate single click
+selection toggle on cover image, pushing 'show_cover' to the double
+click
