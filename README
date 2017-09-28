@@ -147,4 +147,5 @@ a dumping ground for patches which modify or add functionality
 -pluginswidgetbar,.python3.compatibility.diff [git sha:2c38a9865ce7bd19f102e1f7bd52fc6346144383 | pending]
 -embedded.art.widgetbar.diff [git sha:62f076eb1fef78c92bb209fecfa12387d67223ea | pending]
 -embeddedartwidgetbar,.make.icon.selectable.diff [git sha:8b66fc271471978d0d9c14cd2fdd8c4df535d366 | pending]
+-embeddedartwidgetbar,.add.label.and.tooltip.options.diff [git sha:69d0286e76c74716b3c49f4edf6624eec4f6d4a4 | pending]
 
