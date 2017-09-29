@@ -273,3 +273,5 @@ to override the default button-press behaviour
 -override cover image button-press event to facilitate single click
 selection toggle on cover image, pushing 'show_cover' to the double
 click
+
+# embeddedartwidgetbar,.add.selected.counter.diff [git sha:ce2e80dba754c89f87e2ea506cde3e717d73dcbb | pending]
