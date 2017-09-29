@@ -287,3 +287,12 @@ click
 # embeddedartwidgetbar,.improve.selected.counter.diff [git sha:649657f8a610b2a16521caf7c6f84d497011a54c | pending]
 
 # embeddedartwidgetbar,.add.clear.all.embedded.art.support.diff [git sha:11e0311afe7faddfa7886dcbb68562993f492228 | pending]
+
+# embeddedartwidgetbar,.add.single.default.image.embedded.art.support.diff [git sha:9ce21ed3b519ca9ade1f3256cff692f5a0216b36 | pending]
+ support
+
+-this uses the built in CoverManager's 'get_cover' which
+automatically collects an appropriate (hopefully) image from
+either the default filesystem cover source, or else another
+enabled cover source plugin, returning the first usable art
+it finds
