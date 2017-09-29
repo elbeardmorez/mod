@@ -151,4 +151,5 @@ a dumping ground for patches which modify or add functionality
 -core,.allow.coverimage.click.override.diff [git sha:b7834f0ecb5c685cc70a6953817d99ca127961b8 | pending]
 -embeddedartwidgetbar,.rewire.mouse.click.events.diff [git sha:509ba2c0cd0e166c7a8dddb2a0a350ab70473caf | pending]
 -embeddedartwidgetbar,.add.selected.counter.diff [git sha:ce2e80dba754c89f87e2ea506cde3e717d73dcbb | pending]
+-embeddedartwidgetbar,.refactor.some.variable.names.to.improve.readability.diff [git sha:5c7382be500e3d189a8719754ebf7d409e2d3df2 | pending]
 

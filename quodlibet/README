@@ -275,3 +275,11 @@ selection toggle on cover image, pushing 'show_cover' to the double
 click
 
 # embeddedartwidgetbar,.add.selected.counter.diff [git sha:ce2e80dba754c89f87e2ea506cde3e717d73dcbb | pending]
+
+# embeddedartwidgetbar,.refactor.some.variable.names.to.improve.readability.diff [git sha:5c7382be500e3d189a8719754ebf7d409e2d3df2 | pending]
+ readability
+
+-coverimage_box -> image_widget
+-covers -> image_widgets
+-the embeddedart box now contains widgets which can access the inner
+'image_widget's via widget.image_widget
