@@ -283,3 +283,5 @@ click
 -covers -> image_widgets
 -the embeddedart box now contains widgets which can access the inner
 'image_widget's via widget.image_widget
+
+# embeddedartwidgetbar,.improve.selected.counter.diff [git sha:649657f8a610b2a16521caf7c6f84d497011a54c | pending]
