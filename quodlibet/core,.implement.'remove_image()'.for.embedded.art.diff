@@ -1,0 +1,75 @@
+From 9aa2b91eb3776fd8a0f6e15104a9e1ea8a382185 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sun, 1 Oct 2017 10:24:47 +0100
+Subject: core, implement 'remove_image()' for embedded art
+
+---
+ quodlibet/quodlibet/formats/_id3.py   | 31 +++++++++++++++++++++++++++++++
+ quodlibet/quodlibet/formats/_image.py |  9 +++++++++
+ 2 files changed, 40 insertions(+)
+
+diff --git a/quodlibet/quodlibet/formats/_id3.py b/quodlibet/quodlibet/formats/_id3.py
+index fa51d238f..65f88c5b4 100644
+--- a/quodlibet/quodlibet/formats/_id3.py
++++ b/quodlibet/quodlibet/formats/_id3.py
+@@ -459,6 +459,37 @@ class ID3File(AudioFile):
+ 
+         self.has_images = False
+ 
++    def remove_image(self, image):
++        """Remove an embedded image"""
++
++        with translate_errors():
++            audio = self.Kind(self["~filename"])
++
++        if not self.has_images:
++            return False
++
++        if not isinstance(image, EmbeddedImage):
++            print_d("support for EmbeddedImage object only")
++            return False
++
++        bytes_to_compare = 512
++        ibytes = image.read(-bytes_to_compare)
++
++        frames = []
++        removed = False
++        for frame in audio.tags.getall("APIC"):
++            fbytes = frame.data[-min(bytes_to_compare, len(frame.data)):]
++            if fbytes == ibytes and not removed:
++                removed = True
++                continue
++            frames.append(frame)
++        if removed:
++            audio.tags.setall("APIC", frames)
++            audio.save()
++            return True
++
++        return False
++
+     def get_images(self):
+         """Returns a list of embedded images"""
+ 
+diff --git a/quodlibet/quodlibet/formats/_image.py b/quodlibet/quodlibet/formats/_image.py
+index f79165ccd..4019b596c 100644
+--- a/quodlibet/quodlibet/formats/_image.py
++++ b/quodlibet/quodlibet/formats/_image.py
+@@ -62,6 +62,15 @@ class ImageContainer(object):
+ 
+         raise AudioFileError("Not supported for this format")
+ 
++    def remove_image(self, image):
++        """Remove an embedded image.
++
++        Raises:
++            AudioFileError
++        """
++
++        raise AudioFileError("Not supported for this format")
++
+     def set_image(self, image):
+         """Replaces all embedded images by the passed image.
+ 
+-- 
+2.14.1
+

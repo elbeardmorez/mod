@@ -296,3 +296,5 @@ automatically collects an appropriate (hopefully) image from
 either the default filesystem cover source, or else another
 enabled cover source plugin, returning the first usable art
 it finds
+
+# core,.implement.'remove_image()'.for.embedded.art.diff [git sha:9aa2b91eb3776fd8a0f6e15104a9e1ea8a382185 | pending]
