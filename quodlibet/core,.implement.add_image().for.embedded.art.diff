@@ -1,0 +1,75 @@
+From 4b79a789d74ed7292ab0740ca50697d6c363fa8f Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sun, 1 Oct 2017 11:13:53 +0100
+Subject: core, implement add_image() for embedded art
+
+---
+ quodlibet/quodlibet/formats/_id3.py   | 16 ++++++++++++++--
+ quodlibet/quodlibet/formats/_image.py | 12 ++++++++++++
+ 2 files changed, 26 insertions(+), 2 deletions(-)
+
+diff --git a/quodlibet/quodlibet/formats/_id3.py b/quodlibet/quodlibet/formats/_id3.py
+index 65f88c5b4..5eb197389 100644
+--- a/quodlibet/quodlibet/formats/_id3.py
++++ b/quodlibet/quodlibet/formats/_id3.py
+@@ -540,6 +540,18 @@ class ID3File(AudioFile):
+     def set_image(self, image):
+         """Replaces all embedded images by the passed image"""
+ 
++        with translate_errors():
++            audio = self.Kind(self["~filename"])
++
++        frame = self.add_image(image, type_=APICType.COVER_FRONT)
++
++        audio.tags.setall('APIC', [frame])
++        with translate_errors():
++            audio.save()
++
++    def add_image(self, image, type_=APICType.OTHER):
++        """Embedded passed image."""
++
+         with translate_errors():
+             audio = self.Kind(self["~filename"])
+ 
+@@ -553,9 +565,8 @@ class ID3File(AudioFile):
+         except EnvironmentError as e:
+             raise AudioFileError(e)
+ 
+-        tag.delall("APIC")
+         frame = mutagen.id3.APIC(
+-            encoding=3, mime=image.mime_type, type=APICType.COVER_FRONT,
++            encoding=3, mime=image.mime_type, type=type_,
+             desc=u"", data=data)
+         tag.add(frame)
+ 
+@@ -563,3 +574,4 @@ class ID3File(AudioFile):
+             audio.save()
+ 
+         self.has_images = True
++        return frame
+diff --git a/quodlibet/quodlibet/formats/_image.py b/quodlibet/quodlibet/formats/_image.py
+index 4019b596c..f5b543426 100644
+--- a/quodlibet/quodlibet/formats/_image.py
++++ b/quodlibet/quodlibet/formats/_image.py
+@@ -83,6 +83,18 @@ class ImageContainer(object):
+ 
+         raise AudioFileError("Not supported for this format")
+ 
++    def add_image(self, image, type_=None):
++        """Embedded passed image.
++
++        The image type recorded in the file will be APICType.OTHER,
++        unless otherwise specified by the :param type_: parameter.
++
++        Raises:
++            AudioFileError
++        """
++
++        raise AudioFileError("Not supported for this format")
++
+ 
+ class APICType(object):
+     """Enumeration of image types defined by the ID3 standard but also reused
+-- 
+2.14.1
+
