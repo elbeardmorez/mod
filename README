@@ -160,4 +160,5 @@ a dumping ground for patches which modify or add functionality
 -core,.implement.add_image().for.embedded.art.diff [git sha:4b79a789d74ed7292ab0740ca50697d6c363fa8f | pending]
 -embeddedartwidgetbar,.add.addition.of.embedded.art.support.diff [git sha:f28ea81a82bb29a540c9e214db6652d3c768dd54 | pending]
 -embeddedartwidgetbar,.make.controls.scrollable.diff [git sha:8850b6b018b3d5d0b2f69a29406474c22f27a060 | pending]
+-embeddedartwidgetbar,.collapse.embedded.art.items.based.on.image.data.hash.diff [git sha:3337b8e69ca7563150f126f02f9506443e63a011 | pending]
 
