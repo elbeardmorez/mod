@@ -1,0 +1,104 @@
+From 396b6e810c2af1c8fb0efc4638bb49efdb9410d3 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Fri, 6 Oct 2017 08:18:48 +0100
+Subject: embeddedartwidgetbar, enable actions on 'no' selection
+
+---
+ .../quodlibet/ext/covers/embeddedart_widgetbar.py  | 34 ++++++++++++++++++----
+ 1 file changed, 28 insertions(+), 6 deletions(-)
+
+diff --git a/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py b/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
+index d4cbf8e20..7a3ea5cf7 100644
+--- a/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
++++ b/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
+@@ -84,6 +84,8 @@ class EmbeddedArtBox(Gtk.HBox):
+ 
+         self.signalbox = SignalBox()
+ 
++        self.__songs = None
++
+         self.__covers_select_count = 0
+         self.__covers_total_count = 0
+ 
+@@ -92,6 +94,9 @@ class EmbeddedArtBox(Gtk.HBox):
+         self.covers_max = 50
+ 
+     def update(self, songs):
++
++        self.__songs = songs
++
+         if not songs:
+             return
+ 
+@@ -576,7 +581,13 @@ class EmbeddedArtBox(Gtk.HBox):
+ 
+     def _clear_images(self):
+ 
+-        for s in [iw.song for iw in self.get_selected_image_widgets()
++        songs = [iw.song for iw in self.get_selected_image_widgets()]
++        if not songs:
++            songs = self.__songs
++        if not songs:
++            return
++
++        for s in songs:
+             if not s.can_change_images:
+                 ext = os.path.splitext(s['~filename'])[1][1:]
+                 print_d("skipping unsupported song type %r [%s]"
+@@ -584,7 +595,7 @@ class EmbeddedArtBox(Gtk.HBox):
+                 continue
+             try:
+                 s.clear_images()
+-                self._remove_widget_by_image_widget(w)
++                self._remove_widget_by_song(s)
+             except AudioFileError:
+                 print_exc()
+ 
+@@ -623,9 +634,13 @@ class EmbeddedArtBox(Gtk.HBox):
+ 
+     def _set_image(self):
+ 
+-        for w in [w2 for w in self.get_selected_image_widgets()
+-                         for w2 in w.nested]:
+-            s = w.song
++        songs = [iw.song for iw in self.get_selected_image_widgets()]
++        if not songs:
++            songs = self.__songs
++        if not songs:
++            return
++
++        for s in songs:
+             if not s.can_change_images:
+                 ext = os.path.splitext(s['~filename'])[1][1:]
+                 print_d("skipping unsupported song type %r [%s]"
+@@ -644,11 +659,18 @@ class EmbeddedArtBox(Gtk.HBox):
+                 continue
+             try:
+                 s.set_image(image)
++                self._refresh([s])
+             except AudioFileError:
+                 print_exc()
+ 
+     def _add_image(self):
+ 
++        songs = [iw.song for iw in self.get_selected_image_widgets()]
++        if not songs:
++            songs = self.__songs
++        if not songs:
++            return
++
+         pathfiles = self._choose_art_files()
+         if not pathfiles:
+             return
+@@ -661,7 +683,7 @@ class EmbeddedArtBox(Gtk.HBox):
+                 continue
+             images.append(image)
+ 
+-        for s in [iw.song for iw in self.get_selected_image_widgets()]:
++        for s in songs:
+             if not s.can_change_images:
+                 ext = os.path.splitext(s['~filename'])[1][1:]
+                 print_d("skipping unsupported song type %r [%s]"
+-- 
+2.14.1
+

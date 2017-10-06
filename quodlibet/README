@@ -309,3 +309,5 @@ it finds
 
 # embeddedartwidgetbar,.collapse.embedded.art.items.based.on.image.data.hash.diff [git sha:3337b8e69ca7563150f126f02f9506443e63a011 | pending]
  image data hash
+
+# embeddedartwidgetbar,.enable.actions.on.'no'.selection.diff [git sha:396b6e810c2af1c8fb0efc4638bb49efdb9410d3 | pending]
