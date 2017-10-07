@@ -1,0 +1,70 @@
+From 87e6f6b580ca95c751e12b93520c1424d79c64a2 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sat, 7 Oct 2017 09:41:06 +0100
+Subject: core, ignore strict id3 apic single type standard
+
+-requires changes to mutagen library, see pull request:
+https://github.com/quodlibet/mutagen/pull/326
+---
+ quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py | 2 +-
+ quodlibet/quodlibet/formats/_id3.py                     | 4 ++--
+ quodlibet/quodlibet/formats/_image.py                   | 4 +++-
+ 3 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py b/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
+index 04216b47c..f7b1d138f 100644
+--- a/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
++++ b/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
+@@ -693,7 +693,7 @@ class EmbeddedArtBox(Gtk.HBox):
+ 
+             for image in images:
+                 try:
+-                    s.add_image(image)
++                    s.add_image(image, strict=False)
+                 except AudioFileError:
+                     print_exc()
+ 
+diff --git a/quodlibet/quodlibet/formats/_id3.py b/quodlibet/quodlibet/formats/_id3.py
+index 5eb197389..1d84618c8 100644
+--- a/quodlibet/quodlibet/formats/_id3.py
++++ b/quodlibet/quodlibet/formats/_id3.py
+@@ -549,7 +549,7 @@ class ID3File(AudioFile):
+         with translate_errors():
+             audio.save()
+ 
+-    def add_image(self, image, type_=APICType.OTHER):
++    def add_image(self, image, type_=APICType.OTHER, strict=True):
+         """Embedded passed image."""
+ 
+         with translate_errors():
+@@ -568,7 +568,7 @@ class ID3File(AudioFile):
+         frame = mutagen.id3.APIC(
+             encoding=3, mime=image.mime_type, type=type_,
+             desc=u"", data=data)
+-        tag.add(frame)
++        tag.add(frame, strict=strict)
+ 
+         with translate_errors():
+             audio.save()
+diff --git a/quodlibet/quodlibet/formats/_image.py b/quodlibet/quodlibet/formats/_image.py
+index f5b543426..f168e1ab6 100644
+--- a/quodlibet/quodlibet/formats/_image.py
++++ b/quodlibet/quodlibet/formats/_image.py
+@@ -83,11 +83,13 @@ class ImageContainer(object):
+ 
+         raise AudioFileError("Not supported for this format")
+ 
+-    def add_image(self, image, type_=None):
++    def add_image(self, image, type_=None, strict=True):
+         """Embedded passed image.
+ 
+         The image type recorded in the file will be APICType.OTHER,
+         unless otherwise specified by the :param type_: parameter.
++        :param strict: determines whether or not duplicate APICTypes
++        are to be permitted in the tag
+ 
+         Raises:
+             AudioFileError
+-- 
+2.14.1
+
