@@ -162,4 +162,5 @@ a dumping ground for patches which modify or add functionality
 -embeddedartwidgetbar,.make.controls.scrollable.diff [git sha:8850b6b018b3d5d0b2f69a29406474c22f27a060 | pending]
 -embeddedartwidgetbar,.collapse.embedded.art.items.based.on.image.data.hash.diff [git sha:3337b8e69ca7563150f126f02f9506443e63a011 | pending]
 -embeddedartwidgetbar,.enable.actions.on.'no'.selection.diff [git sha:396b6e810c2af1c8fb0efc4638bb49efdb9410d3 | pending]
+-embeddedartwidgetbar,.add.selection.count.tooltips.diff [git sha:6f752a02ac482090d83dc9652755ee89a2b033e1 | pending]
 
