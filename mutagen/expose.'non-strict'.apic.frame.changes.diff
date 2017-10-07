@@ -1,0 +1,44 @@
+From d2388a22ca6bfb2cb66dcde0624d20b4ef70335f Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sat, 7 Oct 2017 09:15:47 +0100
+Subject: expose 'non-strict' apic frame changes
+
+-expose the existing 'strict' flag for loading APIC frames in the
+ID3Tag class
+-this facilitates pushing multiple frames to a tag which happen to
+use the same APICType, which constitutes a 'breakage of standards'
+and hence 'strict' defaulting to 'True'
+---
+ mutagen/id3/_tags.py | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/mutagen/id3/_tags.py b/mutagen/id3/_tags.py
+index 99845fa..282bf32 100644
+--- a/mutagen/id3/_tags.py
++++ b/mutagen/id3/_tags.py
+@@ -325,18 +325,18 @@ class ID3Tags(DictProxy, Tags):
+                     break
+                 hash_key = new_hash
+ 
+-    def loaded_frame(self, tag):
++    def loaded_frame(self, tag, strict=True):
+         """Deprecated; use the add method."""
+ 
+-        self._add(tag, True)
++        self._add(tag, strict)
+ 
+-    def add(self, frame):
++    def add(self, frame, strict=True):
+         """Add a frame to the tag."""
+ 
+         # add = loaded_frame (and vice versa) break applications that
+         # expect to be able to override loaded_frame (e.g. Quod Libet),
+         # as does making loaded_frame call add.
+-        self.loaded_frame(frame)
++        self.loaded_frame(frame, strict)
+ 
+     def __setitem__(self, key, tag):
+         if not isinstance(tag, Frame):
+-- 
+2.14.1
+

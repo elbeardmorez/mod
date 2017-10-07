@@ -1,0 +1,7 @@
+
+# expose.'non-strict'.apic.frame.changes.diff [git sha:d2388a22ca6bfb2cb66dcde0624d20b4ef70335f | pending]
+-expose the existing 'strict' flag for loading APIC frames in the
+ID3Tag class
+-this facilitates pushing multiple frames to a tag which happen to
+use the same APICType, which constitutes a 'breakage of standards'
+and hence 'strict' defaulting to 'True'

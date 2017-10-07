@@ -71,6 +71,9 @@ a dumping ground for patches which modify or add functionality
 -perform.scene.update.on.preferences.'apply'.diff [git sha:6b4bfc68a2797de6ef37b41ec9c776081284ef2c | pending]
 -add.key.up_down.channel.out.control,.shift.mod.channel.in.diff [git sha:927d088a7a668b27872ed171cbf2b42a5bcb9ac7 | pending]
 
+### mutagen
+-expose.'non-strict'.apic.frame.changes.diff [git sha:d2388a22ca6bfb2cb66dcde0624d20b4ef70335f | pending]
+
 ### quodlibet
 -allow.configurable.custom.files.names.for.downloaded.art.diff [git sha:c09fb6f787cf9a701db542d648c9c308e69a809b | pending]
 -expose.album.art.downloader.blackbox.diff [git sha:e6bf84b2599412924f9f01ecdb57a04a4c572e3d | pending]
