@@ -329,3 +329,5 @@ https://github.com/quodlibet/mutagen/pull/326
 https://github.com/quodlibet/mutagen/commit/6b41a636b9997a4f0016abf9213522ff99bac55a
 
 # embeddedartwidgetbar,.add.collapsed.view.album.select.all_none.toggle.diff [git sha:e8fcaeb40da1cf364ebc473d87ca1c4adbee4400 | pending]
+
+# embeddedartwidgetbar,.standalone.'generate_image'.refactor.diff [git sha:2a2e0f7153d70b50596dc0a397def9be8106613a | pending]

@@ -169,3 +169,5 @@ a dumping ground for patches which modify or add functionality
 -core,.ignore.strict.id3.apic.single.type.standard.diff [git sha:87e6f6b580ca95c751e12b93520c1424d79c64a2 | pending]
 -core,.work.around.mutagen's.'strict'.frames.diff [git sha:893b88a7fe41c551b5580d53f2500f35195e7cac | pending]
 -embeddedartwidgetbar,.add.collapsed.view.album.select.all_none.toggle.diff [git sha:e8fcaeb40da1cf364ebc473d87ca1c4adbee4400 | pending]
+-embeddedartwidgetbar,.standalone.'generate_image'.refactor.diff [git sha:2a2e0f7153d70b50596dc0a397def9be8106613a | pending]
+

@@ -1,0 +1,66 @@
+From 2a2e0f7153d70b50596dc0a397def9be8106613a Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sun, 8 Oct 2017 08:46:03 +0100
+Subject: embeddedartwidgetbar, standalone 'generate_image' refactor
+
+---
+ .../quodlibet/ext/covers/embeddedart_widgetbar.py    | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py b/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
+index 02ea9cc2d..9cdbe097a 100644
+--- a/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
++++ b/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
+@@ -103,11 +103,15 @@ class EmbeddedArtBox(Gtk.HBox):
+             return
+ 
+         for song in songs:
+-            imageitems = self.__get_artwork(song)
+             if len(self.image_widgets) == self.covers_max:
+                 print_d("covers max hit, ignoring then rest!")
+                 break
+-            self.__generate_covers(imageitems, song)
++            widgets = self.__generate_covers(song)
++            for w in widgets:
++                self.pack_start(w, False, False, 2)
++                self.image_widgets.append(w.image_widget)
++
++        self.show_all()
+ 
+         self.select_count = 0
+         self.total_count = len(self.image_widgets)
+@@ -247,12 +251,16 @@ class EmbeddedArtBox(Gtk.HBox):
+ 
+         self.update_counts()
+ 
+-    def __generate_covers(self, imageitems, song):
++    def __generate_covers(self, song):
++
++        imageitems = self.__get_artwork(song)
++
+         if len(self.image_widgets) + len(imageitems) >= self.covers_max:
+             if self.image_widgets < self.covers_max:
+                 imageitems = imageitems[:self.covers_max -
+                                          len(self.image_widgets)]
+ 
++        widgets = []
+         for image in imageitems:
+ 
+             title = "<b>" + GLib.markup_escape_text(image.album) + "</b>"
+@@ -442,11 +450,9 @@ class EmbeddedArtBox(Gtk.HBox):
+             image_widget_outer_align.connect(
+                 "button-press-event", highlight_toggle_cb)
+ 
+-            self.pack_start(image_widget_outer_align, False, False, 2)
+-
+-            self.image_widgets.append(image_widget)
++            widgets.append(image_widget_outer_align)
+ 
+-        self.show_all()
++        return widgets
+ 
+     def __get_artwork(self, song):
+         # generate art set for path
+-- 
+2.14.1
+
