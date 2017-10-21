@@ -336,3 +336,9 @@ https://github.com/quodlibet/mutagen/commit/6b41a636b9997a4f0016abf9213522ff99ba
 -avoid duplicates in cache
 
 # embeddedartwidgetbar,.overhaul.post.action.ui.synchronisation.diff [git sha:beb972d21842cf02939584efc695cd677c658230 | pending]
+
+# embeddedartwidgetbar,.refactor.diff [git sha:5859995745312b723f9058a75157b1d2f60d69ca | pending]
+-pull 'image widget' into its own 'ImageWidget' class
+-in the same vein as the renamed 'EmbeddedArtBoxSignalBox', create
+a companion signals class to pass messages to the container,
+-refactor ImageWidget functions to use 'self' name more

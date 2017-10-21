@@ -172,4 +172,5 @@ a dumping ground for patches which modify or add functionality
 -embeddedartwidgetbar,.standalone.'generate_image'.refactor.diff [git sha:2a2e0f7153d70b50596dc0a397def9be8106613a | pending]
 -embeddedartwidgetbar,.hash.on.image.data.only.diff [git sha:8a6921ba69df86c10697201631d00ff0a20252a9 | pending]
 -embeddedartwidgetbar,.overhaul.post.action.ui.synchronisation.diff [git sha:beb972d21842cf02939584efc695cd677c658230 | pending]
+-embeddedartwidgetbar,.refactor.diff [git sha:5859995745312b723f9058a75157b1d2f60d69ca | pending]
 
