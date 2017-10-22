@@ -1,14 +1,14 @@
-From beb972d21842cf02939584efc695cd677c658230 Mon Sep 17 00:00:00 2001
+From 902b77a61c3d097bf00260b3f6e1b940ee9e0463 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Sun, 8 Oct 2017 21:54:59 +0100
 Subject: embeddedartwidgetbar, overhaul post action ui synchronisation
 
 ---
- .../quodlibet/ext/covers/embeddedart_widgetbar.py  | 415 +++++++++++++++------
- 1 file changed, 305 insertions(+), 110 deletions(-)
+ .../quodlibet/ext/covers/embeddedart_widgetbar.py  | 404 +++++++++++++++------
+ 1 file changed, 299 insertions(+), 105 deletions(-)
 
 diff --git a/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py b/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
-index 31d61a5e2..231b4897e 100644
+index e2d1584e5..73e767f23 100644
 --- a/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
 +++ b/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
 @@ -118,6 +118,257 @@ class EmbeddedArtBox(Gtk.HBox):
@@ -327,19 +327,7 @@ index 31d61a5e2..231b4897e 100644
  
              image_widget_cover_box.pack_start(coverimage, True, True, 2)
  
-@@ -317,9 +584,9 @@ class EmbeddedArtBox(Gtk.HBox):
-             def highlight_toggle(box, force_highlight=None):
-                 scv = box.vborder.get_style_context()
-                 sch = box.hborder.get_style_context()
--                if force_highlight == False or \
-+                if force_highlight is not False or \
-                     (scv.has_class('highlightbox') and
--                     not force_highlight == True):
-+                     force_highlight is not True):
-                     scv.remove_class('highlightbox')
-                     sch.remove_class('highlightbox')
-                     box.is_selected = False
-@@ -335,85 +602,45 @@ class EmbeddedArtBox(Gtk.HBox):
+@@ -335,86 +602,45 @@ class EmbeddedArtBox(Gtk.HBox):
              image_widget.hborder = image_widget_hborder
              image_widget.highlight_toggle = highlight_toggle
  
@@ -389,7 +377,7 @@ index 31d61a5e2..231b4897e 100644
 -                                }""", True)
 -                        album_cb.connect("toggled",
 -                            lambda w, iw=widget, *_:
--                                album_toggled(iw, w.get_children()[0]\
+-                                album_toggled(iw, w.get_children()[0]
 -                                              .get_text(), w.get_active()))
 -
 -                        widget.songlist.pack_start(album_cb,
@@ -397,7 +385,8 @@ index 31d61a5e2..231b4897e 100644
 +                        album_cb = self.__add_nested_album(widget, k)
 +
                          active_all = True
--                        for iw2 in sorted(g, key=lambda iw: iw.song("~#track")):
+                         for iw2 in sorted(g, key=lambda iw:
+-                                                        iw.song("~#track")):
 -                            s = iw2.song
 -                            track = s('~#track')
 -                            label = "%s%s" % (str(track) + ' | '
@@ -413,7 +402,6 @@ index 31d61a5e2..231b4897e 100644
 -                                    song_toggled(iw, iw2, w.get_active()))
 -                            active = widget.nested_active[iw2]
 -                            cb.set_active(active)
-+                        for iw2 in sorted(g, key=lambda iw:
 +                                                     iw.song("~#track")):
 +                            cb = self.__add_nested_image_widget(widget, iw2)
                              if active_all:
@@ -448,7 +436,7 @@ index 31d61a5e2..231b4897e 100644
                      widget.songlist.set_size_request(-1, -1)
                      widget.songlist.hide()
                      widget.label.show()
-@@ -431,6 +658,8 @@ class EmbeddedArtBox(Gtk.HBox):
+@@ -432,6 +658,8 @@ class EmbeddedArtBox(Gtk.HBox):
                  " [" + name + "]" if CONFIG.name_in_label else "",
                  " [" + size + "]" if CONFIG.size_in_label else "")
              label_desc = Gtk.Label(desc)
@@ -457,7 +445,7 @@ index 31d61a5e2..231b4897e 100644
              label_desc.set_line_wrap(True)
              label_desc.set_use_markup(True)
              label_desc.set_tooltip_markup(image.path)
-@@ -565,42 +794,6 @@ class EmbeddedArtBox(Gtk.HBox):
+@@ -566,42 +794,6 @@ class EmbeddedArtBox(Gtk.HBox):
              if tooltip:
                  box.cover.set_tooltip_markup('\n'.join(tooltip))
  
@@ -472,7 +460,7 @@ index 31d61a5e2..231b4897e 100644
 -            w = outer.image_widget
 -            if len(w.nested) == 1:
 -                if w.nested[0].song == song:
--                     self._remove_widget_by_image_widget(w)
+-                    self._remove_widget_by_image_widget(w)
 -            else:
 -                for idx in xrange(len(w.nested) - 1, -1, -1):
 -                    if w.nested[idx].song == song:
@@ -485,22 +473,22 @@ index 31d61a5e2..231b4897e 100644
 -        for outer in self.get_children():
 -            w = outer.image_widget
 -            if not w.image == image:
--               continue
+-                continue
 -
--            if len(w.songs) == 1:
--               self._remove_widget_by_image_widget(w)
+-            if len(w.nested) == 1:
+-                self._remove_widget_by_image_widget(w)
 -            else:
--                for idx in xrange(len(w.songs) - 1, -1, -1):
--                    if w.songs[idx] == song:
--                        del w.songs[idx]
--                        del w.songs_active[song]
--                        w.songlist.remove(w.songlist.widgets[song])
--                        del w.songlist.widgets[song]
+-                for idx in xrange(len(w.nested) - 1, -1, -1):
+-                    if w.nesteds[idx].image == image:
+-                        del w.nested[idx]
+-                        del w.nested_active[w]
+-                        w.songlist.remove(w.songlist.widgets[w])
+-                        del w.songlist.widgets[w]
 -
      def _clear_images(self):
  
          songs = [iw.song for iw in self.get_selected_image_widgets()]
-@@ -617,7 +810,7 @@ class EmbeddedArtBox(Gtk.HBox):
+@@ -618,7 +810,7 @@ class EmbeddedArtBox(Gtk.HBox):
                  continue
              try:
                  s.clear_images()
@@ -509,7 +497,7 @@ index 31d61a5e2..231b4897e 100644
              except AudioFileError:
                  print_exc()
  
-@@ -635,7 +828,7 @@ class EmbeddedArtBox(Gtk.HBox):
+@@ -636,7 +828,7 @@ class EmbeddedArtBox(Gtk.HBox):
              if len(images) == 1:
                  try:
                      s.clear_images()
@@ -518,7 +506,7 @@ index 31d61a5e2..231b4897e 100644
                  except AudioFileError:
                      print_exc()
              else:
-@@ -646,7 +839,7 @@ class EmbeddedArtBox(Gtk.HBox):
+@@ -647,7 +839,7 @@ class EmbeddedArtBox(Gtk.HBox):
                          continue
                      try:
                          if s.remove_image(image):
@@ -527,7 +515,7 @@ index 31d61a5e2..231b4897e 100644
                          else:
                              print_d("failed to remove image for song %r"
                                      % s)
-@@ -718,6 +911,8 @@ class EmbeddedArtBox(Gtk.HBox):
+@@ -719,6 +911,8 @@ class EmbeddedArtBox(Gtk.HBox):
                  except AudioFileError:
                      print_exc()
  
@@ -536,19 +524,6 @@ index 31d61a5e2..231b4897e 100644
      def _choose_art_files(self):
          image_types = ['jpg', 'png']
          patterns = ["*" + type_ for type_ in image_types]
-@@ -925,9 +1120,9 @@ class EmbeddedArtWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
-         if self.__noselect_count:
-             self.labels_noselect_box.set_visible(True)
-             if self.__total_count:
--               self.labels_select_box.set_visible(True)
--               if CONFIG.collapsed_view:
--                   self.labels_subselect_box.set_visible(True)
-+                self.labels_select_box.set_visible(True)
-+                if CONFIG.collapsed_view:
-+                    self.labels_subselect_box.set_visible(True)
- 
-         sensitive = True if self.__select_count else False
-         self.__remove_button.set_sensitive(sensitive)
 -- 
 2.14.1
 

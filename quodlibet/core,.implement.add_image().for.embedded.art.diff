@@ -1,23 +1,26 @@
-From 4b79a789d74ed7292ab0740ca50697d6c363fa8f Mon Sep 17 00:00:00 2001
+From e6e2547d5c0bca56369bea115ecc988bd6687057 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Sun, 1 Oct 2017 11:13:53 +0100
 Subject: core, implement add_image() for embedded art
 
 ---
- quodlibet/quodlibet/formats/_id3.py   | 16 ++++++++++++++--
+ quodlibet/quodlibet/formats/_id3.py   | 19 +++++++++++++++++--
  quodlibet/quodlibet/formats/_image.py | 12 ++++++++++++
- 2 files changed, 26 insertions(+), 2 deletions(-)
+ 2 files changed, 29 insertions(+), 2 deletions(-)
 
 diff --git a/quodlibet/quodlibet/formats/_id3.py b/quodlibet/quodlibet/formats/_id3.py
-index 65f88c5b4..5eb197389 100644
+index 65f88c5b4..df6c9e235 100644
 --- a/quodlibet/quodlibet/formats/_id3.py
 +++ b/quodlibet/quodlibet/formats/_id3.py
-@@ -540,6 +540,18 @@ class ID3File(AudioFile):
+@@ -540,6 +540,21 @@ class ID3File(AudioFile):
      def set_image(self, image):
          """Replaces all embedded images by the passed image"""
  
 +        with translate_errors():
 +            audio = self.Kind(self["~filename"])
++
++        if audio.tags is None:
++            audio.add_tags()
 +
 +        frame = self.add_image(image, type_=APICType.COVER_FRONT)
 +
@@ -31,7 +34,7 @@ index 65f88c5b4..5eb197389 100644
          with translate_errors():
              audio = self.Kind(self["~filename"])
  
-@@ -553,9 +565,8 @@ class ID3File(AudioFile):
+@@ -553,9 +568,8 @@ class ID3File(AudioFile):
          except EnvironmentError as e:
              raise AudioFileError(e)
  
@@ -42,7 +45,7 @@ index 65f88c5b4..5eb197389 100644
              desc=u"", data=data)
          tag.add(frame)
  
-@@ -563,3 +574,4 @@ class ID3File(AudioFile):
+@@ -563,3 +577,4 @@ class ID3File(AudioFile):
              audio.save()
  
          self.has_images = True

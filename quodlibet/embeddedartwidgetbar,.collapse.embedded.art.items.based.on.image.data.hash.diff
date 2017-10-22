@@ -1,15 +1,15 @@
-From 3337b8e69ca7563150f126f02f9506443e63a011 Mon Sep 17 00:00:00 2001
+From 513404384b2bb6b342e0c578a19004fd7d17e2ad Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Thu, 5 Oct 2017 07:15:31 +0100
 Subject: embeddedartwidgetbar, collapse embedded art items based on
  image data hash
 
 ---
- .../quodlibet/ext/covers/embeddedart_widgetbar.py  | 382 +++++++++++++++++----
- 1 file changed, 317 insertions(+), 65 deletions(-)
+ .../quodlibet/ext/covers/embeddedart_widgetbar.py  | 385 +++++++++++++++++----
+ 1 file changed, 319 insertions(+), 66 deletions(-)
 
 diff --git a/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py b/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
-index cbc59d5c3..d4cbf8e20 100644
+index 90a2045c3..66b2c3e60 100644
 --- a/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
 +++ b/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
 @@ -7,6 +7,7 @@
@@ -224,7 +224,7 @@ index cbc59d5c3..d4cbf8e20 100644
  
              image_widget_hborder = Gtk.HBox()
              image_widget_hborder.pack_start(
-@@ -200,23 +300,87 @@ class EmbeddedArtBox(Gtk.HBox):
+@@ -200,23 +300,88 @@ class EmbeddedArtBox(Gtk.HBox):
              image_widget_outer = Gtk.EventBox()
              image_widget_outer.add(image_widget_vborder)
  
@@ -233,9 +233,9 @@ index cbc59d5c3..d4cbf8e20 100644
                  scv = box.vborder.get_style_context()
                  sch = box.hborder.get_style_context()
 -                if scv.has_class('highlightbox'):
-+                if force_highlight == False or \
++                if force_highlight is False or \
 +                    (scv.has_class('highlightbox') and
-+                     not force_highlight == True):
++                     force_highlight is not True):
                      scv.remove_class('highlightbox')
                      sch.remove_class('highlightbox')
                      box.is_selected = False
@@ -272,7 +272,8 @@ index cbc59d5c3..d4cbf8e20 100644
 +                            .add_class("boldandbig2")
 +                        widget.songlist.pack_start(album_label,
 +                                                   False, False, 2)
-+                        for iw2 in sorted(g, key=lambda iw: iw.song("~#track")):
++                        for iw2 in sorted(g, key=lambda iw:
++                                                        iw.song("~#track")):
 +                            s = iw2.song
 +                            track = s('~#track')
 +                            label = "%s%s" % (str(track) + ' | '
@@ -316,7 +317,7 @@ index cbc59d5c3..d4cbf8e20 100644
              tooltip = []
              if CONFIG.size_in_tooltip:
                  tooltip.append(size)
-@@ -232,11 +396,12 @@ class EmbeddedArtBox(Gtk.HBox):
+@@ -232,11 +397,12 @@ class EmbeddedArtBox(Gtk.HBox):
              label_desc.set_use_markup(True)
              label_desc.set_tooltip_markup(image.path)
              image_widget.label = label_desc
@@ -330,7 +331,7 @@ index cbc59d5c3..d4cbf8e20 100644
              image_widget_outer_align.image_widget = image_widget
              image_widget.outer = image_widget_outer_align
  
-@@ -246,7 +411,7 @@ class EmbeddedArtBox(Gtk.HBox):
+@@ -246,7 +412,7 @@ class EmbeddedArtBox(Gtk.HBox):
              image_widget_outer_align.connect(
                  "button-press-event", highlight_toggle_cb)
  
@@ -339,7 +340,7 @@ index cbc59d5c3..d4cbf8e20 100644
  
              self.image_widgets.append(image_widget)
  
-@@ -313,8 +478,10 @@ class EmbeddedArtBox(Gtk.HBox):
+@@ -313,8 +479,10 @@ class EmbeddedArtBox(Gtk.HBox):
                      if dump and not self.dump_file(i, f):
                          continue
                      width, height = self.get_info(f)
@@ -352,7 +353,7 @@ index cbc59d5c3..d4cbf8e20 100644
  
          return imageitems
  
-@@ -377,77 +544,114 @@ class EmbeddedArtBox(Gtk.HBox):
+@@ -377,77 +545,114 @@ class EmbeddedArtBox(Gtk.HBox):
          self.update_select_count()
          self.total_count = len(self.image_widgets)
  
@@ -361,7 +362,7 @@ index cbc59d5c3..d4cbf8e20 100644
 +            w = outer.image_widget
 +            if len(w.nested) == 1:
 +                if w.nested[0].song == song:
-+                     self._remove_widget_by_image_widget(w)
++                    self._remove_widget_by_image_widget(w)
 +            else:
 +                for idx in xrange(len(w.nested) - 1, -1, -1):
 +                    if w.nested[idx].song == song:
@@ -374,24 +375,24 @@ index cbc59d5c3..d4cbf8e20 100644
 +        for outer in self.get_children():
 +            w = outer.image_widget
 +            if not w.image == image:
-+               continue
++                continue
 +
-+            if len(w.songs) == 1:
-+               self._remove_widget_by_image_widget(w)
++            if len(w.nested) == 1:
++                self._remove_widget_by_image_widget(w)
 +            else:
-+                for idx in xrange(len(w.songs) - 1, -1, -1):
-+                    if w.songs[idx] == song:
-+                        del w.songs[idx]
-+                        del w.songs_active[song]
-+                        w.songlist.remove(w.songlist.widgets[song])
-+                        del w.songlist.widgets[song]
++                for idx in xrange(len(w.nested) - 1, -1, -1):
++                    if w.nesteds[idx].image == image:
++                        del w.nested[idx]
++                        del w.nested_active[w]
++                        w.songlist.remove(w.songlist.widgets[w])
++                        del w.songlist.widgets[w]
 +
      def _clear_images(self):
  
 -        for w in self.get_selected_image_widgets():
 -            if not w.song.can_change_images:
 -                ext = os.path.splitext(w.song['~filename'])[1][1:]
-+        for s in [iw.song for iw in self.get_selected_image_widgets()
++        for s in [iw.song for iw in self.get_selected_image_widgets()]:
 +            if not s.can_change_images:
 +                ext = os.path.splitext(s['~filename'])[1][1:]
                  print_d("skipping unsupported song type %r [%s]"
@@ -400,8 +401,9 @@ index cbc59d5c3..d4cbf8e20 100644
                  continue
              try:
 -                w.song.clear_images()
+-                self._remove_widget_by_image_widget(w)
 +                s.clear_images()
-                 self._remove_widget_by_image_widget(w)
++                self._remove_widget_by_song(s)
              except AudioFileError:
                  print_exc()
  
@@ -497,7 +499,7 @@ index cbc59d5c3..d4cbf8e20 100644
  
          images = []
          for pathfile in pathfiles:
-@@ -457,16 +661,16 @@ class EmbeddedArtBox(Gtk.HBox):
+@@ -457,16 +662,16 @@ class EmbeddedArtBox(Gtk.HBox):
                  continue
              images.append(image)
  
@@ -519,7 +521,7 @@ index cbc59d5c3..d4cbf8e20 100644
                  except AudioFileError:
                      print_exc()
  
-@@ -553,15 +757,27 @@ class EmbeddedArtWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+@@ -553,15 +758,27 @@ class EmbeddedArtWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
          self.labels_select_box.pack_start(Gtk.VSeparator(), False, False, 2)
          self.label_count_select = Gtk.Label()
          self.label_count_select.get_style_context().add_class("boldandbig1")
@@ -552,7 +554,7 @@ index cbc59d5c3..d4cbf8e20 100644
  
          align_covers = Gtk.Alignment(xalign=0.5, xscale=1.0)
          self.__embeddedart_box = EmbeddedArtBox()
-@@ -569,6 +785,12 @@ class EmbeddedArtWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+@@ -569,6 +786,12 @@ class EmbeddedArtWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
          self.__content.pack_start(align_covers, True, True, 0)
          self.__content.show_all()
  
@@ -565,7 +567,7 @@ index cbc59d5c3..d4cbf8e20 100644
          self.__embeddedart_box.signalbox.connect(
              'select-count-changed',
              self.__embeddedart_on_select_count_changed)
-@@ -618,8 +840,20 @@ class EmbeddedArtWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+@@ -618,8 +841,20 @@ class EmbeddedArtWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
              lambda *_: self.__embeddedart_box._add_image())
          self.__controls_box.pack_start(add_button, False, False, 5)
  
@@ -586,7 +588,7 @@ index cbc59d5c3..d4cbf8e20 100644
          self.__update_count()
  
          self.live = True
-@@ -627,21 +861,37 @@ class EmbeddedArtWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+@@ -627,21 +862,37 @@ class EmbeddedArtWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
          return self.__widgetbar
  
      def __update_count(self):
@@ -611,9 +613,9 @@ index cbc59d5c3..d4cbf8e20 100644
 +        if self.__noselect_count:
 +            self.labels_noselect_box.set_visible(True)
 +            if self.__total_count:
-+               self.labels_select_box.set_visible(True)
-+               if CONFIG.collapsed_view:
-+                   self.labels_subselect_box.set_visible(True)
++                self.labels_select_box.set_visible(True)
++                if CONFIG.collapsed_view:
++                    self.labels_subselect_box.set_visible(True)
  
          map(lambda w, s=False if self.__select_count == 0
                                else True:
@@ -633,7 +635,7 @@ index cbc59d5c3..d4cbf8e20 100644
          self.__select_count = count
          self.__update_count()
  
-@@ -650,9 +900,11 @@ class EmbeddedArtWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+@@ -650,9 +901,11 @@ class EmbeddedArtWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
          self.__update_count()
  
      def plugin_on_songs_selected(self, songs):

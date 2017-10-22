@@ -1,12 +1,12 @@
-From 62f076eb1fef78c92bb209fecfa12387d67223ea Mon Sep 17 00:00:00 2001
+From 13ccb6b272c1f3f20891d03566cdc77c8ba832e7 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Wed, 27 Sep 2017 07:12:53 +0100
 Subject: Embedded Art Widgetbar
 
 ---
  quodlibet/po/POTFILES.in                           |   1 +
- .../quodlibet/ext/covers/embeddedart_widgetbar.py  | 267 +++++++++++++++++++++
- 2 files changed, 268 insertions(+)
+ .../quodlibet/ext/covers/embeddedart_widgetbar.py  | 268 +++++++++++++++++++++
+ 2 files changed, 269 insertions(+)
  create mode 100644 quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
 
 diff --git a/quodlibet/po/POTFILES.in b/quodlibet/po/POTFILES.in
@@ -23,10 +23,10 @@ index 067721d0b..931f85f48 100644
  quodlibet/ext/editing/iconv.py
 diff --git a/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py b/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
 new file mode 100644
-index 000000000..6659e168a
+index 000000000..40301dfb5
 --- /dev/null
 +++ b/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
-@@ -0,0 +1,267 @@
+@@ -0,0 +1,268 @@
 +# -*- coding: utf-8 -*-
 +# Copyright 2017 Pete Beardmore
 +#
@@ -200,6 +200,7 @@ index 000000000..6659e168a
 +                        while itype + str(suffix) in types:
 +                            suffix += 1
 +                        itype = itype + str(suffix)
++                    types[itype] = True
 +                    key = path_hash + "_" + itype
 +                    f = os.path.join(path_thumbs, key)
 +                    dump = False
@@ -257,7 +258,7 @@ index 000000000..6659e168a
 +
 +    PLUGIN_ID = plugin_id
 +    PLUGIN_NAME = _("Embedded Art Widget Bar")
-+    PLUGIN_DESC = _("Display embedded art")
++    PLUGIN_DESC = _("Display embedded art.")
 +    PLUGIN_CONFIG_SECTION = __name__
 +    PLUGIN_ICON = Icons.INSERT_IMAGE
 +

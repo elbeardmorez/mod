@@ -1,15 +1,15 @@
-From e770b2a9c4a4763d6b00908b2bab3cccbac46361 Mon Sep 17 00:00:00 2001
+From 6dceddb824d0883f6f39a0afa3db4af442797f04 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Sat, 7 Oct 2017 11:04:39 +0100
 Subject: embeddedartwidgetbar, add collapsed view album select
  all/none toggle
 
 ---
- .../quodlibet/ext/covers/embeddedart_widgetbar.py  | 35 ++++++++++++++++++----
- 1 file changed, 30 insertions(+), 5 deletions(-)
+ .../quodlibet/ext/covers/embeddedart_widgetbar.py  | 29 +++++++++++++++++++---
+ 1 file changed, 25 insertions(+), 4 deletions(-)
 
 diff --git a/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py b/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
-index 8511fba14..54cfe8da6 100644
+index 49dcd28ff..54cfe8da6 100644
 --- a/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
 +++ b/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
 @@ -330,6 +330,11 @@ class EmbeddedArtBox(Gtk.HBox):
@@ -48,13 +48,14 @@ index 8511fba14..54cfe8da6 100644
 +                                }""", True)
 +                        album_cb.connect("toggled",
 +                            lambda w, iw=widget, *_:
-+                                album_toggled(iw, w.get_children()[0]\
++                                album_toggled(iw, w.get_children()[0]
 +                                              .get_text(), w.get_active()))
 +
 +                        widget.songlist.pack_start(album_cb,
                                                     False, False, 2)
 +                        active_all = True
-                         for iw2 in sorted(g, key=lambda iw: iw.song("~#track")):
+                         for iw2 in sorted(g, key=lambda iw:
+                                                         iw.song("~#track")):
                              s = iw2.song
                              track = s('~#track')
 @@ -361,7 +382,10 @@ class EmbeddedArtBox(Gtk.HBox):
