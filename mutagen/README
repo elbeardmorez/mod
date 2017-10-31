@@ -5,3 +5,7 @@ ID3Tag class
 -this facilitates pushing multiple frames to a tag which happen to
 use the same APICType, which constitutes a 'breakage of standards'
 and hence 'strict' defaulting to 'True'
+
+# tests.diff [git sha:745013b8b63460214d5edf523e71676c30a6aa10 | pending]
+-fix ID3Hack loaded_frame override
+-add strict/non-strict APICType duplicate tests

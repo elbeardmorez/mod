@@ -1,0 +1,43 @@
+From 745013b8b63460214d5edf523e71676c30a6aa10 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Tue, 31 Oct 2017 06:56:07 +0000
+Subject: tests
+
+-fix ID3Hack loaded_frame override
+-add strict/non-strict APICType duplicate tests
+---
+ tests/test_id3.py | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/tests/test_id3.py b/tests/test_id3.py
+index 4fdc311..2db7059 100644
+--- a/tests/test_id3.py
++++ b/tests/test_id3.py
+@@ -147,7 +147,7 @@ class TID3Read(TestCase):
+         # sure that old code keeps working (used in quod libet <=3.6)
+         class ID3hack(ID3):
+             "Override 'correct' behavior with desired behavior"
+-            def loaded_frame(self, tag):
++            def loaded_frame(self, tag, strict=True):
+                 if tag.HashKey in self:
+                     self[tag.HashKey].extend(tag[:])
+                 else:
+@@ -197,6 +197,15 @@ class TID3Read(TestCase):
+         id3.update_to_v24()
+         self.failUnlessEqual(id3["APIC:cover"].mime, "image/png")
+ 
++    def test_multi_pic(self):
++        id3 = ID3()
++        id3.version = (2, 4)
++        pic = PIC(encoding=0, mime="PNG", desc="cover", type=3, data=b"")
++        id3.add(pic)
++        self.assertRaises(TypeError, id3.add(pic))
++        id3.add(pic, strict=False)
++        self.assertEqual(len(id3.getall("APIC")), 2)
++
+     def test_lnk(self):
+         id3 = ID3()
+         id3.version = (2, 2)
+-- 
+2.14.1
+
