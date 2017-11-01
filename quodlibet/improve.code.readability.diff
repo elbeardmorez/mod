@@ -1,0 +1,48 @@
+From ea13d39b5c48491c8764cb0d96c016305a6300e8 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Wed, 1 Nov 2017 06:47:33 +0000
+Subject: improve code readability
+
+-pull out duplicate string munging to separate 'sanitise' function
+---
+ quodlibet/quodlibet/formats/_audio.py | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/quodlibet/quodlibet/formats/_audio.py b/quodlibet/quodlibet/formats/_audio.py
+index c77f6fd16..63d794ff7 100644
+--- a/quodlibet/quodlibet/formats/_audio.py
++++ b/quodlibet/quodlibet/formats/_audio.py
+@@ -543,6 +543,10 @@ class AudioFile(dict, ImageContainer):
+ 
+         from quodlibet.pattern import ArbitraryExtensionFileFromPattern
+ 
++        def sanitise(sep, parts):
++            return sep.join(list(map(lambda s: s.replace(u'/', u'')[:128],
++                                     parts)))
++
+         lyric_paths = \
+             config.getstringlist("memory", "lyric_rootpaths", [])
+         # add default
+@@ -551,13 +555,13 @@ class AudioFile(dict, ImageContainer):
+             config.getstringlist("memory", "lyric_filenames", [])
+         # add defaults
+         lyric_filenames.append(
+-            (self.comma("lyricist") or self.comma("artist"))
+-            .replace(u'/', u'')[:128] + os.sep +
+-            self.comma("title").replace(u'/', u'')[:128] + u'.lyric')
++            sanitise(os.sep, [(self.comma("lyricist") or
++                              self.comma("artist")),
++                              self.comma("title")]) + u'.lyric')
+         lyric_filenames.append(
+-            (self.comma("lyricist") or self.comma("artist"))
+-            .replace(u'/', u'')[:128] + ' - ' +
+-            self.comma("title").replace(u'/', u'')[:128] + u'.lyric')
++            sanitise(' - ', [(self.comma("lyricist") or
++                             self.comma("artist")),
++                             self.comma("title")]) + u'.lyric')
+ 
+         # generate all paths
+         pathfiles = OrderedDict()
+-- 
+2.14.1
+

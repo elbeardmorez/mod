@@ -45,6 +45,9 @@ e.g.
 lyric_filenames = <artist>.-.<title>,<artist> - <title>.lyrics_mod
 lyric_rootpaths = ~/music/lyrics
 
+# improve.code.readability.diff [git sha:ea13d39b5c48491c8764cb0d96c016305a6300e8 | pending]
+-pull out duplicate string munging to separate 'sanitise' function
+
 # orientation.agnostic.names.diff [git sha:aa36c73cbd3d00fc051c2cdceacdc1f4671a8d11 | pending]
 
 # exposed.multipaned.paned.set.diff [git sha:759f306db07154d1c19df499201c1f6fd49cf627 | pending]
