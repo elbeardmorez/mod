@@ -90,6 +90,7 @@ a dumping ground for patches which modify or add functionality
 -tests.for.moving.album.art.diff [git sha:bdf42f19e5ad1ba4f7b980014703cb564e44eca9 | pending]
 -make.'lyric_filename()'.search.harder.diff [git sha:001c4273f159d9e4df858b906ee4ac596e371f68 | pending]
 -improve.code.readability.diff [git sha:ea13d39b5c48491c8764cb0d96c016305a6300e8 | pending]
+-avoid.trying.to.resolve.a.filename.unnecessarily.diff [git sha:408bb69874e1488f3f294bb461da6042feda80ea | pending]
 -orientation.agnostic.names.diff [git sha:aa36c73cbd3d00fc051c2cdceacdc1f4671a8d11 | pending]
 -exposed.multipaned.paned.set.diff [git sha:759f306db07154d1c19df499201c1f6fd49cf627 | pending]
 -make.multirpaned.more.generic.diff [git sha:312d0a012a59097699c6563bf4a5b5d493a57441 | pending]
