@@ -53,6 +53,13 @@ lyric_rootpaths = ~/music/lyrics
 determine whether a potential filename contains a Quod Libet
 placeholder (e.g. <title>)
 
+# improve.code.readability.2.diff [git sha:e239bfed07490e9d2fd3a41711b4269092f230a6 | pending]
+-pull out logic which creates the extended set of search paths
+based on extension modification only to a 'generate_mod_ext_paths'
+function
+-add many more comments
+-improve logging (commented by default)
+
 # orientation.agnostic.names.diff [git sha:aa36c73cbd3d00fc051c2cdceacdc1f4671a8d11 | pending]
 
 # exposed.multipaned.paned.set.diff [git sha:759f306db07154d1c19df499201c1f6fd49cf627 | pending]

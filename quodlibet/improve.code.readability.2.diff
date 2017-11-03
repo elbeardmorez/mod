@@ -1,0 +1,113 @@
+From e239bfed07490e9d2fd3a41711b4269092f230a6 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Fri, 3 Nov 2017 00:03:57 +0000
+Subject: improve code readability
+
+-pull out logic which creates the extended set of search paths
+based on extension modification only to a 'generate_mod_ext_paths'
+function
+-add many more comments
+-improve logging (commented by default)
+---
+ quodlibet/quodlibet/formats/_audio.py | 46 +++++++++++++++++++++++++----------
+ 1 file changed, 33 insertions(+), 13 deletions(-)
+
+diff --git a/quodlibet/quodlibet/formats/_audio.py b/quodlibet/quodlibet/formats/_audio.py
+index 57b7856c5..9f95f9d70 100644
+--- a/quodlibet/quodlibet/formats/_audio.py
++++ b/quodlibet/quodlibet/formats/_audio.py
+@@ -540,7 +540,7 @@ class AudioFile(dict, ImageContainer):
+     def lyric_filename(self):
+         """Returns the validated, or default, lyrics filename for this
+         file. User defined '[memory] lyric_rootpaths' and
+-        '[memory] lyric_filenames' matches take precedent"""
++        '[memory] lyric_filenames' matches take precedence"""
+ 
+         from quodlibet.pattern import ArbitraryExtensionFileFromPattern
+ 
+@@ -548,13 +548,16 @@ class AudioFile(dict, ImageContainer):
+             return sep.join(list(map(lambda s: s.replace(u'/', u'')[:128],
+                                      parts)))
+ 
++        # setup defaults (user-defined take precedence)
++        # root search paths
+         lyric_paths = \
+             config.getstringlist("memory", "lyric_rootpaths", [])
+-        # add default
++        # ensure a default path
+         lyric_paths.append(u'~/.lyrics')
++        # search pathfile names
+         lyric_filenames = \
+             config.getstringlist("memory", "lyric_filenames", [])
+-        # add defaults
++        # ensure some default pathfile names
+         lyric_filenames.append(
+             sanitise(os.sep, [(self.comma("lyricist") or
+                               self.comma("artist")),
+@@ -564,9 +567,8 @@ class AudioFile(dict, ImageContainer):
+                              self.comma("artist")),
+                              self.comma("title")]) + u'.lyric')
+ 
+-        # generate all paths
++        # generate all potential paths (unresolved/unexpanded)
+         pathfiles = OrderedDict()
+-        pathfiles_expanded = OrderedDict()
+         for p in lyric_paths:
+             for f in lyric_filenames:
+                 pathfile = ""
+@@ -584,9 +586,11 @@ class AudioFile(dict, ImageContainer):
+                 if not pathfile in pathfiles:
+                     pathfiles[pathfile] = pathfile
+ 
+-        #print_d("looking for lyrics files:\n%s" % '\n'.join(pathfiles.keys()))
++        #print_d("searching for lyrics in:\n%s" % '\n'.join(pathfiles.keys()))
+ 
++        # expand each raw pathfile in turn and test for existence
+         match_ = ""
++        pathfiles_expanded = OrderedDict()
+         rx_params = re.compile('[^\\\]<[^' + re.escape(os.sep) + ']*[^\\\]>')
+         for pathfile in pathfiles.keys():
+             path = expanduser(pathfile)
+@@ -598,16 +602,32 @@ class AudioFile(dict, ImageContainer):
+                 break
+ 
+         if not match_:
+-            # look at modified extensions
+-            lyric_extensions = ('lyric', 'lyrics', '', 'txt')
+-            for pathfile in pathfiles_expanded.keys():
++            # search even harder!
++            lyric_extensions = ['lyric', 'lyrics', '', 'txt']
++            #print_d("extending search to extensions: %s" % lyric_extensions)
++
++            def generate_mod_ext_paths(pathfile):
++                # separate pathfile's extension (if any)
+                 ext = os.path.splitext(pathfile)[1][1:]
+                 path = pathfile[:-1 * len(ext)].strip('.') if ext else pathfile
+-                for ext2 in lyric_extensions:
+-                    if ext2 == ext:
+-                        continue
+-                    path_ext = '.'.join([path, ext2]) if ext2 else path
++                # skip the proposed lyric extension if it is the same as
++                # the original for a given search pathfile stub - it has
++                # already been tested without success!
++                extra_extensions = [x for x in lyric_extensions if x != ext]
++
++                # join valid new extensions to pathfile stub and return
++                return list(map(lambda ext: '.'.join([path, ext])
++                                                if ext else path,
++                                      extra_extensions))
++
++            # look for a match by modifying the extension for each of the
++            # (now fully resolved) 'pathfiles_expanded' search items
++            for pathfile in pathfiles_expanded.keys():
++                # get alternatives for existence testing
++                paths_mod_ext = generate_mod_ext_paths(pathfile)
++                for path_ext in paths_mod_ext:
+                     if os.path.exists(path_ext):
++                        # persistence has paid off!
+                         match_ = path_ext
+                         break
+                 if match_:
+-- 
+2.14.1
+
