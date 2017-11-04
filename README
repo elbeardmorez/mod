@@ -74,6 +74,7 @@ a dumping ground for patches which modify or add functionality
 ### mutagen
 -expose.'non-strict'.apic.frame.changes.diff [git sha:d2388a22ca6bfb2cb66dcde0624d20b4ef70335f | pending]
 -tests.diff [git sha:745013b8b63460214d5edf523e71676c30a6aa10 | pending]
+-improve.test.diff [git sha:6225473fc087f4f7ffe1795b7d3c457b038e4495 | pending]
 
 ### quodlibet
 -allow.configurable.custom.files.names.for.downloaded.art.diff [git sha:c09fb6f787cf9a701db542d648c9c308e69a809b | pending]
