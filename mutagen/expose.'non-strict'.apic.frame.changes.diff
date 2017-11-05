@@ -1,4 +1,4 @@
-From d2388a22ca6bfb2cb66dcde0624d20b4ef70335f Mon Sep 17 00:00:00 2001
+From 6410d00c8ed0b371786d0f23f23dd2be7d9d69f4 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Sat, 7 Oct 2017 09:15:47 +0100
 Subject: expose 'non-strict' apic frame changes
@@ -6,8 +6,7 @@ Subject: expose 'non-strict' apic frame changes
 -expose the existing 'strict' flag for loading APIC frames in the
 ID3Tag class
 -this facilitates pushing multiple frames to a tag which happen to
-use the same APICType, which constitutes a 'breakage of standards'
-and hence 'strict' defaulting to 'True'
+use the same APICType and description
 ---
  mutagen/id3/_tags.py | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)

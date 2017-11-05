@@ -1,4 +1,4 @@
-From 6225473fc087f4f7ffe1795b7d3c457b038e4495 Mon Sep 17 00:00:00 2001
+From db06e5f9fd8c48ddb019e3d099f0728dba93a8dd Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Sat, 4 Nov 2017 21:52:48 +0000
 Subject: improve test
@@ -10,7 +10,7 @@ Subject: improve test
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/tests/test_id3.py b/tests/test_id3.py
-index 2db7059..4fd899a 100644
+index 2db7059..4e92498 100644
 --- a/tests/test_id3.py
 +++ b/tests/test_id3.py
 @@ -202,7 +202,10 @@ class TID3Read(TestCase):
@@ -19,7 +19,7 @@ index 2db7059..4fd899a 100644
          id3.add(pic)
 -        self.assertRaises(TypeError, id3.add(pic))
 +        id3.add(pic)
-+        # pic replaced (NOT added) due to duplicate 'hash' (uses type!)
++        # pic replaced (NOT added) due to duplicate 'hash' (uses 'type:desc')
 +        self.assertEqual(len(id3.getall("APIC")), 1)
 +        # disable 'strict' to merge duplicate frame with existing
          id3.add(pic, strict=False)

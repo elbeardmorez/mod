@@ -72,9 +72,9 @@ a dumping ground for patches which modify or add functionality
 -add.key.up_down.channel.out.control,.shift.mod.channel.in.diff [git sha:927d088a7a668b27872ed171cbf2b42a5bcb9ac7 | pending]
 
 ### mutagen
--expose.'non-strict'.apic.frame.changes.diff [git sha:d2388a22ca6bfb2cb66dcde0624d20b4ef70335f | pending]
+-expose.'non-strict'.apic.frame.changes.diff [git sha:6410d00c8ed0b371786d0f23f23dd2be7d9d69f4 | pending]
 -tests.diff [git sha:745013b8b63460214d5edf523e71676c30a6aa10 | pending]
--improve.test.diff [git sha:6225473fc087f4f7ffe1795b7d3c457b038e4495 | pending]
+-improve.test.diff [git sha:db06e5f9fd8c48ddb019e3d099f0728dba93a8dd | pending]
 
 ### quodlibet
 -allow.configurable.custom.files.names.for.downloaded.art.diff [git sha:c09fb6f787cf9a701db542d648c9c308e69a809b | pending]
