@@ -62,6 +62,16 @@ function
 
 # add.local.song.dir.to.default.search.paths.diff [git sha:a966b4c7b8d7587f242ca71f11c747aa3654f557 | pending]
 
+# add.tests.diff [git sha:1e81c6f9c886709745e2cebc57282a4dfebf3112 | pending]
+-test built-in default
+-test built-in default local path
+-test custom default (fnf fallback!)
+-test user defined
+-test order priority
+-test modified extension fallback search
+-test '<' and/or '>' in name
+-test '<' and '>' in name across path
+
 # orientation.agnostic.names.diff [git sha:aa36c73cbd3d00fc051c2cdceacdc1f4671a8d11 | pending]
 
 # exposed.multipaned.paned.set.diff [git sha:759f306db07154d1c19df499201c1f6fd49cf627 | pending]
