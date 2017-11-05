@@ -1,0 +1,28 @@
+From a966b4c7b8d7587f242ca71f11c747aa3654f557 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sun, 5 Nov 2017 08:16:23 +0000
+Subject: add local song dir to default search paths
+
+---
+ quodlibet/quodlibet/formats/_audio.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/quodlibet/quodlibet/formats/_audio.py b/quodlibet/quodlibet/formats/_audio.py
+index 2803d556d..8ed96f70a 100644
+--- a/quodlibet/quodlibet/formats/_audio.py
++++ b/quodlibet/quodlibet/formats/_audio.py
+@@ -552,8 +552,10 @@ class AudioFile(dict, ImageContainer):
+         # root search paths
+         lyric_paths = \
+             config.getstringlist("memory", "lyric_rootpaths", [])
+-        # ensure a default path
++        # ensure default paths
+         lyric_paths.append(os.path.join(get_home_dir(), ".lyrics"))
++        lyric_paths.append(
++            os.path.join(os.path.dirname(self.comma('~filename'))))
+         # search pathfile names
+         lyric_filenames = \
+             config.getstringlist("memory", "lyric_filenames", [])
+-- 
+2.14.1
+
