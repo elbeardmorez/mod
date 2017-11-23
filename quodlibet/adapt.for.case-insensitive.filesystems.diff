@@ -1,0 +1,86 @@
+From 50797654b92cdad72678ba9792acc8964cb70dff Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Thu, 23 Nov 2017 08:43:46 +0000
+Subject: adapt for case-insensitive filesystems
+
+-push filename escaping code path beyond the initial globbing
+for existence
+-make string comparison case insensitive in tests
+---
+ quodlibet/quodlibet/formats/_audio.py  | 33 ++++++++++++++++++++-------------
+ quodlibet/tests/test_formats__audio.py |  8 +++++---
+ 2 files changed, 25 insertions(+), 16 deletions(-)
+
+diff --git a/quodlibet/quodlibet/formats/_audio.py b/quodlibet/quodlibet/formats/_audio.py
+index 448590d9a..fbedfacec 100644
+--- a/quodlibet/quodlibet/formats/_audio.py
++++ b/quodlibet/quodlibet/formats/_audio.py
+@@ -574,18 +574,8 @@ class AudioFile(dict, ImageContainer):
+         pathfiles = OrderedDict()
+         for p in lyric_paths:
+             for f in lyric_filenames:
+-                pathfile = ""
+-                if os.name == "nt":
+-                    # this was added at a later point. only use
+-                    # escape_filename here to keep the linux case
+-                    # the same as before
+-                    pathfile = \
+-                        os.path.join(p, os.path.dirname(f),
+-                                     escape_filename(os.path.basename(f)))
+-                else:
+-                    pathfile = \
+-                        os.path.join(p, os.path.dirname(f),
+-                                    fsnative(os.path.basename(f)))
++                pathfile = os.path.join(p, os.path.dirname(f),
++                                        fsnative(os.path.basename(f)))
+                 if not pathfile in pathfiles:
+                     pathfiles[pathfile] = pathfile
+ 
+@@ -636,7 +626,24 @@ class AudioFile(dict, ImageContainer):
+                 if match_:
+                     break
+ 
+-        return match_ if match_ else list(pathfiles_expanded.keys())[0]
++        if not match_:
++            match_ = list(pathfiles_expanded.keys())[0]
++
++        if os.name == "nt":
++            # FIX: assumes 'nix build used on a case-sensitive fs, nt case
++            # insensitive, hence only pass the proposed path through
++            # 'escape_filename' (which apparently doesn't respect case) if
++            # we don't care about case
++            #
++            # FIX: in any case this call misses the possibility of needing to
++            # escape characters in the file's parent dir if that was built
++            # from the artist name etc.
++            #
++            # clearly this isn't biting anyone though..
++            match_ = os.path.join(os.path.dirname(match_),
++                                  escape_filename(os.path.basename(match_)))
++
++        return match_
+ 
+     @property
+     def has_rating(self):
+diff --git a/quodlibet/tests/test_formats__audio.py b/quodlibet/tests/test_formats__audio.py
+index 0cdc40704..565792b4f 100644
+--- a/quodlibet/tests/test_formats__audio.py
++++ b/quodlibet/tests/test_formats__audio.py
+@@ -412,9 +412,11 @@ class TAudioFile(TestCase):
+     def test_lyric_filename_search(self):
+ 
+         def assertEqual(a, b):
+-            # don't truncate the bloody error message..
+-            msg_fail = str("item1: %s !=\nitem2: %s" % (a, b))
+-            self.assertEqual(a, b, msg_fail)
++            # pass custom error message to avoid truncation!
++            a2 = a.lower()
++            b2 = b.lower()
++            msg_fail = str("item1: %s !=\nitem2: %s" % (a2, b2))
++            self.assertEqual(a2, b2, msg_fail)
+ 
+         with temp_filename() as filename:
+             s = AudioFile()
+-- 
+2.14.1
+
