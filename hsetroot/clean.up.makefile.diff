@@ -1,0 +1,53 @@
+From ee70781de231c71767d456d6c92c2bf56e7f3c72 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sun, 21 Jan 2018 16:13:02 +0000
+Subject: clean up Makefile
+
+-use recipe helpers
+-pull out install prefix
+---
+ Makefile | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index a8ef4b8..9c855d0 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,23 +1,25 @@
++INSTALL_PREFIX=/usr/local/bin
+ CC?=gcc
+ PKG_CONFIG?=pkg-config
+ 
+ CFLAGS?=-g -O2 -Wall
+-LDFLAGS?=
+ 
+-CFLAGS+=$(shell $(PKG_CONFIG) x11 --cflags)
+-LDFLAGS+=$(shell $(PKG_CONFIG) x11 --libs)
++CFLAGS_EXTRA=$(shell $(PKG_CONFIG) x11 --cflags) $(shell $(PKG_CONFIG) imlib2 --cflags)
+ 
+-CFLAGS+=$(shell $(PKG_CONFIG) imlib2 --cflags)
+-LDFLAGS+=$(shell $(PKG_CONFIG) imlib2 --libs)
++LDFLAGS?=
++LDFLAGS+=$(shell $(PKG_CONFIG) x11 --libs) $(shell $(PKG_CONFIG) imlib2 --libs)
+ 
+-hsetroot: hsetroot.o outputs_xrandr.o
++BINARY=hsetroot
++OBJS=$(BINARY).o outputs.o
+ 
+-hsetroot.o: hsetroot.c outputs.h
++$(BINARY): $(OBJS)
++	$(CC) $(CFLAGS) $(CFLAGS_EXTRA) $^ -o $@ $(LDFLAGS)
+ 
+-outputs.o: outputs.c outputs.h
++%.o: %.c %.h
++	$(CC) -c $(CFLAGS) $(CFLAGS_EXTRA) $< -o $@
+ 
+ install: hsetroot
+-	install -st /usr/local/bin/ hsetroot
++	install -st $(INSTALL_PREFIX) $(BINARY)
+ 
+ clean:
+ 	rm -f hsetroot *.o
+-- 
+2.14.1
+

@@ -1,2 +1,6 @@
 
 # move.outputs_xrandr.c.->.outputs.c.as.per.makefile.diff [git sha:1e40d3f0fc82fe14b7b17d5773b4bae98dab8bd9 | pending]
+
+# clean.up.makefile.diff [git sha:ee70781de231c71767d456d6c92c2bf56e7f3c72 | pending]
+-use recipe helpers
+-pull out install prefix
