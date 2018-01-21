@@ -1,0 +1,35 @@
+From cc64ca98c1d91ecea49504025bb327931ac39f2d Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sun, 21 Jan 2018 16:14:45 +0000
+Subject: add 'debug' target to Makefile
+
+---
+ Makefile | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 7f120cc..46956c6 100644
+--- a/Makefile
++++ b/Makefile
+@@ -4,6 +4,7 @@ CC?=gcc
+ PKG_CONFIG?=pkg-config
+ 
+ CFLAGS?=-g -O2 -Wall
++CFLAGS_DEBUG=-ggdb3 -gdwarf-2 -O0 -Wall
+ 
+ CFLAGS_EXTRA=$(shell $(PKG_CONFIG) x11 --cflags) $(shell $(PKG_CONFIG) imlib2 --cflags)
+ 
+@@ -19,6 +20,10 @@ $(BINARY): $(OBJS)
+ %.o: %.c %.h
+ 	$(VERBOSE)$(CC) -c $(CFLAGS) $(CFLAGS_EXTRA) $< -o $@
+ 
++debug: CFLAGS=$(CFLAGS_DEBUG)
++debug: VERBOSE=
++debug: $(BINARY)
++
+ install: hsetroot
+ 	$(VERBOSE)install -st $(INSTALL_PREFIX) $(BINARY)
+ 
+-- 
+2.14.1
+
