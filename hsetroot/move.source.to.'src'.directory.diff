@@ -1,0 +1,61 @@
+From 2e9a9cfc63d56b77a83d113bbcea0248167ac80a Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sun, 21 Jan 2018 16:31:16 +0000
+Subject: move source to 'src' directory
+
+---
+ Makefile                     | 8 +++++---
+ hsetroot.c => src/hsetroot.c | 0
+ outputs.c => src/outputs.c   | 0
+ outputs.h => src/outputs.h   | 0
+ 4 files changed, 5 insertions(+), 3 deletions(-)
+ rename hsetroot.c => src/hsetroot.c (100%)
+ rename outputs.c => src/outputs.c (100%)
+ rename outputs.h => src/outputs.h (100%)
+
+diff --git a/Makefile b/Makefile
+index 46956c6..226f792 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,3 +1,5 @@
++SRC=./src/
++
+ INSTALL_PREFIX=/usr/local/bin
+ VERBOSE=@
+ CC?=gcc
+@@ -12,12 +14,12 @@ LDFLAGS?=
+ LDFLAGS+=$(shell $(PKG_CONFIG) x11 --libs) $(shell $(PKG_CONFIG) imlib2 --libs)
+ 
+ BINARY=hsetroot
+-OBJS=$(BINARY).o outputs.o
++OBJS=$(SRC)$(BINARY).o $(SRC)outputs.o
+ 
+ $(BINARY): $(OBJS)
+ 	$(VERBOSE)$(CC) $(CFLAGS) $(CFLAGS_EXTRA) $^ -o $@ $(LDFLAGS)
+ 
+-%.o: %.c %.h
++$(SRC)%.o: $(SRC)%.c $(SRC)%.h
+ 	$(VERBOSE)$(CC) -c $(CFLAGS) $(CFLAGS_EXTRA) $< -o $@
+ 
+ debug: CFLAGS=$(CFLAGS_DEBUG)
+@@ -28,4 +30,4 @@ install: hsetroot
+ 	$(VERBOSE)install -st $(INSTALL_PREFIX) $(BINARY)
+ 
+ clean:
+-	$(VERBOSE)rm -f hsetroot *.o
++	$(VERBOSE)rm -f hsetroot $(SRC)*.o
+diff --git a/hsetroot.c b/src/hsetroot.c
+similarity index 100%
+rename from hsetroot.c
+rename to src/hsetroot.c
+diff --git a/outputs.c b/src/outputs.c
+similarity index 100%
+rename from outputs.c
+rename to src/outputs.c
+diff --git a/outputs.h b/src/outputs.h
+similarity index 100%
+rename from outputs.h
+rename to src/outputs.h
+-- 
+2.14.1
+
