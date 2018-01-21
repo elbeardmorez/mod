@@ -71,6 +71,9 @@ a dumping ground for patches which modify or add functionality
 -perform.scene.update.on.preferences.'apply'.diff [git sha:6b4bfc68a2797de6ef37b41ec9c776081284ef2c | pending]
 -add.key.up_down.channel.out.control,.shift.mod.channel.in.diff [git sha:927d088a7a668b27872ed171cbf2b42a5bcb9ac7 | pending]
 
+### hsetroot
+-move.outputs_xrandr.c.->.outputs.c.as.per.makefile.diff [git sha:1e40d3f0fc82fe14b7b17d5773b4bae98dab8bd9 | pending]
+
 ### mutagen
 -expose.'non-strict'.apic.frame.changes.diff [git sha:6410d00c8ed0b371786d0f23f23dd2be7d9d69f4 | pending]
 -tests.diff [git sha:745013b8b63460214d5edf523e71676c30a6aa10 | pending]
@@ -182,4 +185,3 @@ a dumping ground for patches which modify or add functionality
 -embeddedartwidgetbar,.hash.on.image.data.only.diff [git sha:8a6921ba69df86c10697201631d00ff0a20252a9 | pending]
 -embeddedartwidgetbar,.overhaul.post.action.ui.synchronisation.diff [git sha:902b77a61c3d097bf00260b3f6e1b940ee9e0463 | pending]
 -embeddedartwidgetbar,.refactor.diff [git sha:5859995745312b723f9058a75157b1d2f60d69ca | pending]
-

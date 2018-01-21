@@ -1,0 +1,17 @@
+From 1e40d3f0fc82fe14b7b17d5773b4bae98dab8bd9 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sun, 21 Jan 2018 16:12:16 +0000
+Subject: move outputs_xrandr.c -> outputs.c as per Makefile
+
+---
+ outputs_xrandr.c => outputs.c | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ rename outputs_xrandr.c => outputs.c (100%)
+
+diff --git a/outputs_xrandr.c b/outputs.c
+similarity index 100%
+rename from outputs_xrandr.c
+rename to outputs.c
+-- 
+2.14.1
+
