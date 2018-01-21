@@ -74,6 +74,7 @@ a dumping ground for patches which modify or add functionality
 ### hsetroot
 -move.outputs_xrandr.c.->.outputs.c.as.per.makefile.diff [git sha:1e40d3f0fc82fe14b7b17d5773b4bae98dab8bd9 | pending]
 -clean.up.makefile.diff [git sha:ee70781de231c71767d456d6c92c2bf56e7f3c72 | pending]
+-suppress.build.info.by.default.diff [git sha:84a7b51e829b63ab796830b9db51266f49365357 | pending]
 
 ### mutagen
 -expose.'non-strict'.apic.frame.changes.diff [git sha:6410d00c8ed0b371786d0f23f23dd2be7d9d69f4 | pending]

@@ -4,3 +4,5 @@
 # clean.up.makefile.diff [git sha:ee70781de231c71767d456d6c92c2bf56e7f3c72 | pending]
 -use recipe helpers
 -pull out install prefix
+
+# suppress.build.info.by.default.diff [git sha:84a7b51e829b63ab796830b9db51266f49365357 | pending]

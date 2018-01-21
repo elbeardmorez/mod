@@ -1,0 +1,40 @@
+From 84a7b51e829b63ab796830b9db51266f49365357 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sun, 21 Jan 2018 16:14:08 +0000
+Subject: suppress build info by default
+
+---
+ Makefile | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 9c855d0..7f120cc 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,4 +1,5 @@
+ INSTALL_PREFIX=/usr/local/bin
++VERBOSE=@
+ CC?=gcc
+ PKG_CONFIG?=pkg-config
+ 
+@@ -13,13 +14,13 @@ BINARY=hsetroot
+ OBJS=$(BINARY).o outputs.o
+ 
+ $(BINARY): $(OBJS)
+-	$(CC) $(CFLAGS) $(CFLAGS_EXTRA) $^ -o $@ $(LDFLAGS)
++	$(VERBOSE)$(CC) $(CFLAGS) $(CFLAGS_EXTRA) $^ -o $@ $(LDFLAGS)
+ 
+ %.o: %.c %.h
+-	$(CC) -c $(CFLAGS) $(CFLAGS_EXTRA) $< -o $@
++	$(VERBOSE)$(CC) -c $(CFLAGS) $(CFLAGS_EXTRA) $< -o $@
+ 
+ install: hsetroot
+-	install -st $(INSTALL_PREFIX) $(BINARY)
++	$(VERBOSE)install -st $(INSTALL_PREFIX) $(BINARY)
+ 
+ clean:
+-	rm -f hsetroot *.o
++	$(VERBOSE)rm -f hsetroot *.o
+-- 
+2.14.1
+
