@@ -16,3 +16,7 @@
 # default.no.argument.usage.to.'help'.diff [git sha:821f1ff20bf66c1ea18fb8d8f60eec6130c4a782 | pending]
 -be defensive, don't reset the root desktop to solid black by default
 -add a '-help' option
+
+# refactor.outputs.info.printing.diff [git sha:f4614095bf63029b1b21b7dec78adb383465b577 | pending]
+-add '-outputs' options
+-rename 'outputs_list' -> 'outputs_set'
