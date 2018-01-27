@@ -20,3 +20,7 @@
 # refactor.outputs.info.printing.diff [git sha:f4614095bf63029b1b21b7dec78adb383465b577 | pending]
 -add '-outputs' options
 -rename 'outputs_list' -> 'outputs_set'
+
+# collect.output.name.info.diff [git sha:4cf89d7b7e6d34ab483a1c5e55b055113b79ed82 | pending]
+-slightly refactor data parsing to improve readability/intent
+-remove grep binary dependency
