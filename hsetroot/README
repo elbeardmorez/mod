@@ -24,3 +24,7 @@
 # collect.output.name.info.diff [git sha:4cf89d7b7e6d34ab483a1c5e55b055113b79ed82 | pending]
 -slightly refactor data parsing to improve readability/intent
 -remove grep binary dependency
+
+# nest.output.info.in.struct.diff [git sha:bd92a2d70044cf5b0e20b83374d6e992f134dc43 | pending]
+-nest info struct inside a struct to hold array count
+-refactor infos initialisation
