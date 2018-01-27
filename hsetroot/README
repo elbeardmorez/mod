@@ -28,3 +28,5 @@
 # nest.output.info.in.struct.diff [git sha:bd92a2d70044cf5b0e20b83374d6e992f134dc43 | pending]
 -nest info struct inside a struct to hold array count
 -refactor infos initialisation
+
+# add.'outputs_by_name'.to.target.specific.outputs.diff [git sha:e4d2ffbf1b517e65f6dfac0973bbe2c585be0722 | pending]

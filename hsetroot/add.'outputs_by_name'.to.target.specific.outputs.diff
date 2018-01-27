@@ -1,0 +1,53 @@
+From e4d2ffbf1b517e65f6dfac0973bbe2c585be0722 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sat, 27 Jan 2018 19:54:55 +0000
+Subject: add 'outputs_by_name' to target specific outputs
+
+---
+ src/outputs.c | 10 ++++++++++
+ src/outputs.h |  1 +
+ 2 files changed, 11 insertions(+)
+
+diff --git a/src/outputs.c b/src/outputs.c
+index f9f617a..c1c7a3a 100644
+--- a/src/outputs.c
++++ b/src/outputs.c
+@@ -1,6 +1,7 @@
+ #include <ctype.h>
+ #include <sys/wait.h>
+ #include <sys/types.h>
++#include <string.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <unistd.h>
+@@ -108,6 +109,15 @@ outputs_print(OutputInfo o)
+   printf("output idx: %d, name: %s, size: %dx%d, pos: +%d +%d\n", o.idx, o.name, o.w, o.h, o.x, o.y);
+ }
+ 
++OutputInfo
++*outputs_by_name(Outputs* outputs, char* name)
++{
++  for (int i = 0; i < outputs->noutputs; i++) {
++    if (strcmp(outputs->infos[i].name, name) == 0) return &(outputs->infos[i]);
++  }
++  return NULL;
++}
++
+ void
+ outputs_free(Outputs* outputs)
+ {
+diff --git a/src/outputs.h b/src/outputs.h
+index 36bb8c4..d5d7f56 100644
+--- a/src/outputs.h
++++ b/src/outputs.h
+@@ -15,6 +15,7 @@ typedef struct {
+ 
+ void outputs_set(Outputs*);
+ void outputs_print(OutputInfo);
++OutputInfo *outputs_by_name(Outputs*, char*);
+ void outputs_free(Outputs*);
+ 
+ #endif	// __OUTPUTS_H__
+-- 
+2.14.1
+
