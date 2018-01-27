@@ -1,0 +1,26 @@
+From 6582c5c6ba310f1ab1393ff969abafea502cf7d3 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sat, 27 Jan 2018 13:30:35 +0000
+Subject: remove extern flags
+
+---
+ src/outputs.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/outputs.h b/src/outputs.h
+index 6d85a38..dc10308 100644
+--- a/src/outputs.h
++++ b/src/outputs.h
+@@ -6,7 +6,7 @@ typedef struct {
+   int x, y;
+ } OutputInfo;
+ 
+-extern OutputInfo *outputs_list(int *count_out);
+-extern void outputs_free(OutputInfo *);
++OutputInfo *outputs_list(int *count_out);
++void outputs_free(OutputInfo *);
+ 
+ #endif	// __OUTPUTS_H__
+-- 
+2.14.1
+

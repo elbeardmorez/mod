@@ -10,3 +10,5 @@
 # add.'debug'.target.to.makefile.diff [git sha:cc64ca98c1d91ecea49504025bb327931ac39f2d | pending]
 
 # move.source.to.'src'.directory.diff [git sha:2e9a9cfc63d56b77a83d113bbcea0248167ac80a | pending]
+
+# remove.extern.flags.diff [git sha:6582c5c6ba310f1ab1393ff969abafea502cf7d3 | pending]
