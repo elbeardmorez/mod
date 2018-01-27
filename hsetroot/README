@@ -12,3 +12,7 @@
 # move.source.to.'src'.directory.diff [git sha:2e9a9cfc63d56b77a83d113bbcea0248167ac80a | pending]
 
 # remove.extern.flags.diff [git sha:6582c5c6ba310f1ab1393ff969abafea502cf7d3 | pending]
+
+# default.no.argument.usage.to.'help'.diff [git sha:821f1ff20bf66c1ea18fb8d8f60eec6130c4a782 | pending]
+-be defensive, don't reset the root desktop to solid black by default
+-add a '-help' option

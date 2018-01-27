@@ -1,0 +1,66 @@
+From 821f1ff20bf66c1ea18fb8d8f60eec6130c4a782 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sat, 27 Jan 2018 14:44:54 +0000
+Subject: default no argument usage to 'help'
+
+-be defensive, don't reset the root desktop to solid black by default
+-add a '-help' option
+---
+ src/hsetroot.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/src/hsetroot.c b/src/hsetroot.c
+index a6bd1f3..7792748 100644
+--- a/src/hsetroot.c
++++ b/src/hsetroot.c
+@@ -16,9 +16,10 @@ usage(char *commandline)
+   printf(
+     "hsetroot - yet another wallpaper application\n"
+     "\n"
+-    "Syntax: %s [command1 [arg1..]] [command2 [arg1..]]..."
++    "Syntax: %s command1 [arg1..] [command2 [arg1..]]..."
+     "\n"
+     "Generic Options:\n"
++    " -help                      This help information\n"
+     " -screens <int>             Set a screenmask to use\n"
+     "\n"
+     "Gradients:\n"
+@@ -275,7 +276,18 @@ main(int argc, char **argv)
+     exit(123);
+   }
+ 
++  if (argc < 2) {
++    usage(argv[0]);
++    exit(0);
++  }
++
+   // global options
++  for (i = 1; i < argc; i++) {
++    if (strcmp(argv[i], "-help") == 0) {
++      usage(argv[0]);
++      exit(0);
++    }
++  }
+   for (i = 1; i < argc; i++) {
+     if (strcmp(argv[i], "-screens"))
+       continue;
+@@ -553,7 +565,6 @@ main(int argc, char **argv)
+         /* handled as global, just skipping here, + arg */
+         i++;
+       } else {
+-        usage(argv[0]);
+         imlib_free_image();
+         imlib_free_color_range();
+         if (modifier != NULL) {
+@@ -562,6 +573,8 @@ main(int argc, char **argv)
+           modifier = NULL;
+         }
+         XFreePixmap(display, pixmap);
++        usage(argv[0]);
++        fprintf(stderr, "\nunsupported option '%s'\n", argv[i]);
+         exit(1);
+       }
+     }
+-- 
+2.14.1
+

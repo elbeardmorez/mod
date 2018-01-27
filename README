@@ -78,6 +78,7 @@ a dumping ground for patches which modify or add functionality
 -add.'debug'.target.to.makefile.diff [git sha:cc64ca98c1d91ecea49504025bb327931ac39f2d | pending]
 -move.source.to.'src'.directory.diff [git sha:2e9a9cfc63d56b77a83d113bbcea0248167ac80a | pending]
 -remove.extern.flags.diff [git sha:6582c5c6ba310f1ab1393ff969abafea502cf7d3 | pending]
+-default.no.argument.usage.to.'help'.diff [git sha:821f1ff20bf66c1ea18fb8d8f60eec6130c4a782 | pending]
 
 ### mutagen
 -expose.'non-strict'.apic.frame.changes.diff [git sha:6410d00c8ed0b371786d0f23f23dd2be7d9d69f4 | pending]
