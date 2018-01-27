@@ -83,6 +83,7 @@ a dumping ground for patches which modify or add functionality
 -collect.output.name.info.diff [git sha:4cf89d7b7e6d34ab483a1c5e55b055113b79ed82 | pending]
 -nest.output.info.in.struct.diff [git sha:bd92a2d70044cf5b0e20b83374d6e992f134dc43 | pending]
 -add.'outputs_by_name'.to.target.specific.outputs.diff [git sha:e4d2ffbf1b517e65f6dfac0973bbe2c585be0722 | pending]
+-add.options.struct.for.passing.to.'load_image'.diff [git sha:e6e34484f8938a21478e742b5901633b490532c9 | pending]
 
 ### mutagen
 -expose.'non-strict'.apic.frame.changes.diff [git sha:6410d00c8ed0b371786d0f23f23dd2be7d9d69f4 | pending]

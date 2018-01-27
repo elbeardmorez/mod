@@ -30,3 +30,5 @@
 -refactor infos initialisation
 
 # add.'outputs_by_name'.to.target.specific.outputs.diff [git sha:e4d2ffbf1b517e65f6dfac0973bbe2c585be0722 | pending]
+
+# add.options.struct.for.passing.to.'load_image'.diff [git sha:e6e34484f8938a21478e742b5901633b490532c9 | pending]
