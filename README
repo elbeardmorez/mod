@@ -88,6 +88,7 @@ a dumping ground for patches which modify or add functionality
 -restructure.to.support.new.'-output.<name>'.option.diff [git sha:ac5f81dca7a5ed94146f9a790986c0f793ed4668 | pending]
 -whitespace.changes.only.diff [git sha:26ad3836db806e2518e9392e1c40923a80a11449 | pending]
 -make.'blur'.and.'sharpen'.output.specific.diff [git sha:f3acae08282368b6472f9388d27a26843ad30230 | pending]
+-licencing.info.diff [git sha:c8862512940058c486c84d7f58dd8c111795ac5d | pending]
 
 ### mutagen
 -expose.'non-strict'.apic.frame.changes.diff [git sha:6410d00c8ed0b371786d0f23f23dd2be7d9d69f4 | pending]

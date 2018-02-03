@@ -44,3 +44,7 @@ against C convensions!
 # make.'blur'.and.'sharpen'.output.specific.diff [git sha:f3acae08282368b6472f9388d27a26843ad30230 | pending]
 -commit serves as a template for switching options from
 'global only' to 'output specific' support mode
+
+# licencing.info.diff [git sha:c8862512940058c486c84d7f58dd8c111795ac5d | pending]
+-mark source files
+-add standard LICENCE and AUTHORS files
