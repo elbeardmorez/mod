@@ -36,3 +36,5 @@
 # switch.to.bools.where.appropriate.diff [git sha:739b6db4e5f0b379db8a05da4ed126b0bcd1dc87 | pending]
 -improve readability, especially when one pits OS exit codes
 against C convensions!
+
+# restructure.to.support.new.'-output.<name>'.option.diff [git sha:ac5f81dca7a5ed94146f9a790986c0f793ed4668 | pending]
