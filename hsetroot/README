@@ -48,3 +48,10 @@ against C convensions!
 # licencing.info.diff [git sha:c8862512940058c486c84d7f58dd8c111795ac5d | pending]
 -mark source files
 -add standard LICENCE and AUTHORS files
+
+# readme.md,.overhaul.diff [git sha:ef89ce0493e2a23b57fb50af3094d6d7bb43111a | pending]
+-use more formal language
+-create sections
+-add usage
+-add contributors
+-add examples to help explain nuances
