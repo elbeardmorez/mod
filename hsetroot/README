@@ -32,3 +32,7 @@
 # add.'outputs_by_name'.to.target.specific.outputs.diff [git sha:e4d2ffbf1b517e65f6dfac0973bbe2c585be0722 | pending]
 
 # add.options.struct.for.passing.to.'load_image'.diff [git sha:e6e34484f8938a21478e742b5901633b490532c9 | pending]
+
+# switch.to.bools.where.appropriate.diff [git sha:739b6db4e5f0b379db8a05da4ed126b0bcd1dc87 | pending]
+-improve readability, especially when one pits OS exit codes
+against C convensions!
