@@ -86,6 +86,7 @@ a dumping ground for patches which modify or add functionality
 -add.options.struct.for.passing.to.'load_image'.diff [git sha:e6e34484f8938a21478e742b5901633b490532c9 | pending]
 -switch.to.bools.where.appropriate.diff [git sha:739b6db4e5f0b379db8a05da4ed126b0bcd1dc87 | pending]
 -restructure.to.support.new.'-output.<name>'.option.diff [git sha:ac5f81dca7a5ed94146f9a790986c0f793ed4668 | pending]
+-whitespace.changes.only.diff [git sha:26ad3836db806e2518e9392e1c40923a80a11449 | pending]
 
 ### mutagen
 -expose.'non-strict'.apic.frame.changes.diff [git sha:6410d00c8ed0b371786d0f23f23dd2be7d9d69f4 | pending]
