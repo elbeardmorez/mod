@@ -79,6 +79,13 @@ function
 for existence
 -make string comparison case insensitive in tests
 
+# add.rootpathfile.utility.container.to.discern.file.parts.diff [git sha:ef4150fabbbb1cbf33cd84087a5909039524b974 | pending]
+-simple container used for discerning a pathfile's 'root directory
+part' from its 'end part'. the variable depth of a pathfile's 'end
+part' (e.g. the part of the path constructed from song attributes)
+renders  os.path built-ins (basename etc.) useless for this purpose
+-optionally recover 'escaped' versions of the parts too
+
 # orientation.agnostic.names.diff [git sha:aa36c73cbd3d00fc051c2cdceacdc1f4671a8d11 | pending]
 
 # exposed.multipaned.paned.set.diff [git sha:759f306db07154d1c19df499201c1f6fd49cf627 | pending]

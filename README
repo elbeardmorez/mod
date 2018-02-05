@@ -116,6 +116,7 @@ a dumping ground for patches which modify or add functionality
 -add.tests.diff [git sha:1e81c6f9c886709745e2cebc57282a4dfebf3112 | pending]
 -use.custom.assert.to.avoid.error.truncation.diff [git sha:7aa28efcc79123e2ddc060447f6bc72412e194e3 | pending]
 -adapt.for.case-insensitive.filesystems.diff [git sha:b0a9af94c66b2e49a278b88c4a0dcd6259f7a406 | pending]
+-add.rootpathfile.utility.container.to.discern.file.parts.diff [git sha:ef4150fabbbb1cbf33cd84087a5909039524b974 | pending]
 -orientation.agnostic.names.diff [git sha:aa36c73cbd3d00fc051c2cdceacdc1f4671a8d11 | pending]
 -exposed.multipaned.paned.set.diff [git sha:759f306db07154d1c19df499201c1f6fd49cf627 | pending]
 -make.multirpaned.more.generic.diff [git sha:312d0a012a59097699c6563bf4a5b5d493a57441 | pending]

@@ -1,0 +1,83 @@
+From ef4150fabbbb1cbf33cd84087a5909039524b974 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Mon, 5 Feb 2018 20:33:39 +0000
+Subject: add RootPathFile utility container to discern file parts
+
+-simple container used for discerning a pathfile's 'root directory
+part' from its 'end part'. the variable depth of a pathfile's 'end
+part' (e.g. the part of the path constructed from song attributes)
+renders  os.path built-ins (basename etc.) useless for this purpose
+-optionally recover 'escaped' versions of the parts too
+---
+ quodlibet/quodlibet/util/path.py | 51 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
+
+diff --git a/quodlibet/quodlibet/util/path.py b/quodlibet/quodlibet/util/path.py
+index 74fbc325f..a8f404b8d 100644
+--- a/quodlibet/quodlibet/util/path.py
++++ b/quodlibet/quodlibet/util/path.py
+@@ -8,6 +8,7 @@
+ # (at your option) any later version.
+ 
+ import os
++import io
+ import re
+ import sys
+ import errno
+@@ -443,3 +444,53 @@ def uri_is_valid(uri):
+         return False
+     else:
+         return True
++
++
++class RootPathFile:
++    """Simple container used for discerning a pathfile's 'root' directory
++    and 'end' part. The variable depth of a pathfile's 'end' part renders
++    os.path built-ins (basename etc.) useless for this purpose"""
++
++    _root = ''  # 'root' of full file path
++    _pathfile = ''  # full file path
++
++    def __init__(self, root, pathfile):
++        self._root = root
++        self._pathfile = pathfile
++
++    @property
++    def root(self):
++        return self._root
++
++    @property
++    def end(self):
++        return self._pathfile[len(self._root) + len(os.sep):]
++
++    @property
++    def pathfile(self):
++        return self._pathfile
++
++    @property
++    def end_escaped(self):
++        escaped = list(map(lambda part: escape_filename(part),
++                           self.end.split(os.path.sep)))
++        return os.path.sep.join(escaped)
++
++    @property
++    def pathfile_escaped(self):
++        return os.path.sep.join([self.root, self.end_escaped])
++
++    @property
++    def is_valid(self):
++        valid = True
++        if os.path.exists(self.pathfile):
++            return valid
++        else:
++            try:
++                with io.open(self.pathfile, "w", encoding='utf-8') as f:
++                    f.close()  # do nothing
++            except OSError:
++                valid = False
++            if os.path.exists(self.pathfile):
++                os.remove(self.pathfile)
++            return valid
+-- 
+2.14.1
+
