@@ -95,6 +95,9 @@ renders  os.path built-ins (basename etc.) useless for this purpose
 
 # make.'santitise()'.useful.on.all.platforms.diff [git sha:c8460c9d4e63eaf5372adc6a0512fa8a70bf74d7 | pending]
 
+# improve.code.readability.3.diff [git sha:77cd6a8257324688eac394e73994bac84e54323c | pending]
+-pull out 'expand_pathfile' code to separate function
+
 # orientation.agnostic.names.diff [git sha:aa36c73cbd3d00fc051c2cdceacdc1f4671a8d11 | pending]
 
 # exposed.multipaned.paned.set.diff [git sha:759f306db07154d1c19df499201c1f6fd49cf627 | pending]
