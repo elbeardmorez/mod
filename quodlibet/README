@@ -86,6 +86,9 @@ part' (e.g. the part of the path constructed from song attributes)
 renders  os.path built-ins (basename etc.) useless for this purpose
 -optionally recover 'escaped' versions of the parts too
 
+# compare.canonical.results.diff [git sha:06f41dbc8deecab03d790b3a4cb3fe64bc2ce507 | pending]
+-fixes tests on darwin
+
 # orientation.agnostic.names.diff [git sha:aa36c73cbd3d00fc051c2cdceacdc1f4671a8d11 | pending]
 
 # exposed.multipaned.paned.set.diff [git sha:759f306db07154d1c19df499201c1f6fd49cf627 | pending]
