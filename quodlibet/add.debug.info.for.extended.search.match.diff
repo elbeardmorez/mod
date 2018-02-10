@@ -1,0 +1,24 @@
+From e0fed41c00f1be4092b131788271325f5815c128 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sat, 10 Feb 2018 08:36:30 +0000
+Subject: add debug info for extended search match
+
+---
+ quodlibet/quodlibet/formats/_audio.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/quodlibet/quodlibet/formats/_audio.py b/quodlibet/quodlibet/formats/_audio.py
+index 32147cdbc..c7d665c3d 100644
+--- a/quodlibet/quodlibet/formats/_audio.py
++++ b/quodlibet/quodlibet/formats/_audio.py
+@@ -639,6 +639,7 @@ class AudioFile(dict, ImageContainer):
+                 for path_ext in paths_mod_ext:
+                     if os.path.exists(path_ext):
+                         # persistence has paid off!
++                        #print_d("extended search match!")
+                         match_ = path_ext
+                         break
+                 if match_:
+-- 
+2.14.1
+
