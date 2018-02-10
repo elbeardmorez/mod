@@ -1,0 +1,26 @@
+From c8460c9d4e63eaf5372adc6a0512fa8a70bf74d7 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sat, 10 Feb 2018 08:56:15 +0000
+Subject: make 'santitise()' useful on all platforms
+
+---
+ quodlibet/quodlibet/formats/_audio.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/quodlibet/quodlibet/formats/_audio.py b/quodlibet/quodlibet/formats/_audio.py
+index c7d665c3d..18fb445b2 100644
+--- a/quodlibet/quodlibet/formats/_audio.py
++++ b/quodlibet/quodlibet/formats/_audio.py
+@@ -546,7 +546,8 @@ class AudioFile(dict, ImageContainer):
+         from quodlibet.pattern import ArbitraryExtensionFileFromPattern
+ 
+         def sanitise(sep, parts):
+-            return sep.join(part.replace(u'/', u'')[:128]
++            """Return a santisied version of a path's parts"""
++            return sep.join(part.replace(os.path.sep, u'')[:128]
+                                 for part in parts)
+ 
+         # setup defaults (user-defined take precedence)
+-- 
+2.14.1
+
