@@ -1,0 +1,34 @@
+From 5876d95d476353ed527d49395ea7328796d34741 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sun, 25 Feb 2018 08:02:33 +0000
+Subject: prioritise 'special char encoded' version on nt
+
+---
+ quodlibet/quodlibet/formats/_audio.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/quodlibet/quodlibet/formats/_audio.py b/quodlibet/quodlibet/formats/_audio.py
+index 30910ea72..2ea600edf 100644
+--- a/quodlibet/quodlibet/formats/_audio.py
++++ b/quodlibet/quodlibet/formats/_audio.py
+@@ -559,7 +559,7 @@ class AudioFile(dict, ImageContainer):
+             rpf = RootPathFile(root, pathfile)
+             expanded.append(rpf)
+             if not os.path.exists(pathfile) and os.name == "nt":
+-                # add a special character encoded version
++                # prioritise a special character encoded version
+                 #
+                 # most 'alien' chars are supported for 'nix fs paths, and we
+                 # only pass the proposed path through 'escape_filename' (which
+@@ -569,7 +569,7 @@ class AudioFile(dict, ImageContainer):
+                 # insensitive. clearly this is not biting anyone though (yet!)
+                 pathfile = os.path.sep.join([rpf.root, rpf.end_escaped])
+                 rpf = RootPathFile(rpf.root, pathfile)
+-                expanded.append(rpf)
++                expanded.insert(len(expanded) - 1, rpf)
+             return expanded
+ 
+         def sanitise(sep, parts):
+-- 
+2.14.1
+

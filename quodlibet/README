@@ -100,6 +100,8 @@ renders  os.path built-ins (basename etc.) useless for this purpose
 
 # separate.all.tests.diff [git sha:4d0346495407304b0ca67c31b256b910e52705af | pending]
 
+# prioritise.'special.char.encoded'.version.on.nt.diff [git sha:5876d95d476353ed527d49395ea7328796d34741 | pending]
+
 # orientation.agnostic.names.diff [git sha:aa36c73cbd3d00fc051c2cdceacdc1f4671a8d11 | pending]
 
 # exposed.multipaned.paned.set.diff [git sha:759f306db07154d1c19df499201c1f6fd49cf627 | pending]
