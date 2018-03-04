@@ -215,3 +215,4 @@ a dumping ground for patches which modify or add functionality
 -fbtk,.textbox,.limit.selection.height.to.font.size.diff [git sha:5a11c3eb272dd58b0b1a0a455def6d960ae9e7ad | pending]
 -fbtk,.textbox,.overflow.selection.deselection.diff [git sha:44fc06e617d45ccd3a6f6489ca05a68359566904 | pending]
 -fbtk,.textbox,.support.horizontal.padding.diff [git sha:eae0af39bab001e9798689a4b474b9ba4c91f7c4 | pending]
+-fbrun,.add.horizontal.padding.option.diff [git sha:5c72d5a6e76fdc0e315bfcb5f5cd8aed7d3d8427 | pending]

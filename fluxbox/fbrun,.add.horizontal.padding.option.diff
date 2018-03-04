@@ -1,0 +1,98 @@
+From 5c72d5a6e76fdc0e315bfcb5f5cd8aed7d3d8427 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sun, 4 Mar 2018 10:17:31 +0000
+Subject: fbrun, add horizontal padding option
+
+---
+ util/fbrun/FbRun.cc | 6 ++++++
+ util/fbrun/FbRun.hh | 2 ++
+ util/fbrun/main.cc  | 6 ++++++
+ 3 files changed, 14 insertions(+)
+
+diff --git a/util/fbrun/FbRun.cc b/util/fbrun/FbRun.cc
+index 780d22af..2b01bc91 100644
+--- a/util/fbrun/FbRun.cc
++++ b/util/fbrun/FbRun.cc
+@@ -62,6 +62,7 @@ FbRun::FbRun(int x, int y, size_t width):
+     m_font("fixed"),
+     m_display(FbTk::App::instance()->display()),
+     m_bevel(4),
++    m_padding(0),
+     m_gc(*this),
+     m_end(false),
+     m_current_history_item(0),
+@@ -252,6 +253,11 @@ void FbRun::resize(unsigned int width, unsigned int height) {
+     FbTk::TextBox::resize(width, height);
+ }
+ 
++void FbRun::setPadding(int padding) {
++    m_padding = padding;
++    FbTk::TextBox::setPadding(padding);
++}
++
+ void FbRun::redrawLabel() {
+     clear();
+ }
+diff --git a/util/fbrun/FbRun.hh b/util/fbrun/FbRun.hh
+index e351d28d..dbba4152 100644
+--- a/util/fbrun/FbRun.hh
++++ b/util/fbrun/FbRun.hh
+@@ -43,6 +43,7 @@ public:
+     void resize(unsigned int width, unsigned int height);
+     void setPrint(bool print) { m_print = print; }
+     void setAutocomplete(bool complete) { m_autocomplete = complete; }
++    void setPadding(int padding);
+ 
+     /// load and reconfigure for new font
+     bool loadFont(const std::string &fontname);
+@@ -89,6 +90,7 @@ private:
+     FbTk::Font m_font; ///< font used to draw command text
+     Display *m_display;  ///< display connection
+     int m_bevel;
++    int m_padding;
+     FbTk::GContext m_gc; ///< graphic context
+     bool m_end; ///< marks when this object is done
+ 
+diff --git a/util/fbrun/main.cc b/util/fbrun/main.cc
+index 0e52b19d..65b85642 100644
+--- a/util/fbrun/main.cc
++++ b/util/fbrun/main.cc
+@@ -58,6 +58,7 @@ void showUsage(const char *progname) {
+         "   -print                      Print result to stdout"<<endl<<
+         "   -w [width]                  Window width in pixels"<<endl<<
+         "   -h [height]                 Window height in pixels"<<endl<<
++        "   -pad [size]                 Padding size in pixels"<<endl<<
+         "   -display [display string]   Display name"<<endl<<
+         "   -pos [x] [y]                Window position in pixels"<<endl<<
+         "   -nearmouse                  Window position near mouse"<<endl<<
+@@ -76,6 +77,7 @@ int main(int argc, char **argv) {
+     int x = 0, y = 0; // default pos of window
+     size_t width = 200, height = 32; // default size of window
+     bool set_height = false, set_width=false; // use height/width of font by default
++    int padding = 0; // default horizontal padding for text
+     bool set_pos = false; // set position
+     bool near_mouse = false; // popup near mouse
+     bool center = false;
+@@ -107,6 +109,8 @@ int main(int argc, char **argv) {
+         } else if (arg == "-h" && i+1 < argc) {
+             height = atoi(argv[++i]);
+             set_height = true; // mark true else the height of font will be used
++        } else if (arg == "-pad" && i+1 < argc) {
++            padding = atoi(argv[++i]);
+         } else if ((arg == "-display" || arg == "--display") && i+1 < argc) {
+             display_name = argv[++i];
+         } else if ((arg == "-pos" || arg == "--pos") && i+2 < argc) {
+@@ -180,8 +184,10 @@ int main(int argc, char **argv) {
+                 cerr<<"FbRun Warning: Failed to load completion file: "<<expanded_filename<<endl;
+         }
+ 
++        fbrun.setPadding(padding);
+         fbrun.setTitle(title);
+         fbrun.setText(text);
++
+         if (preselect)
+             fbrun.selectAll();
+ 
+-- 
+2.14.1
+

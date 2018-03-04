@@ -17,3 +17,5 @@ is selected' when in fact it is, gives a poor UX
 
 # fbtk,.textbox,.support.horizontal.padding.diff [git sha:eae0af39bab001e9798689a4b474b9ba4c91f7c4 | pending]
 -add 'setPadding' function
+
+# fbrun,.add.horizontal.padding.option.diff [git sha:5c72d5a6e76fdc0e315bfcb5f5cd8aed7d3d8427 | pending]
