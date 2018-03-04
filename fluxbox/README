@@ -1,2 +1,16 @@
 
 # fbtk,.textbox,.limit.selection.height.to.font.size.diff [git sha:5a11c3eb272dd58b0b1a0a455def6d960ae9e7ad | pending]
+
+# fbtk,.textbox,.overflow.selection.deselection.diff [git sha:44fc06e617d45ccd3a6f6489ca05a68359566904 | pending]
+changes the selection's deselection mechanism for oversized (e.g
+larger than window width) text
+
+new behaviour ensures the maximum selection width remains whilst
+the selection length is 'oversized'. only when the selection length
+has a width less than the window width will the selection (i.e. the
+highlight / inverted colours) reduce in size
+
+this is in contrast to the existing approach which would immediately
+decrease an oversized selection down to nothing visually, leaving
+the remainder of the selection 'off screen'. this 'looks like nothing
+is selected' when in fact it is, gives a poor UX
