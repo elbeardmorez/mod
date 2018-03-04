@@ -14,3 +14,6 @@ this is in contrast to the existing approach which would immediately
 decrease an oversized selection down to nothing visually, leaving
 the remainder of the selection 'off screen'. this 'looks like nothing
 is selected' when in fact it is, gives a poor UX
+
+# fbtk,.textbox,.support.horizontal.padding.diff [git sha:eae0af39bab001e9798689a4b474b9ba4c91f7c4 | pending]
+-add 'setPadding' function
