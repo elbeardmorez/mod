@@ -1,0 +1,25 @@
+From 5a11c3eb272dd58b0b1a0a455def6d960ae9e7ad Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sun, 4 Mar 2018 21:46:22 +0000
+Subject: fbtk, textbox, limit selection height to font size
+
+---
+ src/FbTk/TextBox.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/FbTk/TextBox.cc b/src/FbTk/TextBox.cc
+index 8384c459..aeb411c7 100644
+--- a/src/FbTk/TextBox.cc
++++ b/src/FbTk/TextBox.cc
+@@ -235,7 +235,7 @@ void TextBox::clear() {
+         XGetGCValues(dpy, gc(), GCForeground|GCBackground, &backup);
+         XSetForeground(dpy, gc(), backup.foreground);
+ 
+-        fillRectangle(gc(), x, 0, width, height());
++        fillRectangle(gc(), x, (height()-font().height())/2, width, font().height());
+ 
+         XColor c;
+         c.pixel = backup.foreground;
+-- 
+2.14.1
+

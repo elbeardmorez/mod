@@ -210,3 +210,6 @@ a dumping ground for patches which modify or add functionality
 -embeddedartwidgetbar,.hash.on.image.data.only.diff [git sha:8a6921ba69df86c10697201631d00ff0a20252a9 | pending]
 -embeddedartwidgetbar,.overhaul.post.action.ui.synchronisation.diff [git sha:902b77a61c3d097bf00260b3f6e1b940ee9e0463 | pending]
 -embeddedartwidgetbar,.refactor.diff [git sha:5859995745312b723f9058a75157b1d2f60d69ca | pending]
+
+### fluxbox
+-fbtk,.textbox,.limit.selection.height.to.font.size.diff [git sha:5a11c3eb272dd58b0b1a0a455def6d960ae9e7ad | pending]
