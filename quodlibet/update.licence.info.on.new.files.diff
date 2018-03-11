@@ -1,0 +1,45 @@
+From 8de09c1ee1c2e6a52a96e08c8580bcde90d27270 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sun, 11 Mar 2018 20:41:28 +0000
+Subject: update licence info on new files
+
+---
+ quodlibet/quodlibet/ext/events/widgetbars.py | 5 +++--
+ quodlibet/quodlibet/qltk/widgetbar.py        | 5 +++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/quodlibet/quodlibet/ext/events/widgetbars.py b/quodlibet/quodlibet/ext/events/widgetbars.py
+index 87719d65a..dae69fc95 100644
+--- a/quodlibet/quodlibet/ext/events/widgetbars.py
++++ b/quodlibet/quodlibet/ext/events/widgetbars.py
+@@ -2,8 +2,9 @@
+ # Copyright 2017 Pete Beardmore
+ #
+ # This program is free software; you can redistribute it and/or modify
+-# it under the terms of the GNU General Public License version 2 as
+-# published by the Free Software Foundation
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
+ 
+ from gi.repository import Gtk
+ 
+diff --git a/quodlibet/quodlibet/qltk/widgetbar.py b/quodlibet/quodlibet/qltk/widgetbar.py
+index 445b298fc..d268606af 100644
+--- a/quodlibet/quodlibet/qltk/widgetbar.py
++++ b/quodlibet/quodlibet/qltk/widgetbar.py
+@@ -2,8 +2,9 @@
+ # Copyright 2017 Pete Beardmore
+ #
+ # This program is free software; you can redistribute it and/or modify
+-# it under the terms of the GNU General Public License version 2 as
+-# published by the Free Software Foundation
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
+ 
+ from quodlibet.qltk.pluginwin import PluginWindow
+ from quodlibet.plugins import PluginManager
+-- 
+2.14.1
+
