@@ -404,3 +404,5 @@ https://github.com/quodlibet/mutagen/commit/6b41a636b9997a4f0016abf9213522ff99ba
 -in the same vein as the renamed 'EmbeddedArtBoxSignalBox', create
 a companion signals class to pass messages to the container,
 -refactor ImageWidget functions to use 'self' name more
+
+# embeddedartwidgetbar,.update.licence.info.on.new.files.diff [git sha:8b3728561d64f3e53fc1e2e48fb2941f2f065eec | pending]
