@@ -1,0 +1,28 @@
+From 111e00e88673fa373d37068d92d09b03c904637b Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Tue, 13 Mar 2018 22:43:24 +0000
+Subject: coverswidgetbar, update licence info on new files
+
+---
+ quodlibet/quodlibet/ext/covers/covers_widgetbar.py | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/quodlibet/quodlibet/ext/covers/covers_widgetbar.py b/quodlibet/quodlibet/ext/covers/covers_widgetbar.py
+index bc59eb3e5..9918b4861 100644
+--- a/quodlibet/quodlibet/ext/covers/covers_widgetbar.py
++++ b/quodlibet/quodlibet/ext/covers/covers_widgetbar.py
+@@ -2,8 +2,9 @@
+ # Copyright 2017 Pete Beardmore
+ #
+ # This program is free software; you can redistribute it and/or modify
+-# it under the terms of the GNU General Public License version 2 as
+-# published by the Free Software Foundation
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
+ 
+ import os
+ import glob
+-- 
+2.14.1
+
