@@ -1,7 +1,7 @@
 
-# fbtk,.textbox,.limit.selection.height.to.font.size.diff [git sha:5a11c3eb272dd58b0b1a0a455def6d960ae9e7ad | pending]
+# fbtk,.textbox,.limit.selection.height.to.font.size.diff [git sha:3ae7b81ae106db4c169996e21d1d196929af4b33 | committed]
 
-# fbtk,.textbox,.overflow.selection.deselection.diff [git sha:44fc06e617d45ccd3a6f6489ca05a68359566904 | pending]
+# fbtk,.textbox,.overflow.selection.deselection.diff [git sha:ca0995bdec7c96452291639c9736ed7212f96ca2 | committed]
 changes the selection's deselection mechanism for oversized (e.g
 larger than window width) text
 
@@ -15,7 +15,7 @@ decrease an oversized selection down to nothing visually, leaving
 the remainder of the selection 'off screen'. this 'looks like nothing
 is selected' when in fact it is, gives a poor UX
 
-# fbtk,.textbox,.support.horizontal.padding.diff [git sha:eae0af39bab001e9798689a4b474b9ba4c91f7c4 | pending]
+# fbtk,.textbox,.support.horizontal.padding.diff [git sha:ed7ea14167e531dc3d7cc3db931f299fcc8c7ba4 | committed]
 -add 'setPadding' function
 
-# fbrun,.add.horizontal.padding.option.diff [git sha:5c72d5a6e76fdc0e315bfcb5f5cd8aed7d3d8427 | pending]
+# fbrun,.add.horizontal.padding.option.diff [git sha:248b15c25f924c56da457ed144050e65013335b0 | committed]

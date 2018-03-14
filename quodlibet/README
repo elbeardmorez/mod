@@ -1,11 +1,11 @@
-# allow.configurable.custom.files.names.for.downloaded.art.diff [git sha:c09fb6f787cf9a701db542d648c9c308e69a809b | pending]
+# allow.configurable.custom.files.names.for.downloaded.art.diff [git sha:37b62b8a2f200dfd02586049d5676947fa2a889b | committed]
 
-# expose.album.art.downloader.blackbox.diff [git sha:e6bf84b2599412924f9f01ecdb57a04a4c572e3d | pending]
+# expose.album.art.downloader.blackbox.diff [git sha:37b62b8a2f200dfd02586049d5676947fa2a889b | committed]
 the algorithm for construction of a final 'query to send'  based on user
 input is imperfect. allow users to override this if the results are off
 (e.g. missing words) whilst giving them insight into what's usually best.
 
-# expose.album.art.downloader.query.results.limit.diff [git sha:6d15d03750fb8f668b43a17fa8a6412e7581a578 | pending]
+# expose.album.art.downloader.query.results.limit.diff [git sha:37b62b8a2f200dfd02586049d5676947fa2a889b | committed]
 -the current engine defaults of 5 and 3 for Amazon and Discogs respectively
  occassionally aren't enough to see the actual cover you want. this
  change allows for more results
@@ -13,27 +13,27 @@ input is imperfect. allow users to override this if the results are off
 -REQUEST_LIMIT_MAX is hardcoded as 15 so users can't do anything too crazy
 -breaking change as it causes all engines to use the same user defined  limit
 
-# move.album.art.when.renaming.[#237].diff [git sha:7cd099d5587c88b9bd84f67558342993a249b42a | pending]
+# move.album.art.when.renaming.[#237].diff [git sha:75202a669d610aec44d76a991f06c3401deb6ae4 | committed]
 
-# add.option.to.remove.empty.directories.post.rename.diff [git sha:94e4c199be65ef237ad323e1de38fd7b5c6d686d | pending]
+# add.option.to.remove.empty.directories.post.rename.diff [git sha:75202a669d610aec44d76a991f06c3401deb6ae4 | committed]
 
-# update.config.variable.names.diff [git sha:1b2ac52404e0a40b6dc4f4ca9c0c3743cc1b7854 | pending]
+# update.config.variable.names.diff [git sha:75202a669d610aec44d76a991f06c3401deb6ae4 | committed]
 
-# code.purpose._.clarity.improvements.diff [git sha:121d31bd6d72de289784fe1669da895445b2de8e | pending]
+# code.purpose._.clarity.improvements.diff [git sha:75202a669d610aec44d76a991f06c3401deb6ae4 | committed]
 
-# code.style.improvements.diff [git sha:13f510909cf40341d56e7987c01ffb934bd79fac | pending]
+# code.style.improvements.diff [git sha:75202a669d610aec44d76a991f06c3401deb6ae4 | committed]
 
-# filterpluginbox,.no_show_all.on.plugins.expander.diff [git sha:4b99a31a21e68569556c05edc1bacf9466643ef0 | pending]
+# filterpluginbox,.no_show_all.on.plugins.expander.diff [git sha:75202a669d610aec44d76a991f06c3401deb6ae4 | committed]
 -this facilitates show_all() calls on containers holding this widget
 without exposing the 'More options..' expander for plugins which has
 its own visibility logic triggered via its 'changed' signal callback
 -verified no impact through toggling of the 'Regex Substitution' plugin
 
-# split.rename.options.into.frames.diff [git sha:1f81bff5626d4d145aa9a116e083ba82fa88fd35 | pending]
+# split.rename.options.into.frames.diff [git sha:75202a669d610aec44d76a991f06c3401deb6ae4 | committed]
 -use separate 'File names' and 'Album art' frames to display sets
 of options to make better use of dead space
 
-# tests.for.moving.album.art.diff [git sha:bdf42f19e5ad1ba4f7b980014703cb564e44eca9 | pending]
+# tests.for.moving.album.art.diff [git sha:75202a669d610aec44d76a991f06c3401deb6ae4 | committed]
 
 # make.'lyric_filename()'.search.harder.diff [git sha:001c4273f159d9e4df858b906ee4ac596e371f68 | pending]
 -search alternate extensions: 'lyrics', '', 'txt'
