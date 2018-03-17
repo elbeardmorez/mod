@@ -1,0 +1,28 @@
+From 5e79065d5fdf73b9ff19b49f0690f457a0022d34 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sat, 17 Mar 2018 17:27:18 +0000
+Subject: widgetbars, prefer comprehensions over maps
+
+---
+ quodlibet/quodlibet/qltk/quodlibetwindow.py | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/quodlibet/quodlibet/qltk/quodlibetwindow.py b/quodlibet/quodlibet/qltk/quodlibetwindow.py
+index c0d7995b0..4f33c39b0 100644
+--- a/quodlibet/quodlibet/qltk/quodlibetwindow.py
++++ b/quodlibet/quodlibet/qltk/quodlibetwindow.py
+@@ -949,9 +949,8 @@ class QuodLibetWindow(Window, PersistentWindowMixin, AppWindow):
+ 
+         print_d("%d ui elements live:\n%s" %
+                     (len(self.ui_elements_ordered),
+-                     '\n'.join(list(
+-                         map(lambda s: s[0] + ' | ' + str(s[1]),
+-                             list(zip(order, self.ui_elements_ordered)))))))
++                     '\n'.join([s[0] + ' | ' + str(s[1]) for s in
++                                list(zip(order, self.ui_elements_ordered))])))
+ 
+         return self.ui_elements_ordered
+ 
+-- 
+2.14.1
+
