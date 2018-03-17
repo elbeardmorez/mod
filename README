@@ -158,6 +158,7 @@ a dumping ground for patches which modify or add functionality
 -update.licence.info.on.new.files.diff [git sha:8de09c1ee1c2e6a52a96e08c8580bcde90d27270 | pending]
 -widgetbars,.prefer.comprehensions.over.maps.diff [git sha:5e79065d5fdf73b9ff19b49f0690f457a0022d34 | pending]
 -core,.refactor.'expandboxhack'.diff [git sha:deb75cc186f4eb1a6c00a02e03bcadef6226181e | pending]
+-widgetbars,.utilise.'expandertitlecontainerhack'.diff [git sha:378c1cc4d5c3dfcdd7d5379bb3aed65dafe9e2ef | pending]
 -return.default.1x1.for.invalid.image.scaling.diff [git sha:85076f1e50e2eec5fb957dd4c4d9af7e677d0f55 | pending]
 -persistent.moveable.big.images.diff [git sha:bf3969e4fed0658d0f225a1a0537a26d746293b7 | pending]
 -support.multiple.big.images.diff [git sha:d394ce2a8e86f2365bfe4e836cb1fe9b00ab8220 | pending]

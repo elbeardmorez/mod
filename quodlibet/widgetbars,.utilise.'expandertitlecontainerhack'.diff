@@ -1,0 +1,35 @@
+From 378c1cc4d5c3dfcdd7d5379bb3aed65dafe9e2ef Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sat, 17 Mar 2018 21:23:13 +0000
+Subject: widgetbars, utilise 'ExpanderTitleContainerHack'
+
+-facilitates styling of the expander title bars
+---
+ quodlibet/quodlibet/qltk/widgetbar.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/quodlibet/quodlibet/qltk/widgetbar.py b/quodlibet/quodlibet/qltk/widgetbar.py
+index bff1f6a26..2d4eefa4e 100644
+--- a/quodlibet/quodlibet/qltk/widgetbar.py
++++ b/quodlibet/quodlibet/qltk/widgetbar.py
+@@ -18,7 +18,7 @@ from quodlibet.qltk import get_top_parent
+ from quodlibet.qltk import Icons
+ from quodlibet.qltk.menubutton import SmallMenuButton
+ from quodlibet.qltk.x import ScrolledWindow, SymbolicIconImage, \
+-    SmallImageButton, MenuItem, PaneLock
++    SmallImageButton, MenuItem, PaneLock, ExpanderTitleContainerHack
+ 
+ from gi.repository import Gtk, GLib
+ 
+@@ -53,7 +53,7 @@ class WidgetBar(Gtk.Expander):
+ 
+         self.title = Gtk.Label()
+         self.title.set_alignment(0.0, 0.5)
+-        self.set_label_widget(self.title)
++        self.set_label_widget(ExpanderTitleContainerHack(self.title))
+ 
+         self.scroll = ScrolledWindow()
+         self.scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.NEVER)
+-- 
+2.14.1
+
