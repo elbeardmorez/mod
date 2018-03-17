@@ -1,0 +1,27 @@
+From 0e4199d777e5aed7c9ecc0e90ff34c33ab7d6152 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sat, 17 Mar 2018 12:24:21 +0000
+Subject: prefer comprehensions over maps
+
+---
+ quodlibet/quodlibet/util/path.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/quodlibet/quodlibet/util/path.py b/quodlibet/quodlibet/util/path.py
+index a8f404b8d..c9adb4081 100644
+--- a/quodlibet/quodlibet/util/path.py
++++ b/quodlibet/quodlibet/util/path.py
+@@ -472,8 +472,8 @@ class RootPathFile:
+ 
+     @property
+     def end_escaped(self):
+-        escaped = list(map(lambda part: escape_filename(part),
+-                           self.end.split(os.path.sep)))
++        escaped = [escape_filename(part)
++                    for part in self.end.split(os.path.sep)]
+         return os.path.sep.join(escaped)
+ 
+     @property
+-- 
+2.14.1
+

@@ -124,6 +124,7 @@ a dumping ground for patches which modify or add functionality
 -improve.code.readability.3.diff [git sha:77cd6a8257324688eac394e73994bac84e54323c | pending]
 -separate.all.tests.diff [git sha:4d0346495407304b0ca67c31b256b910e52705af | pending]
 -prioritise.'special.char.encoded'.version.on.nt.diff [git sha:5876d95d476353ed527d49395ea7328796d34741 | pending]
+-prefer.comprehensions.over.maps.2.diff [git sha:0e4199d777e5aed7c9ecc0e90ff34c33ab7d6152 | pending]
 -orientation.agnostic.names.diff [git sha:aa36c73cbd3d00fc051c2cdceacdc1f4671a8d11 | pending]
 -exposed.multipaned.paned.set.diff [git sha:759f306db07154d1c19df499201c1f6fd49cf627 | pending]
 -make.multirpaned.more.generic.diff [git sha:312d0a012a59097699c6563bf4a5b5d493a57441 | pending]
