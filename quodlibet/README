@@ -112,6 +112,9 @@ renders  os.path built-ins (basename etc.) useless for this purpose
 no idea what (if anything) changed (e.g. pytest flags for verbosity)
 -clarifies use of 'lower' function in string comparisons
 
+# remove.some.repeated.code.sections.from.tests.diff [git sha:5c3a269a0bb1c7c3b9d27d5135ef1d2dd49dfd13 | pending]
+-nest test file creation within a setup context
+
 # orientation.agnostic.names.diff [git sha:aa36c73cbd3d00fc051c2cdceacdc1f4671a8d11 | pending]
 
 # exposed.multipaned.paned.set.diff [git sha:759f306db07154d1c19df499201c1f6fd49cf627 | pending]
