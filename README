@@ -172,6 +172,7 @@ a dumping ground for patches which modify or add functionality
 -coverswidgetbar,.add.uri.to.tooltip.option.diff [git sha:fbb35ba58c012aee1866280adcc3ccaec262d55c | pending]
 -coverswidgetbar,.python3.compatibility.diff [git sha:e93ee54431f9cdd0be90f8496cd9a9312761937c | pending]
 -coverswidgetbar,.update.licence.info.on.new.files.diff [git sha:111e00e88673fa373d37068d92d09b03c904637b | pending]
+-coverswidgetbar,.prefer.comprehensions.over.maps.diff [git sha:733013e5d3da90ff9975d64990090214b2f0b2b3 | pending]
 -add.filtering.to.comboboxentrysave.widget.diff [git sha:7e07dd260f392bf55ef96d8bb4dfd1051448cc14 | pending]
 -create.an.actions.dialog.diff [git sha:5903ef144a244abcb0a0fac6b6f1564af55c7bfb | pending]
 -expose.pluginmanager's.scanned.modules.diff [git sha:94b1aa6bbb79dbde2db472851cc38738769400be | pending]
