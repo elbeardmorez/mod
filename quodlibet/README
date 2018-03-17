@@ -317,3 +317,13 @@ it finds
 # core,.ignore.strict.id3.apic.single.type.standard.diff [git sha:87e6f6b580ca95c751e12b93520c1424d79c64a2 | pending]
 -requires changes to mutagen library, see pull request:
 https://github.com/quodlibet/mutagen/pull/326
+
+# core,.work.around.mutagen's.'strict'.frames.diff [git sha:893b88a7fe41c551b5580d53f2500f35195e7cac | pending]
+-following rejection of mutagen #326 PR, push the logic required to
+overcome the 'strict' (in terms of frame type) no duplication /
+overwrites by default when adding by (the recommended) abuse of the
+frame's 'desc' attribute
+
+see:
+https://github.com/quodlibet/mutagen/pull/326
+https://github.com/quodlibet/mutagen/commit/6b41a636b9997a4f0016abf9213522ff99bac55a

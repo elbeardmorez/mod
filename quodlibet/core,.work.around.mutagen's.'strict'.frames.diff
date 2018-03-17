@@ -1,0 +1,40 @@
+From 893b88a7fe41c551b5580d53f2500f35195e7cac Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sat, 17 Mar 2018 22:42:22 +0000
+Subject: core, work around mutagen's 'strict' frames
+
+-following rejection of mutagen #326 PR, push the logic required to
+overcome the 'strict' (in terms of frame type) no duplication /
+overwrites by default when adding by (the recommended) abuse of the
+frame's 'desc' attribute
+
+see:
+https://github.com/quodlibet/mutagen/pull/326
+https://github.com/quodlibet/mutagen/commit/6b41a636b9997a4f0016abf9213522ff99bac55a
+---
+ quodlibet/quodlibet/formats/_id3.py | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/quodlibet/quodlibet/formats/_id3.py b/quodlibet/quodlibet/formats/_id3.py
+index cac761832..7b70df158 100644
+--- a/quodlibet/quodlibet/formats/_id3.py
++++ b/quodlibet/quodlibet/formats/_id3.py
+@@ -563,7 +563,14 @@ class ID3File(AudioFile):
+         frame = mutagen.id3.APIC(
+             encoding=3, mime=image.mime_type, type=type_,
+             desc=u"", data=data)
+-        tag.add(frame, strict=strict)
++
++        if not strict:
++            # abuse the 'desc' attribute (used in creation of the frame's
++            # hashkey) to ensure uniqueness (as far as mutagen cares)
++            while frame.HashKey in tag:
++                frame.desc += u" "
++
++        tag.add(frame)
+ 
+         with translate_errors():
+             audio.save()
+-- 
+2.14.1
+
