@@ -339,6 +339,9 @@ front of the full list)
 
 # pluginswidgetbar,.update.licence.info.on.new.files.diff [git sha:23d998eebd1e26fb2533fa75c3346eaca3e63cd8 | pending]
 
+# pluginswidgetbar,.prefer.comprehensions.and.slicing.over.maps.and.reversed.diff [git sha:8cbb54ed139769aeff8d541ba426a96578d59868 | pending]
+ and reversed
+
 # embedded.art.widgetbar.diff [git sha:13ccb6b272c1f3f20891d03566cdc77c8ba832e7 | pending]
 
 # embeddedartwidgetbar,.make.icon.selectable.diff [git sha:8b66fc271471978d0d9c14cd2fdd8c4df535d366 | pending]
