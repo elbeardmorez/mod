@@ -35,7 +35,7 @@ of options to make better use of dead space
 
 # tests.for.moving.album.art.diff [git sha:75202a669d610aec44d76a991f06c3401deb6ae4 | committed]
 
-# make.'lyric_filename()'.search.harder.diff [git sha:001c4273f159d9e4df858b906ee4ac596e371f68 | pending]
+# make.'lyric_filename()'.search.harder.diff [git sha:9c53f4e4fe7b48936d35dfb8a5d181fb8ed7d34b | committed]
 -search alternate extensions: 'lyrics', '', 'txt'
 -add another default 'root'/'<artist> - <title>/lyric search path
 -add support for lyrics filename configuration via two '[memory]'
@@ -45,24 +45,24 @@ e.g.
 lyric_filenames = <artist>.-.<title>,<artist> - <title>.lyrics_mod
 lyric_rootpaths = ~/music/lyrics
 
-# improve.code.readability.diff [git sha:ea13d39b5c48491c8764cb0d96c016305a6300e8 | pending]
+# improve.code.readability.diff [git sha:9c53f4e4fe7b48936d35dfb8a5d181fb8ed7d34b | committed]
 -pull out duplicate string munging to separate 'sanitise' function
 
-# avoid.trying.to.resolve.a.filename.unnecessarily.diff [git sha:408bb69874e1488f3f294bb461da6042feda80ea | pending]
+# avoid.trying.to.resolve.a.filename.unnecessarily.diff [git sha:9c53f4e4fe7b48936d35dfb8a5d181fb8ed7d34b | committed]
 -use a regular expression over trivial string comparison to
 determine whether a potential filename contains a Quod Libet
 placeholder (e.g. <title>)
 
-# improve.code.readability.2.diff [git sha:e239bfed07490e9d2fd3a41711b4269092f230a6 | pending]
+# improve.code.readability.2.diff [git sha:9c53f4e4fe7b48936d35dfb8a5d181fb8ed7d34b | committed]
 -pull out logic which creates the extended set of search paths
 based on extension modification only to a 'generate_mod_ext_paths'
 function
 -add many more comments
 -improve logging (commented by default)
 
-# add.local.song.dir.to.default.search.paths.diff [git sha:a966b4c7b8d7587f242ca71f11c747aa3654f557 | pending]
+# add.local.song.dir.to.default.search.paths.diff [git sha:9c53f4e4fe7b48936d35dfb8a5d181fb8ed7d34b | committed]
 
-# add.tests.diff [git sha:1e81c6f9c886709745e2cebc57282a4dfebf3112 | pending]
+# add.tests.diff [git sha:9c53f4e4fe7b48936d35dfb8a5d181fb8ed7d34b | committed]
 -test built-in default
 -test built-in default local path
 -test custom default (fnf fallback!)
@@ -72,47 +72,47 @@ function
 -test '<' and/or '>' in name
 -test '<' and '>' in name across path
 
-# use.custom.assert.to.avoid.error.truncation.diff [git sha:7aa28efcc79123e2ddc060447f6bc72412e194e3 | pending]
+# use.custom.assert.to.avoid.error.truncation.diff [git sha:9c53f4e4fe7b48936d35dfb8a5d181fb8ed7d34b | committed]
 
-# adapt.for.case-insensitive.filesystems.diff [git sha:b0a9af94c66b2e49a278b88c4a0dcd6259f7a406 | pending]
+# adapt.for.case-insensitive.filesystems.diff [git sha:9c53f4e4fe7b48936d35dfb8a5d181fb8ed7d34b | committed]
 -push filename escaping code path beyond the initial globbing
 for existence
 -make string comparison case insensitive in tests
 
-# add.rootpathfile.utility.container.to.discern.file.parts.diff [git sha:ef4150fabbbb1cbf33cd84087a5909039524b974 | pending]
+# add.rootpathfile.utility.container.to.discern.file.parts.diff [git sha:9c53f4e4fe7b48936d35dfb8a5d181fb8ed7d34b | committed]
 -simple container used for discerning a pathfile's 'root directory
 part' from its 'end part'. the variable depth of a pathfile's 'end
 part' (e.g. the part of the path constructed from song attributes)
 renders  os.path built-ins (basename etc.) useless for this purpose
 -optionally recover 'escaped' versions of the parts too
 
-# compare.canonical.results.diff [git sha:06f41dbc8deecab03d790b3a4cb3fe64bc2ce507 | pending]
+# compare.canonical.results.diff [git sha:9c53f4e4fe7b48936d35dfb8a5d181fb8ed7d34b | committed]
 -fixes tests on darwin
 
-# prefer.comprehensions.over.maps.diff [git sha:b4d2e9e58af2c7e4f87b187dad40cc6f5e98d82d | pending]
+# prefer.comprehensions.over.maps.diff [git sha:9c53f4e4fe7b48936d35dfb8a5d181fb8ed7d34b | committed]
 
-# add.debug.info.for.extended.search.match.diff [git sha:e0fed41c00f1be4092b131788271325f5815c128 | pending]
+# add.debug.info.for.extended.search.match.diff [git sha:9c53f4e4fe7b48936d35dfb8a5d181fb8ed7d34b | committed]
 
-# make.'santitise()'.useful.on.all.platforms.diff [git sha:c8460c9d4e63eaf5372adc6a0512fa8a70bf74d7 | pending]
+# make.'santitise()'.useful.on.all.platforms.diff [git sha:9c53f4e4fe7b48936d35dfb8a5d181fb8ed7d34b | committed]
 
-# improve.code.readability.3.diff [git sha:77cd6a8257324688eac394e73994bac84e54323c | pending]
+# improve.code.readability.3.diff [git sha:9c53f4e4fe7b48936d35dfb8a5d181fb8ed7d34b | committed]
 -pull out 'expand_pathfile' code to separate function
 
-# separate.all.tests.diff [git sha:4d0346495407304b0ca67c31b256b910e52705af | pending]
+# separate.all.tests.diff [git sha:9c53f4e4fe7b48936d35dfb8a5d181fb8ed7d34b | committed]
 
-# prioritise.'special.char.encoded'.version.on.nt.diff [git sha:5876d95d476353ed527d49395ea7328796d34741 | pending]
+# prioritise.'special.char.encoded'.version.on.nt.diff [git sha:9c53f4e4fe7b48936d35dfb8a5d181fb8ed7d34b | committed]
 
-# prefer.comprehensions.over.maps.2.diff [git sha:0e4199d777e5aed7c9ecc0e90ff34c33ab7d6152 | pending]
+# prefer.comprehensions.over.maps.2.diff [git sha:9c53f4e4fe7b48936d35dfb8a5d181fb8ed7d34b | committed]
 
-# use.'is_windows'.helper.diff [git sha:2dfdcd3510b90eccf2de22d857da28bc0e13e820 | pending]
+# use.'is_windows'.helper.diff [git sha:9c53f4e4fe7b48936d35dfb8a5d181fb8ed7d34b | committed]
 -ease OS specific code tracking
 
-# revert.to.built-in.'assertequal'.diff [git sha:e5b26f35c5575f4a160c9e0336d465da5bcc71bc | pending]
+# revert.to.built-in.'assertequal'.diff [git sha:9c53f4e4fe7b48936d35dfb8a5d181fb8ed7d34b | committed]
 -truncation of vital debugging text doesn't seem to be an issue now,
 no idea what (if anything) changed (e.g. pytest flags for verbosity)
 -clarifies use of 'lower' function in string comparisons
 
-# remove.some.repeated.code.sections.from.tests.diff [git sha:5c3a269a0bb1c7c3b9d27d5135ef1d2dd49dfd13 | pending]
+# remove.some.repeated.code.sections.from.tests.diff [git sha:9c53f4e4fe7b48936d35dfb8a5d181fb8ed7d34b | committed]
 -nest test file creation within a setup context
 
 # orientation.agnostic.names.diff [git sha:aa36c73cbd3d00fc051c2cdceacdc1f4671a8d11 | pending]
