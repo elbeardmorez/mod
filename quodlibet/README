@@ -451,3 +451,5 @@ a companion signals class to pass messages to the container,
 -refactor ImageWidget functions to use 'self' name more
 
 # embeddedartwidgetbar,.update.licence.info.on.new.files.diff [git sha:8b3728561d64f3e53fc1e2e48fb2941f2f065eec | pending]
+
+# embeddedartwidgetbar,.make.object.types.clearer.in.code.diff [git sha:2cc4565d629e1f7c8616cfca95be9983f4ab3d14 | pending]
