@@ -228,6 +228,7 @@ a dumping ground for patches which modify or add functionality
 -embeddedartwidgetbar,.update.licence.info.on.new.files.diff [git sha:8b3728561d64f3e53fc1e2e48fb2941f2f065eec | pending]
 -embeddedartwidgetbar,.make.object.types.clearer.in.code.diff [git sha:2cc4565d629e1f7c8616cfca95be9983f4ab3d14 | pending]
 -embeddedartwidgetbar,.add.code.comments.for.'collapsed'.states.diff [git sha:d23812fa8ca6fd7212c187eaeb7fd6b390407021 | pending]
+-embeddedartwidgetbar,.separate.styling.to.its.own.function.diff [git sha:f24ca73542b0438f6125d3ab6707f51bb53f176e | pending]
 
 ### fluxbox
 -fbtk,.textbox,.limit.selection.height.to.font.size.diff [git sha:3ae7b81ae106db4c169996e21d1d196929af4b33 | committed]

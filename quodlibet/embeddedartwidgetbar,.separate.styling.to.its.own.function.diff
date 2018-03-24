@@ -1,0 +1,36 @@
+From f24ca73542b0438f6125d3ab6707f51bb53f176e Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sat, 24 Mar 2018 21:01:12 +0000
+Subject: embeddedartwidgetbar, separate styling to its own function
+
+---
+ quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py b/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
+index 2c9a4ce8a..05cb6ffdf 100644
+--- a/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
++++ b/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
+@@ -954,6 +954,9 @@ class EmbeddedArtWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+         super(EmbeddedArtWidgetBarPlugin, self).__init__()
+         self.live = False
+ 
++        self.__style()
++
++    def __style(self):
+         add_global_css("""
+             .highlightbox {
+                 background-color: #558fcb;
+@@ -970,8 +973,7 @@ class EmbeddedArtWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
+             .warning {
+                 color: red;
+                 font-weight: bold;
+-            }
+-        """, True)
++            }""", True)
+ 
+     def enabled(self):
+         pass
+-- 
+2.14.1
+

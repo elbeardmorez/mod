@@ -456,3 +456,5 @@ a companion signals class to pass messages to the container,
 
 # embeddedartwidgetbar,.add.code.comments.for.'collapsed'.states.diff [git sha:d23812fa8ca6fd7212c187eaeb7fd6b390407021 | pending]
  states
+
+# embeddedartwidgetbar,.separate.styling.to.its.own.function.diff [git sha:f24ca73542b0438f6125d3ab6707f51bb53f176e | pending]
