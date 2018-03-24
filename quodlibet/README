@@ -464,3 +464,8 @@ a companion signals class to pass messages to the container,
 # embeddedartwidgetbar,.collapsed.album.auto-(un)select.all.diff [git sha:d3bef65b2128c253cfa15cc555ba0094358c150e | pending]
 -ensure album checked state is consistent with respect to its songs'
 state
+
+# embeddedartwidgetbar,.add.'autoselect.all.selected'.option.diff [git sha:b8d81c5402eab8cab9ff98d3589e1d87719c2368 | pending]
+-optionally auto select collapsed containers when all contents
+(album/songs) are selected
+-perform selection on collapse toggle only
