@@ -367,6 +367,8 @@ front of the full list)
 # pluginswidgetbar,.prefer.comprehensions.and.slicing.over.maps.and.reversed.diff [git sha:8cbb54ed139769aeff8d541ba426a96578d59868 | pending]
  and reversed
 
+# pluginswidgetbar,.separate.styling.to.its.own.function.diff [git sha:86011230b9f7bbce83a6263cc413686b1ba31b1f | pending]
+
 # embedded.art.widgetbar.diff [git sha:13ccb6b272c1f3f20891d03566cdc77c8ba832e7 | pending]
 
 # embeddedartwidgetbar,.make.icon.selectable.diff [git sha:8b66fc271471978d0d9c14cd2fdd8c4df535d366 | pending]

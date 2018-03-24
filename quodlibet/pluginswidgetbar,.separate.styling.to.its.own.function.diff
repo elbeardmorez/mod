@@ -1,0 +1,49 @@
+From 86011230b9f7bbce83a6263cc413686b1ba31b1f Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sat, 24 Mar 2018 21:01:37 +0000
+Subject: pluginswidgetbar, separate styling to its own function
+
+---
+ quodlibet/quodlibet/ext/events/plugins_widgetbar.py | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
+
+diff --git a/quodlibet/quodlibet/ext/events/plugins_widgetbar.py b/quodlibet/quodlibet/ext/events/plugins_widgetbar.py
+index d0deb870e..6b59bdd91 100644
+--- a/quodlibet/quodlibet/ext/events/plugins_widgetbar.py
++++ b/quodlibet/quodlibet/ext/events/plugins_widgetbar.py
+@@ -351,20 +351,25 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin,
+         self.__callbacks_dragdrop = {}
+         self.__read_actions()
+ 
+-        add_global_css("""
+-            .highlightbox {background-color: #558fcb;
+-                           border-radius: 2px;}
+-            .lowlightbox {background-color: #000000;
+-                           border-radius: 2px;}
+-            """, True)
+-
+         self.live = True
+ 
++        self.__style()
+         self.__content.show_all()
+         self.__update_plugins()
+ 
+         return self.__widgetbar
+ 
++    def __style(self):
++        add_global_css("""
++            .highlightbox {
++                background-color: #558fcb;
++                border-radius: 2px;
++            }
++            .lowlightbox {
++                background-color: #000000;
++                border-radius: 2px;
++            }""", True)
++
+     def plugin_on_song_started(self, song):
+         self._song_playing = song
+ 
+-- 
+2.14.1
+
