@@ -203,7 +203,7 @@ a dumping ground for patches which modify or add functionality
 -embedded.art.widgetbar.diff [git sha:13ccb6b272c1f3f20891d03566cdc77c8ba832e7 | pending]
 -embeddedartwidgetbar,.make.icon.selectable.diff [git sha:8b66fc271471978d0d9c14cd2fdd8c4df535d366 | pending]
 -embeddedartwidgetbar,.add.label.and.tooltip.options.diff [git sha:69d0286e76c74716b3c49f4edf6624eec4f6d4a4 | pending]
--core,.allow.coverimage.click.override.diff [git sha:b7834f0ecb5c685cc70a6953817d99ca127961b8 | pending]
+-core,.cover,.allow.coverimage.click.override.diff [git sha:9317139916ffe5cc0f533215deb4eb89c67e3c25 | pending]
 -embeddedartwidgetbar,.rewire.mouse.click.events.diff [git sha:509ba2c0cd0e166c7a8dddb2a0a350ab70473caf | pending]
 -embeddedartwidgetbar,.add.selected.counter.diff [git sha:ce2e80dba754c89f87e2ea506cde3e717d73dcbb | pending]
 -embeddedartwidgetbar,.refactor.some.variable.names.to.improve.readability.diff [git sha:5c7382be500e3d189a8719754ebf7d409e2d3df2 | pending]

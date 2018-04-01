@@ -373,7 +373,7 @@ front of the full list)
 
 # embeddedartwidgetbar,.add.label.and.tooltip.options.diff [git sha:69d0286e76c74716b3c49f4edf6624eec4f6d4a4 | pending]
 
-# core,.allow.coverimage.click.override.diff [git sha:b7834f0ecb5c685cc70a6953817d99ca127961b8 | pending]
+# core,.cover,.allow.coverimage.click.override.diff [git sha:9317139916ffe5cc0f533215deb4eb89c67e3c25 | pending]
 -expose a CoverImage 'cover_click_cb' property to be set in order
 to override the default button-press behaviour
 
