@@ -469,3 +469,5 @@ state
 -optionally auto select collapsed containers when all contents
 (album/songs) are selected
 -perform selection on collapse toggle only
+
+# embeddedartwidgetbar,.add.'max.art.width'.option.diff [git sha:f3b23a5430ba75f097684ace200a8953c63c9297 | pending]
