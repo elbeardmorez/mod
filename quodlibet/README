@@ -239,6 +239,8 @@ for which users obviously have zero influence upon
 space to be configurable
 -add 'hcenter' and 'vcenter' bool CoverImage constructor parameters
 
+# core,.image,.calc_scale_size,.support.single.dimension.boundaries.diff [git sha:a2a87db03f462d7164aaed0beb777ffece43d491 | pending]
+
 # embeddedimage,.add.size().diff [git sha:68d1f84b228bfc47c32ed103cbd6b2fa40131275 | pending]
 
 # embeddedimage,.facilitate.partial.reads.diff [git sha:e5299619a47d71284560f93e97d1a16d1b51bc55 | pending]
