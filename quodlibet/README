@@ -471,3 +471,7 @@ state
 -perform selection on collapse toggle only
 
 # embeddedartwidgetbar,.add.'max.art.width'.option.diff [git sha:f3b23a5430ba75f097684ace200a8953c63c9297 | pending]
+
+# embeddedartwidgetbar,.add.'image_max'.option.diff [git sha:403b604b17f6f36f8a995301f7c9ce1449f8336d | pending]
+-refactor 'covers_max' to 'images_max' and make the variable
+configurable
