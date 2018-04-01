@@ -1,6 +1,6 @@
-From 16f614c4a112f27d32a353c9eaf720799e8df5ca Mon Sep 17 00:00:00 2001
+From 2d4819fd71cd40b74d12579a7af2e4edadd45459 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
-Date: Sun, 01 Apr 2018 12:53:49 +0100
+Date: Sun, 1 Apr 2018 12:53:49 +0100
 Subject: core, cover, add h/v center switches
 
 -allow the automatic centering of the pixbuf on the allocated canvas
@@ -11,7 +11,7 @@ space to be configurable
  1 file changed, 18 insertions(+), 5 deletions(-)
 
 diff --git a/quodlibet/quodlibet/qltk/cover.py b/quodlibet/quodlibet/qltk/cover.py
-index 7d3b578c9..cbd481481 100644
+index 7d3b578c9..e73a8b541 100644
 --- a/quodlibet/quodlibet/qltk/cover.py
 +++ b/quodlibet/quodlibet/qltk/cover.py
 @@ -111,13 +111,19 @@ def get_no_cover_pixbuf(width, height, scale_factor=1):
@@ -42,9 +42,9 @@ index 7d3b578c9..cbd481481 100644
 -        xoffset = int(0.5 * (alloc.width - pixbuf.get_width()))
 -        yoffset = int(0.5 * (alloc.height - pixbuf.get_height()))
 +        xoffset = int(0.5 * (alloc.width - pixbuf.get_width())) \
-+                      if self._hcenter else 0;
++                      if self._hcenter else 0
 +        yoffset = int(0.5 * (alloc.height - pixbuf.get_height())) \
-+                      if self._vcenter else 0;
++                      if self._vcenter else 0
          Gtk.render_icon_surface(style_context, cairo_context, surface,
                                  xoffset, yoffset)
  

@@ -1,4 +1,4 @@
-From a2a87db03f462d7164aaed0beb777ffece43d491 Mon Sep 17 00:00:00 2001
+From 2d4b464bb89c1132f50690c5dd4fcec5c3e19985 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Sun, 1 Apr 2018 13:08:57 +0100
 Subject: core, image, calc_scale_size, support single dimension
@@ -9,7 +9,7 @@ Subject: core, image, calc_scale_size, support single dimension
  1 file changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/quodlibet/quodlibet/qltk/image.py b/quodlibet/quodlibet/qltk/image.py
-index 1ca7ab6af..233d6ba94 100644
+index 333fc07ea..c8ad3998c 100644
 --- a/quodlibet/quodlibet/qltk/image.py
 +++ b/quodlibet/quodlibet/qltk/image.py
 @@ -148,14 +148,19 @@ def calc_scale_size(boundary, size, scale_up=True):
@@ -17,8 +17,8 @@ index 1ca7ab6af..233d6ba94 100644
      iwidth, iheight = size
  
 -    if bwidth <= 0 or bheight <= 0 or iwidth <= 0 or iheight <= 0:
-+    if (bwidth <= 0 and bheight <= 0) or (iwidth <= 0 and iheight <= 0):
-         return 1, 1 # don't error - probably a temporary state
++    if (bwidth <= 0 and bheight <= 0) or iwidth <= 0 or iheight <= 0:
+         return 1, 1 # ensure validity without erroring. likely an initial state
  
      scale_w, scale_h = iwidth, iheight
  

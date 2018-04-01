@@ -1,9 +1,8 @@
-From 3dd32f0aafd81ac426ef1c6e2e85399f4cf56188 Mon Sep 17 00:00:00 2001
+From 16adc49863eb9ef2b797d9b2d43aa3f4b1c4bd3b Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Tue, 22 Aug 2017 17:53:03 +0100
-Subject: PluginsWidgetBar plugin [#2042 part]
+Subject: Plugins Widgetbar plugin
 
--part implementation of #2042 (drag and drop to follow)
 -configurable actions via silly string magic in right-click 'actions'
 dialog which perists preferences
 -action strings can use combinations of plugin or module/class and
@@ -11,6 +10,7 @@ method names with arguments that are either known (e.g. <songs>,
 <library>) or simple strings. they MUST be prefixed by either 'default'
 (if you want the action to be visible to all plugins), or the plugin id
 (visible only to a specific plugin)
+-implementation of #2042
 
 e.g.
 [lyrics]
@@ -44,10 +44,10 @@ dialog
  create mode 100644 quodlibet/quodlibet/ext/events/plugins_widgetbar.py
 
 diff --git a/quodlibet/po/POTFILES.in b/quodlibet/po/POTFILES.in
-index c3eb4dd..067721d 100644
+index 06ecfc3fc..3067a35c7 100644
 --- a/quodlibet/po/POTFILES.in
 +++ b/quodlibet/po/POTFILES.in
-@@ -55,6 +55,7 @@ quodlibet/ext/events/mpdserver/__init__.py
+@@ -56,6 +56,7 @@ quodlibet/ext/events/mpdserver/__init__.py
  quodlibet/ext/events/mpris/__init__.py
  quodlibet/ext/events/mqtt.py
  quodlibet/ext/events/notify.py
@@ -57,7 +57,7 @@ index c3eb4dd..067721d 100644
  quodlibet/ext/events/randomalbum.py
 diff --git a/quodlibet/quodlibet/ext/events/plugins_widgetbar.py b/quodlibet/quodlibet/ext/events/plugins_widgetbar.py
 new file mode 100644
-index 0000000..6883fc6
+index 000000000..8e28b1db6
 --- /dev/null
 +++ b/quodlibet/quodlibet/ext/events/plugins_widgetbar.py
 @@ -0,0 +1,544 @@
@@ -486,7 +486,7 @@ index 0000000..6883fc6
 +            plugin_icon_image = Gtk.Image.new_from_icon_name(
 +                p.icon or Icons.SYSTEM_RUN, Gtk.IconSize.LARGE_TOOLBAR)
 +            plugin_icon_image.set_tooltip_markup(
-+                "%s: %s\n%s: %s" % (_(u"name"), p.name, _(u"id"), p.id))
++                _("name") + (": %s\nid: %s" % (name, p.id)))
 +            plugin_icon_align = \
 +                Align(left=5, right=5, top=0, bottom=0)
 +            plugin_icon_align.add(plugin_icon_image)
@@ -606,7 +606,7 @@ index 0000000..6883fc6
 +
 +        return box
 diff --git a/quodlibet/quodlibet/plugins/actions.py b/quodlibet/quodlibet/plugins/actions.py
-index c814ef9..4380059 100644
+index c814ef96c..438005960 100644
 --- a/quodlibet/quodlibet/plugins/actions.py
 +++ b/quodlibet/quodlibet/plugins/actions.py
 @@ -88,6 +88,8 @@ class PluginActionSelector(qltk.Window, PersistentWindowMixin):
@@ -619,5 +619,5 @@ index c814ef9..4380059 100644
  
          self.show_all()
 -- 
-1.8.4
+2.14.1
 

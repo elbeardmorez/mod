@@ -1,7 +1,7 @@
-From 85076f1e50e2eec5fb957dd4c4d9af7e677d0f55 Mon Sep 17 00:00:00 2001
+From e32db88939e639e6a20044a7d56735e29f11a784 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Wed, 16 Aug 2017 07:14:40 +0100
-Subject: return default 1x1 for invalid image scaling
+Subject: core, return default 1x1 for invalid image scaling
 
 ---
  quodlibet/quodlibet/qltk/image.py  | 2 +-
@@ -9,20 +9,20 @@ Subject: return default 1x1 for invalid image scaling
  2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/quodlibet/quodlibet/qltk/image.py b/quodlibet/quodlibet/qltk/image.py
-index 566fdb8..6cd823a 100644
+index 92ed88163..333fc07ea 100644
 --- a/quodlibet/quodlibet/qltk/image.py
 +++ b/quodlibet/quodlibet/qltk/image.py
-@@ -148,7 +148,7 @@ def calc_scale_size(boundary, size, scale_up=True):
+@@ -149,7 +149,7 @@ def calc_scale_size(boundary, size, scale_up=True):
      iwidth, iheight = size
  
      if bwidth <= 0 or bheight <= 0 or iwidth <= 0 or iheight <= 0:
 -        raise ValueError
-+        return 1, 1 # don't error - probably a temporary state
++        return 1, 1 # ensure validity without erroring. likely an initial state
  
      scale_w, scale_h = iwidth, iheight
  
 diff --git a/quodlibet/tests/test_qltk_image.py b/quodlibet/tests/test_qltk_image.py
-index a72aa95..d8a12f9 100644
+index a72aa95c2..d8a12f904 100644
 --- a/quodlibet/tests/test_qltk_image.py
 +++ b/quodlibet/tests/test_qltk_image.py
 @@ -44,8 +44,8 @@ class TImageUtils(TestCase):
@@ -37,5 +37,5 @@ index a72aa95..d8a12f9 100644
          self.assertEqual(res, (100, 20))
  
 -- 
-1.8.4
+2.14.1
 

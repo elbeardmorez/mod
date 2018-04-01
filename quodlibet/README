@@ -218,7 +218,7 @@ for which users obviously have zero influence upon
 # widgetbars,.utilise.'expandertitlecontainerhack'.diff [git sha:378c1cc4d5c3dfcdd7d5379bb3aed65dafe9e2ef | pending]
 -facilitates styling of the expander title bars
 
-# return.default.1x1.for.invalid.image.scaling.diff [git sha:85076f1e50e2eec5fb957dd4c4d9af7e677d0f55 | pending]
+# core,.return.default.1x1.for.invalid.image.scaling.diff [git sha:e32db88939e639e6a20044a7d56735e29f11a784 | pending]
 
 # persistent.moveable.big.images.diff [git sha:bf3969e4fed0658d0f225a1a0537a26d746293b7 | pending]
 -identical single-click destroy feature as the 'POPUP' window type,
@@ -234,12 +234,12 @@ for which users obviously have zero influence upon
 
 # center.images.on.their.cairo.surface.diff [git sha:50c66a87cdca68d95f950886529ea670b5b3c9ab | pending]
 
-# core,.cover,.add.h_v.center.switches.diff [git sha:16f614c4a112f27d32a353c9eaf720799e8df5ca | pending]
+# core,.cover,.add.h_v.center.switches.diff [git sha:2d4819fd71cd40b74d12579a7af2e4edadd45459 | pending]
 -allow the automatic centering of the pixbuf on the allocated canvas
 space to be configurable
 -add 'hcenter' and 'vcenter' bool CoverImage constructor parameters
 
-# core,.image,.calc_scale_size,.support.single.dimension.boundaries.diff [git sha:a2a87db03f462d7164aaed0beb777ffece43d491 | pending]
+# core,.image,.calc_scale_size,.support.single.dimension.boundaries.diff [git sha:2d4b464bb89c1132f50690c5dd4fcec5c3e19985 | pending]
 
 # core,.cover,.improve.sizing.implementation.diff [git sha:655c2a071353febb0bb692fedabfcff96b1b0ec8 | pending]
 -replace CoverImage 'resize' parameter with 'size_mode' parameter
@@ -279,7 +279,7 @@ size_requests
 
 # expose.pluginmanager's.scanned.modules.diff [git sha:94b1aa6bbb79dbde2db472851cc38738769400be | pending]
 
-# pluginswidgetbar.plugin.[#2042.part].diff [git sha:3dd32f0aafd81ac426ef1c6e2e85399f4cf56188 | pending]
+# plugins.widgetbar.plugin.diff [git sha:16adc49863eb9ef2b797d9b2d43aa3f4b1c4bd3b | pending]
 -part implementation of #2042 (drag and drop to follow)
 -configurable actions via silly string magic in right-click 'actions'
 dialog which perists preferences
@@ -316,11 +316,11 @@ dialog
 
 # pluginswidgetbar,.add.'enabled.only'.toggle.diff [git sha:61e09b72aacf15801e8b8f5d43a004bab72a4799 | pending]
 
-# pluginswidgetbar,.add.'show.labels'.toggle.diff [git sha:16b08625ec661598f4f63c0f33d492b364d1dbab | pending]
+# pluginswidgetbar,.add.'show.labels'.toggle.diff [git sha:9e6f63e483c3f0b6e731423de255674359e60647 | pending]
 
 # pluginswidgetbar,.add.'small.icons'.toggle.diff [git sha:d2661638ee95d8973401ab07d25d36d50b04efcd | pending]
 
-# pluginswidgetbar,.add.plugin.errors.icon.diff [git sha:3c914f03f48dfd846cb3d28d273680b73edf6fe3 | pending]
+# pluginswidgetbar,.add.plugin.errors.icon.diff [git sha:7d110d8aa2ed1ce15d3e3941c3bb86ca35eca64d | pending]
 
 # add.'add_global_css'.wrapper.function.diff [git sha:3c97caaaa44d5b619b9be5f181dbc691f1f57896 | pending]
 -add css to for current (default) screen context
@@ -421,7 +421,7 @@ it finds
 
 # embeddedartwidgetbar,.enable.actions.on.'no'.selection.diff [git sha:049e3022e6e04a06d803699037ee5cac40f21ed7 | pending]
 
-# embeddedartwidgetbar,.add.selection.count.tooltips.diff [git sha:6f752a02ac482090d83dc9652755ee89a2b033e1 | pending]
+# embeddedartwidgetbar,.add.selection.count.tooltips.diff [git sha:3a982c7f0bb911867b1943ca183b3e4d783b3dac | pending]
 
 # core,.ignore.strict.id3.apic.single.type.standard.diff [git sha:87e6f6b580ca95c751e12b93520c1424d79c64a2 | pending]
 -requires changes to mutagen library, see pull request:

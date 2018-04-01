@@ -1,4 +1,4 @@
-From 6f752a02ac482090d83dc9652755ee89a2b033e1 Mon Sep 17 00:00:00 2001
+From 3a982c7f0bb911867b1943ca183b3e4d783b3dac Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Sat, 7 Oct 2017 08:01:54 +0100
 Subject: embeddedartwidgetbar, add selection count tooltips
@@ -8,7 +8,7 @@ Subject: embeddedartwidgetbar, add selection count tooltips
  1 file changed, 7 insertions(+)
 
 diff --git a/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py b/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
-index 7a3ea5cf7..fd4891934 100644
+index e51a66b9b..7d7ab725e 100644
 --- a/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
 +++ b/quodlibet/quodlibet/ext/covers/embeddedart_widgetbar.py
 @@ -773,6 +773,9 @@ class EmbeddedArtWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
@@ -35,7 +35,7 @@ index 7a3ea5cf7..fd4891934 100644
          self.labels_noselect_box.set_no_show_all(True)
          self.labels_noselect_box.set_visible(False)
 +        self.labels_noselect_box.set_tooltip_text(
-+            _(u"selected browser songs count "))
++            _(u"selected browser songs count"))
  
          align_covers = Gtk.Alignment(xalign=0.5, xscale=1.0)
          self.__embeddedart_box = EmbeddedArtBox()

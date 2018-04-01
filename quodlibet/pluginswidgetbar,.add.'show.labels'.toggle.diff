@@ -1,4 +1,4 @@
-From 16b08625ec661598f4f63c0f33d492b364d1dbab Mon Sep 17 00:00:00 2001
+From 9e6f63e483c3f0b6e731423de255674359e60647 Mon Sep 17 00:00:00 2001
 From: Pete Beardmore <pete.beardmore@msn.com>
 Date: Wed, 23 Aug 2017 07:17:52 +0100
 Subject: pluginswidgetbar, add 'show labels' toggle
@@ -8,7 +8,7 @@ Subject: pluginswidgetbar, add 'show labels' toggle
  1 file changed, 10 insertions(+), 5 deletions(-)
 
 diff --git a/quodlibet/quodlibet/ext/events/plugins_widgetbar.py b/quodlibet/quodlibet/ext/events/plugins_widgetbar.py
-index 093307a..bff98e7 100644
+index 3842026ec..e893026d3 100644
 --- a/quodlibet/quodlibet/ext/events/plugins_widgetbar.py
 +++ b/quodlibet/quodlibet/ext/events/plugins_widgetbar.py
 @@ -47,6 +47,7 @@ class Config(object):
@@ -22,7 +22,7 @@ index 093307a..bff98e7 100644
 @@ -443,18 +444,20 @@ class PluginsWidgetBarPlugin(UserInterfacePlugin, EventPlugin):
                  p.icon or Icons.SYSTEM_RUN, Gtk.IconSize.LARGE_TOOLBAR)
              plugin_icon_image.set_tooltip_markup(
-                 "%s: %s\n%s: %s" % (_(u"name"), p.name, _(u"id"), p.id))
+                 _("name") + (": %s\nid: %s" % (name, p.id)))
 +            padding = 10 if CONFIG.show_labels else 5
              plugin_icon_align = \
 -                Align(left=5, right=5, top=0, bottom=0)
@@ -55,5 +55,5 @@ index 093307a..bff98e7 100644
          for key, label, tooltip, default, changed_cb, indent in toggles:
              ccb = ConfigCheckButton(label, 'plugins', key,
 -- 
-1.8.4
+2.14.1
 
