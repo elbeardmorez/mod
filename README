@@ -167,6 +167,7 @@ a dumping ground for patches which modify or add functionality
 -center.images.on.their.cairo.surface.diff [git sha:50c66a87cdca68d95f950886529ea670b5b3c9ab | pending]
 -core,.cover,.add.h_v.center.switches.diff [git sha:16f614c4a112f27d32a353c9eaf720799e8df5ca | pending]
 -core,.image,.calc_scale_size,.support.single.dimension.boundaries.diff [git sha:a2a87db03f462d7164aaed0beb777ffece43d491 | pending]
+-core,.cover,.improve.sizing.implementation.diff [git sha:655c2a071353febb0bb692fedabfcff96b1b0ec8 | pending]
 -embeddedimage,.add.size().diff [git sha:68d1f84b228bfc47c32ed103cbd6b2fa40131275 | pending]
 -embeddedimage,.facilitate.partial.reads.diff [git sha:e5299619a47d71284560f93e97d1a16d1b51bc55 | pending]
 -coverswidgetbar,.add.check.to.catch.stale.embedded.art.cache.diff [git sha:4f7a7241af60d52ba8a1458966d1f3a6c80dc2e9 | pending]
