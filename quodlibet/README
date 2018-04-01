@@ -234,6 +234,11 @@ for which users obviously have zero influence upon
 
 # center.images.on.their.cairo.surface.diff [git sha:50c66a87cdca68d95f950886529ea670b5b3c9ab | pending]
 
+# core,.cover,.add.h_v.center.switches.diff [git sha:16f614c4a112f27d32a353c9eaf720799e8df5ca | pending]
+-allow the automatic centering of the pixbuf on the allocated canvas
+space to be configurable
+-add 'hcenter' and 'vcenter' bool CoverImage constructor parameters
+
 # embeddedimage,.add.size().diff [git sha:68d1f84b228bfc47c32ed103cbd6b2fa40131275 | pending]
 
 # embeddedimage,.facilitate.partial.reads.diff [git sha:e5299619a47d71284560f93e97d1a16d1b51bc55 | pending]
