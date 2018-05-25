@@ -1,0 +1,27 @@
+From 251052740a8805d0ec7324fe3ed8bfb8ca2abb96 Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Fri, 25 May 2018 11:24:50 +0100
+Subject: widgetbars, improve multipaned resizing for >3 panes
+
+-set resize False when packing nested Paned, shifting the control of
+resizing to the widget/pane level alone
+---
+ quodlibet/quodlibet/qltk/paned.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/quodlibet/quodlibet/qltk/paned.py b/quodlibet/quodlibet/qltk/paned.py
+index 64591b500..8ef412754 100644
+--- a/quodlibet/quodlibet/qltk/paned.py
++++ b/quodlibet/quodlibet/qltk/paned.py
+@@ -540,7 +540,7 @@ class MultiPaned(object):
+             tmp_paned = self.PANED()
+             tmp_paned.root = self._root_paned
+ 
+-            curr_paned.pack2(tmp_paned, pack_expand, pack_fill)
++            curr_paned.pack2(tmp_paned, False, False)
+             curr_paned = tmp_paned
+ 
+     def get_paned(self):
+-- 
+2.14.1
+

@@ -218,6 +218,10 @@ for which users obviously have zero influence upon
 # widgetbars,.utilise.'expandertitlecontainerhack'.diff [git sha:378c1cc4d5c3dfcdd7d5379bb3aed65dafe9e2ef | pending]
 -facilitates styling of the expander title bars
 
+# widgetbars,.improve.multipaned.resizing.for.>3.panes.diff [git sha:251052740a8805d0ec7324fe3ed8bfb8ca2abb96 | pending]
+-set resize False when packing nested Paned, shifting the control of
+resizing to the widget/pane level alone
+
 # core,.return.default.1x1.for.invalid.image.scaling.diff [git sha:e32db88939e639e6a20044a7d56735e29f11a784 | pending]
 
 # persistent.moveable.big.images.diff [git sha:bf3969e4fed0658d0f225a1a0537a26d746293b7 | pending]
