@@ -222,6 +222,30 @@ for which users obviously have zero influence upon
 -set resize False when packing nested Paned, shifting the control of
 resizing to the widget/pane level alone
 
+# widgetbars,.multipaned.xpaned.resizing.redux.diff [git sha:48ab4e4776b7047ba5e4a0083a40ed89b048a24f | pending]
+-targets the root paned as a container for 'pane infos' during updates
+ to remove the recursive complexity and reduce the redundant/duplicate
+ effort in deducing the state of system
+
+-uses a new mechanism for resizing which deduces the target of the
+ action and facilitates the building of the ultimate required state of
+ the system
+
+ specifically, this uses 'enter-notify' and 'button-press' events
+ to set up the environment ready for the relevent 'do_size_allocate'
+ hook to simulate what would probably be called 'paned-handle-moving'
+ ..if it existed!
+
+-creates a set of helper functions in xpaned around pane info setup
+ which pulls out various common existing code chunks from 'update'
+ and 'do_size_allocate' which are the entry points for 'toggling'
+ and 'resizing' xpaneds respectivily. both entry points look readable
+ now, and coupled with 'check_resize' (used to clamp collapsed widgets)
+ all re-use the common code functions
+
+-vastly improved logging / debugging experience due to the dumping
+ of pane info states at a single point, and only once
+
 # core,.return.default.1x1.for.invalid.image.scaling.diff [git sha:e32db88939e639e6a20044a7d56735e29f11a784 | pending]
 
 # persistent.moveable.big.images.diff [git sha:bf3969e4fed0658d0f225a1a0537a26d746293b7 | pending]
