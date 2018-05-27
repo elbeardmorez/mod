@@ -161,6 +161,7 @@ a dumping ground for patches which modify or add functionality
 -widgetbars,.utilise.'expandertitlecontainerhack'.diff [git sha:378c1cc4d5c3dfcdd7d5379bb3aed65dafe9e2ef | pending]
 -widgetbars,.improve.multipaned.resizing.for.>3.panes.diff [git sha:251052740a8805d0ec7324fe3ed8bfb8ca2abb96 | pending]
 -widgetbars,.multipaned.xpaned.resizing.redux.diff [git sha:48ab4e4776b7047ba5e4a0083a40ed89b048a24f | pending]
+-widgetbars,.allow.main.pane.to.shrink.diff [git sha:ae01cb84ad57df198dc7a9dcd0b9277be9c0e44a | pending]
 -core,.return.default.1x1.for.invalid.image.scaling.diff [git sha:e32db88939e639e6a20044a7d56735e29f11a784 | pending]
 -persistent.moveable.big.images.diff [git sha:bf3969e4fed0658d0f225a1a0537a26d746293b7 | pending]
 -support.multiple.big.images.diff [git sha:d394ce2a8e86f2365bfe4e836cb1fe9b00ab8220 | pending]

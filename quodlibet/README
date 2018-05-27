@@ -246,6 +246,12 @@ resizing to the widget/pane level alone
 -vastly improved logging / debugging experience due to the dumping
  of pane info states at a single point, and only once
 
+# widgetbars,.allow.main.pane.to.shrink.diff [git sha:ae01cb84ad57df198dc7a9dcd0b9277be9c0e44a | pending]
+-facilitates extra space for widgetbars should they need it when
+ toggled
+-no harm in this given there are always pane handles about to
+ manipulate the pane size
+
 # core,.return.default.1x1.for.invalid.image.scaling.diff [git sha:e32db88939e639e6a20044a7d56735e29f11a784 | pending]
 
 # persistent.moveable.big.images.diff [git sha:bf3969e4fed0658d0f225a1a0537a26d746293b7 | pending]

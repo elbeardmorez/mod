@@ -1,0 +1,33 @@
+From ae01cb84ad57df198dc7a9dcd0b9277be9c0e44a Mon Sep 17 00:00:00 2001
+From: Pete Beardmore <pete.beardmore@msn.com>
+Date: Sun, 27 May 2018 08:52:04 +0100
+Subject: widgetbars, allow main pane to shrink
+
+-facilitates extra space for widgetbars should they need it when
+ toggled
+-no harm in this given there are always pane handles about to
+ manipulate the pane size
+---
+ quodlibet/quodlibet/qltk/quodlibetwindow.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/quodlibet/quodlibet/qltk/quodlibetwindow.py b/quodlibet/quodlibet/qltk/quodlibetwindow.py
+index bcdf09fe3..c4852b845 100644
+--- a/quodlibet/quodlibet/qltk/quodlibetwindow.py
++++ b/quodlibet/quodlibet/qltk/quodlibetwindow.py
+@@ -902,10 +902,10 @@ class QuodLibetWindow(Window, PersistentWindowMixin, AppWindow):
+             if isinstance(p, Gtk.Paned):
+                 if w == p.get_child1():
+                     p.remove(w)
+-                    p.pack1(w, True, False)
++                    p.pack1(w, True, True)
+                 else:
+                     p.remove(w)
+-                    p.pack2(w, True, False)
++                    p.pack2(w, True, True)
+             w = p
+ 
+         self.__dyn_elements_box.add(self.__multipaned.get_paned())
+-- 
+2.14.1
+
